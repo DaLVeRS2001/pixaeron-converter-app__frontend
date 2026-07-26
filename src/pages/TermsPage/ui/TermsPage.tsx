@@ -4,7 +4,12 @@ const TermsPage = () => (
   <LegalPageLayout title="Terms of Service" updated="July 26, 2026">
     <p>
       These terms govern access to Pixaeron. By creating an account or using the service, you
-      agree to these terms and the Privacy Policy.
+      agree to these terms. The Privacy Policy explains how Pixaeron processes personal data.
+    </p>
+    <h2>Service operator</h2>
+    <p>
+      Pixaeron is an independently operated software service provided by Vladislav Biriukov, an
+      independent developer based in Russia.
     </p>
     <h2>Accounts</h2>
     <p>
@@ -37,15 +42,16 @@ const TermsPage = () => (
       service, or third parties; investigate abuse; or comply with law. Where appropriate, we
       will provide notice and a way to contact support.
     </p>
-    <h2>Production legal review</h2>
+    <h2>Governing law</h2>
     <p>
-      Commercial terms covering the operating legal entity, jurisdiction, warranties,
-      liability, payments, refunds, and dispute resolution require owner and legal approval
-      before paid production services are offered.
+      These terms are governed by the applicable laws of Russian Federation, without depriving
+      consumers of mandatory protections provided by the laws that apply to them. If Pixaeron
+      introduces paid services, the applicable pricing, payment, cancellation, and refund terms
+      will be presented before purchase.
     </p>
     <h2>Contact</h2>
     <p>
-      Questions about these terms may be sent to{' '}
+      Questions about these terms or Pixaeron may be sent to
       <a href="mailto:support@pixaeron.com">support@pixaeron.com</a>.
     </p>
   </LegalPageLayout>

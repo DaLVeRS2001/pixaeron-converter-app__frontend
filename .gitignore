@@ -29,3 +29,4 @@ Thumbs.db
 workbox-*.js
 sw.js.map
 docs
+/.wrangler/
