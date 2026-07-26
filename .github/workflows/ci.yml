@@ -17,7 +17,7 @@ jobs:
     permissions:
       actions: read
       contents: read
-    uses: DaLVeRS2001/ci/.github/workflows/pixaeron-frontend.yml@1219b14cd891136a61bc5ff79346fb0f70e996a4
+    uses: DaLVeRS2001/ci/.github/workflows/pixaeron-frontend.yml@85e3285023f9e3d5ec6965269380f56ee94b320b
     with:
       graphql_api_url: ${{ vars.GRAPHQL_API_URL }}
       google_client_id: ${{ vars.GOOGLE_CLIENT_ID }}
@@ -65,7 +65,7 @@ jobs:
           [[ ! -e build ]] || { echo 'Refusing to mix the verified artifact with a pre-existing build directory.' >&2; exit 1; }
 
       - name: Download verified production assets
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: pixaeron-frontend-${{ github.sha }}
           path: build
