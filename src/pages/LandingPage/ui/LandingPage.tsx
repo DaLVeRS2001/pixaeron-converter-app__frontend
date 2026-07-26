@@ -34,6 +34,7 @@ const LandingPage = () => {
           <p className={cn('eyebrow')}>{t('landing.eyebrow')}</p>
           <h1>{t('landing.title')}</h1>
           <p className={cn('lead')}>{t('landing.description')}</p>
+          <p className={cn('google-data')}>{t('landing.googleData')}</p>
           <div className={cn('actions')}>
             <Button to="/sign-up">{t('landing.start')}</Button>
             <Button to="/sign-in" variant="secondary">
@@ -44,12 +45,15 @@ const LandingPage = () => {
         <section className={cn('features')} aria-label="Pixaeron benefits">
           <article>
             <h2>{t('landing.formats')}</h2>
+            <p>{t('landing.formatsDescription')}</p>
           </article>
           <article>
             <h2>{t('landing.speed')}</h2>
+            <p>{t('landing.speedDescription')}</p>
           </article>
           <article>
             <h2>{t('landing.security')}</h2>
+            <p>{t('landing.securityDescription')}</p>
           </article>
         </section>
       </main>
