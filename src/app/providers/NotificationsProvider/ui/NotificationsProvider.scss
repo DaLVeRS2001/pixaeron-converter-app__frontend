@@ -1,0 +1,71 @@
+.notifications-provider {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: grid;
+  gap: 0.75rem;
+  width: min(100% - 2rem, 24rem);
+  pointer-events: none;
+
+  &__item {
+    position: relative;
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.875rem 2.5rem 0.875rem 1rem;
+    border-radius: 0.75rem;
+    background-color: var(--bg-color);
+    color: var(--primary-color);
+    box-shadow: 0 0.75rem 2rem rgb(16 24 40 / 18%);
+    pointer-events: auto;
+    animation: notification-slide-in 0.25s ease-out;
+    will-change: transform, opacity;
+  }
+  &__item_type_success {
+    border-left: 0.25rem solid #12b76a;
+  }
+  &__item_type_error {
+    border-left: 0.25rem solid #f04438;
+  }
+  &__item_type_info {
+    border-left: 0.25rem solid var(--secondary-color);
+  }
+  &__item_type_warning {
+    border-left: 0.25rem solid #f79009;
+  }
+  &__title {
+    font-weight: 700;
+  }
+  &__message {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  &__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.625rem;
+    border: 0;
+    background-color: transparent;
+    color: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+}
+
+@keyframes notification-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(100% + 1rem));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notifications__item {
+    animation: none;
+  }
+}

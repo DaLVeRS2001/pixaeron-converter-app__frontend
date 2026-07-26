@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "pixaeron-web",
+  "compatibility_date": "2026-07-26",
+  "assets": {
+    "directory": "./build",
+    "not_found_handling": "single-page-application",
+  },
+  "dependencies_instrumentation": {
+    "enabled": false,
+  },
+}

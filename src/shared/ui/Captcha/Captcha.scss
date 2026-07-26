@@ -1,0 +1,16 @@
+.captcha {
+  min-height: 4.125rem;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+
+  &_unavailable {
+    display: flex;
+    align-items: center;
+    min-height: 3.25rem;
+    padding: 0.625rem 0.75rem;
+    color: var(--color-warning-700);
+    background: var(--color-warning-100);
+    border: 0.0625rem solid #fde68a;
+    font-size: 0.75rem;
+  }
+}

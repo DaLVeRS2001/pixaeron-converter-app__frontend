@@ -1,0 +1,23 @@
+.header {
+  background: var(--color-white);
+  border-bottom: 0.0625rem solid var(--color-slate-200);
+
+  &__inner {
+    display: flex;
+    width: min(100% - 2rem, 75rem);
+    min-height: 4.5rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin: 0 auto;
+  }
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  &__logout {
+    width: 7.5rem;
+  }
+}

@@ -1,0 +1,48 @@
+mutation Login($input: LoginInput!) {
+  login(loginInput: $input) {
+    id
+    email
+    username
+    emailVerified
+  }
+}
+
+mutation Register($input: RegisterInput!) {
+  register(registerInput: $input) {
+    accepted
+    email
+  }
+}
+
+mutation GoogleLogin($input: GoogleLoginInput!) {
+  googleLogin(googleLoginInput: $input) {
+    id
+    email
+    username
+    emailVerified
+  }
+}
+
+mutation ResendEmailVerification($input: EmailActionInput!) {
+  resendEmailVerification(input: $input) {
+    accepted
+  }
+}
+
+mutation VerifyEmail($input: AuthTokenInput!) {
+  verifyEmail(input: $input) {
+    status
+  }
+}
+
+mutation RequestPasswordReset($input: EmailActionInput!) {
+  requestPasswordReset(input: $input) {
+    accepted
+  }
+}
+
+mutation ResetPassword($input: ResetPasswordInput!) {
+  resetPassword(input: $input) {
+    status
+  }
+}

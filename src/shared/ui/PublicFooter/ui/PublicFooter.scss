@@ -1,0 +1,25 @@
+.public-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: min(70rem, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 2rem 0;
+  border-top: 0.0625rem solid var(--color-slate-200);
+  color: var(--color-slate-500);
+  font-size: 0.875rem;
+
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+
+    a {
+      color: var(--color-slate-600);
+    }
+  }
+
+  @media (width <= 40rem) {
+    flex-direction: column;
+  }
+}

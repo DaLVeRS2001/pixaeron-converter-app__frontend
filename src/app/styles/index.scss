@@ -1,0 +1,29 @@
+@use 'variables/global';
+@use 'reset';
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-600.css';
+@import '@fontsource/inter/latin-700.css';
+
+html,
+body,
+#root,
+.app {
+  min-height: 100%;
+}
+
+body {
+  min-width: 20rem;
+  background: var(--color-slate-50);
+  color: var(--color-slate-900);
+  font-family: var(--font-family-main);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}

@@ -1,0 +1,47 @@
+{
+  "language": { "label": "Language" },
+  "notifications": { "close": "Close notification" },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "goBack": "Go back",
+    "reload": "Reload page"
+  },
+  "session": {
+    "unavailableTitle": "Service unavailable",
+    "unavailable": "We could not check your session. Please try again.",
+    "retry": "Try again"
+  },
+  "header": { "signOut": "Sign out", "signingOut": "Signing out…" },
+  "routeError": {
+    "title": "Something went wrong",
+    "unknown": "Unknown application error",
+    "home": "Go home",
+    "reload": "Reload page"
+  },
+  "main": {
+    "accountReady": "Account ready",
+    "welcome": "Welcome, {{username}}",
+    "description": "Authentication is connected to the Pixaeron backend. The converter workspace will be implemented as the next product area.",
+    "email": "Email",
+    "verification": "Verification",
+    "verified": "Verified",
+    "pending": "Pending"
+  },
+  "notFound": { "title": "Page not found", "home": "Go home", "signIn": "Sign in" },
+  "landing": {
+    "eyebrow": "Image tools for real workflows",
+    "title": "Convert, compress, and prepare images without losing control",
+    "description": "Pixaeron is building a secure workspace for fast image conversion and compression, backed by production-grade authentication and privacy controls.",
+    "start": "Create account",
+    "signIn": "Sign in",
+    "security": "Secure account access",
+    "formats": "Practical image workflows",
+    "speed": "Fast, scalable processing"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "signIn": "Sign in",
+    "copyright": "© {{year}} Pixaeron"
+  }
+}

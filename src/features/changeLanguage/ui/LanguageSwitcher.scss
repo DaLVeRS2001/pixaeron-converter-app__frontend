@@ -1,0 +1,19 @@
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &__label {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  &__select {
+    min-width: 5rem;
+    padding: 0.375rem 0.625rem;
+    border: 0.0625rem solid #d0d5dd;
+    border-radius: 0.375rem;
+    background: #fff;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+}

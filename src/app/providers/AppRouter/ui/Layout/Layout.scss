@@ -1,0 +1,10 @@
+.main-layout {
+  min-height: 100vh;
+  background: var(--color-slate-50);
+
+  &__container {
+    width: min(100% - 2rem, 75rem);
+    margin: 0 auto;
+    padding: 3rem 0;
+  }
+}

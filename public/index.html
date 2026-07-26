@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="/favicon.webp" type="image/webp" />
+    <meta name="description" content="Secure image conversion and compression with Pixaeron" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:image" content="favicon.webp" />
+    <title>Pixaeron</title>
+    <style type="text/css">
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      .load-app {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        text-align: center;
+        background: #f8fafc;
+      }
+
+      .load-app__img {
+        width: 3rem;
+        height: 3rem;
+        border: 0.3125rem solid;
+        border-color: #4f46e5 transparent;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+      }
+
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="modal-root"></div>
+    <div id="notification-root"></div>
+    <div id="root">
+      <div class="load-app">
+        <span class="load-app__img"></span>
+      </div>
+    </div>
+  </body>
+</html>
