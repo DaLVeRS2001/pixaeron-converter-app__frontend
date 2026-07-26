@@ -44,10 +44,10 @@ const TermsPage = () => (
     </p>
     <h2>Governing law</h2>
     <p>
-      These terms are governed by the applicable laws of Russian Federation, without depriving
-      consumers of mandatory protections provided by the laws that apply to them. If Pixaeron
-      introduces paid services, the applicable pricing, payment, cancellation, and refund terms
-      will be presented before purchase.
+      These terms are governed by the applicable laws of the Russian Federation, without
+      depriving consumers of mandatory protections provided by the laws that apply to them. If
+      Pixaeron introduces paid services, the applicable pricing, payment, cancellation, and
+      refund terms will be presented before purchase.
     </p>
     <h2>Contact</h2>
     <p>
