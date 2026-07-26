@@ -36,14 +36,19 @@ npx prettier . --check
 
 ## CI/CD and hosting
 
-Pull requests call the immutable central Pixaeron frontend workflow and run verification only. Trusted `main` runs repeat the complete check and deploy `build/` to Cloudflare Workers Static Assets with lockfile-pinned Wrangler. Cloudflare recommends Workers Static Assets for new SPAs; no frontend Docker image or Worker handler is required.
+Pull requests call the immutable central Pixaeron frontend workflow and run verification only. Trusted `main` runs use the same central verification, preserve the exact verified `build/` as a short-lived workflow artifact, and then run a small repository-local protected deployment job. That job downloads the artifact and deploys it to Cloudflare Workers Static Assets with lockfile-pinned Wrangler. Cloudflare recommends Workers Static Assets for new SPAs; no frontend Docker image or Worker handler is required.
 
-GitHub repository variables:
+GitHub repository variables (available to pull-request verification):
 
 ```text
 GRAPHQL_API_URL
 GOOGLE_CLIENT_ID
 TURNSTILE_SITE_KEY
+```
+
+GitHub `production` environment variable:
+
+```text
 CLOUDFLARE_ACCOUNT_ID
 ```
 
@@ -53,7 +58,7 @@ GitHub `production` environment secret (not a repository secret):
 CLOUDFLARE_API_TOKEN
 ```
 
-The deployment token is available only to the final Wrangler deploy step.
+The deployment token is available only to the local protected job's final Wrangler deploy step.
 
 Use Node.js 24. Detailed API, schema, CI/CD, Cloudflare, Google, Turnstile, AWS, and production operator instructions are indexed in `docs/AGENTS.md`. The `docs/` directory is intentionally ignored by repository policy.
 
