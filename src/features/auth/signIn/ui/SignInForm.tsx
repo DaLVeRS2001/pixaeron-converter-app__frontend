@@ -81,7 +81,7 @@ const SignInForm = () => {
         />
       </div>
       <p className={cn('footer')}>
-        {t('signIn.noAccount')}{' '}
+        {t('signIn.noAccount')}
         <Link className={cn('link')} to="/sign-up">
           {t('signIn.createAccount')}
         </Link>

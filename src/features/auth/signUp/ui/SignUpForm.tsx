@@ -100,7 +100,7 @@ const SignUpForm = () => {
           <label className={cn('checkbox')}>
             <input type="checkbox" {...model.form.register('termsAccepted')} />
             <span>
-              {t('signUp.termsPrefix')} <Link to="/terms">{t('signUp.terms')}</Link>{' '}
+              {t('signUp.termsPrefix')} <Link to="/terms">{t('signUp.terms')}</Link>
               {t('signUp.and')} <Link to="/privacy">{t('signUp.privacy')}</Link>
             </span>
           </label>
@@ -126,7 +126,7 @@ const SignUpForm = () => {
         </form>
       </div>
       <p className={cn('footer')}>
-        {t('signUp.hasAccount')}{' '}
+        {t('signUp.hasAccount')}
         <Link className={cn('link')} to="/sign-in">
           {t('common.signIn')}
         </Link>

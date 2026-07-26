@@ -59,13 +59,13 @@ const RequestPasswordResetForm = () => {
         </form>
       </div>
       <p className={cn('footer')}>
-        {t('forgot.remember')}{' '}
+        {t('forgot.remember')}
         <Link className={cn('link')} to="/sign-in">
           {t('common.signIn')}
         </Link>
       </p>
       <p className={cn('footer')}>
-        {t('forgot.noAccount')}{' '}
+        {t('forgot.noAccount')}
         <Link className={cn('link')} to="/sign-up">
           {t('common.signUp')}
         </Link>
