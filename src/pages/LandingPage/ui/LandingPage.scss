@@ -50,6 +50,13 @@
     color: var(--color-slate-600);
     font-size: 1.125rem;
   }
+  &__google-data {
+    max-width: 48rem;
+    margin: 1.25rem auto 0;
+    color: var(--color-slate-500);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
   &__actions {
     justify-content: center;
     margin-top: 2rem;
@@ -71,6 +78,11 @@
   }
   &__features h2 {
     font-size: 1.125rem;
+  }
+  &__features p {
+    margin-top: 0.75rem;
+    color: var(--color-slate-600);
+    line-height: 1.6;
   }
 
   @media (width <= 48rem) {

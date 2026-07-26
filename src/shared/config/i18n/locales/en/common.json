@@ -29,14 +29,18 @@
   },
   "notFound": { "title": "Page not found", "home": "Go home", "signIn": "Sign in" },
   "landing": {
-    "eyebrow": "Image tools for real workflows",
+    "eyebrow": "Secure access for image workflows",
     "title": "Convert, compress, and prepare images without losing control",
-    "description": "Pixaeron is building a secure workspace for fast image conversion and compression, backed by production-grade authentication and privacy controls.",
+    "description": "Pixaeron is an image-processing web application. The current release provides secure account creation, sign-in, email verification, and password recovery; image conversion and compression tools are the next product area.",
+    "googleData": "Use email and password or Google Sign-In. With Google Sign-In, Pixaeron receives your name, email address, and Google account identifier only to create and authenticate your account. Pixaeron does not access Gmail, Google Drive, Google Contacts, or other Google services.",
     "start": "Create account",
     "signIn": "Sign in",
     "security": "Secure account access",
+    "securityDescription": "Create and access your account with email and password or Google Sign-In, email verification, protected sessions, and password recovery.",
     "formats": "Practical image workflows",
-    "speed": "Fast, scalable processing"
+    "formatsDescription": "The planned workspace will support practical image conversion and compression workflows. These processing tools are not yet publicly available.",
+    "speed": "Designed to scale",
+    "speedDescription": "The platform is structured so processing services can scale independently as image workloads are introduced."
   },
   "footer": {
     "privacy": "Privacy Policy",
