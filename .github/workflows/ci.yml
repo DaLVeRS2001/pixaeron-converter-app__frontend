@@ -1,0 +1,26 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  pipeline:
+    name: Frontend pipeline
+    permissions:
+      actions: read
+      contents: read
+    uses: DaLVeRS2001/ci/.github/workflows/pixaeron-frontend.yml@a27ce3b8cabbe9941b29c3b21f2875aa0732fbf1
+    with:
+      deploy: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+      graphql_api_url: ${{ vars.GRAPHQL_API_URL }}
+      google_client_id: ${{ vars.GOOGLE_CLIENT_ID }}
+      turnstile_site_key: ${{ vars.TURNSTILE_SITE_KEY }}
+      cloudflare_account_id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}

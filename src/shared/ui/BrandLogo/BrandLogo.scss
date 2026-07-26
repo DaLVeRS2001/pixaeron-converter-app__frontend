@@ -1,0 +1,35 @@
+.brand-logo {
+  $root: &;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-slate-900);
+  text-decoration: none;
+
+  &__mark {
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: var(--color-brand-500);
+  }
+  &__name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025rem;
+  }
+  &_light {
+    color: var(--color-white);
+  }
+  &_compact {
+    gap: 0;
+  }
+  &_large {
+    #{$root}__mark {
+      width: 2rem;
+      height: 2rem;
+    }
+    #{$root}__name {
+      font-size: 1.75rem;
+    }
+  }
+}

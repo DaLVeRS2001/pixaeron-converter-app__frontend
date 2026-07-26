@@ -1,0 +1,17 @@
+{
+  "extends": ["stylelint-config-standard-scss"],
+  "rules": {
+    "selector-class-pattern": "^[a-z]([a-z0-9-]+)?(__[a-z0-9-]+)?(_[a-z0-9-]+)?(--[a-z0-9-]+)?$",
+    "unit-disallowed-list": ["px"],
+    "block-no-empty": null,
+    "no-empty-source": null,
+    "length-zero-no-unit": true,
+    "rule-empty-line-before": [
+      "always",
+      {
+        "except": ["inside-block-and-after-rule"],
+        "ignore": ["first-nested"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,87 @@
+.landing-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--color-white), var(--color-slate-50));
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: min(70rem, calc(100% - 3rem));
+    margin: 0 auto;
+    padding: 1.5rem 0;
+
+    > a {
+      text-decoration: none;
+    }
+  }
+  &__nav,
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  &__nav > a {
+    color: var(--color-slate-600);
+    text-decoration: none;
+  }
+  &__hero {
+    width: min(58rem, calc(100% - 3rem));
+    margin: 0 auto;
+    padding: 7rem 0 5rem;
+    text-align: center;
+  }
+  &__eyebrow {
+    color: var(--color-brand-600);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  &__hero h1 {
+    margin: 1rem auto;
+    max-width: 52rem;
+    color: var(--color-slate-950);
+    font-size: clamp(2.5rem, 7vw, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+  }
+  &__lead {
+    max-width: 44rem;
+    margin: 0 auto;
+    color: var(--color-slate-600);
+    font-size: 1.125rem;
+  }
+  &__actions {
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  &__features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    width: min(70rem, calc(100% - 3rem));
+    margin: 0 auto 5rem;
+  }
+  &__features article {
+    min-height: 10rem;
+    padding: 2rem;
+    border: 0.0625rem solid var(--color-slate-200);
+    border-radius: var(--radius-xl);
+    background: var(--color-white);
+    box-shadow: var(--shadow-card);
+  }
+  &__features h2 {
+    font-size: 1.125rem;
+  }
+
+  @media (width <= 48rem) {
+    &__nav > a {
+      display: none;
+    }
+    &__hero {
+      padding-top: 4rem;
+    }
+    &__features {
+      grid-template-columns: 1fr;
+    }
+  }
+}

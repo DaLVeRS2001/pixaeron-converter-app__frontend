@@ -1,0 +1,62 @@
+.button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.625rem 1.25rem;
+  border: 0.0625rem solid transparent;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+
+  &:focus-visible {
+    outline: 0.1875rem solid rgb(99 102 241 / 24%);
+    outline-offset: 0.125rem;
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+  &_variant {
+    &_primary {
+      color: var(--color-white);
+      background: var(--color-brand-600);
+
+      &:hover:not(:disabled) {
+        background: var(--color-brand-700);
+      }
+    }
+    &_secondary {
+      color: var(--color-slate-900);
+      background: var(--color-white);
+      border-color: var(--color-slate-200);
+
+      &:hover:not(:disabled) {
+        background: var(--color-slate-50);
+        border-color: var(--color-slate-300);
+      }
+    }
+    &_text {
+      min-height: auto;
+      width: auto;
+      padding: 0;
+      color: var(--color-brand-600);
+      background: transparent;
+    }
+    &_danger {
+      color: var(--color-white);
+      background: var(--color-error-700);
+    }
+  }
+}
