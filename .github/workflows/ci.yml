@@ -17,7 +17,7 @@ jobs:
     permissions:
       actions: read
       contents: read
-    uses: DaLVeRS2001/ci/.github/workflows/pixaeron-frontend.yml@85e3285023f9e3d5ec6965269380f56ee94b320b
+    uses: DaLVeRS2001/ci/.github/workflows/pixaeron-frontend.yml@b865e9fd9db38eae47381d54d67d7d9f73743bf2
     with:
       graphql_api_url: ${{ vars.GRAPHQL_API_URL }}
       google_client_id: ${{ vars.GOOGLE_CLIENT_ID }}

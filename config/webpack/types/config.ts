@@ -9,18 +9,25 @@ interface IBuildPaths {
   headers: string;
 }
 
+interface BuildEnvironment {
+  port: number;
+  authApiUrl: string;
+  graphqlApiUrl: string;
+  googleClientId: string;
+  turnstileSiteKey: string;
+}
+
 interface IBuildEnv {
   mode: BuildMode;
-  port?: number;
   analyze?: boolean;
 }
 
 interface IBuildOptions {
   paths: IBuildPaths;
   mode: BuildMode;
-  port: number;
+  environment: BuildEnvironment;
   isDev: boolean;
   analyze: boolean;
 }
 
-export type { BuildMode, IBuildOptions, IBuildPaths, IBuildEnv };
+export type { BuildEnvironment, BuildMode, IBuildOptions, IBuildPaths, IBuildEnv };

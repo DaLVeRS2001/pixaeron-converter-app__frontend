@@ -20,6 +20,8 @@ Environment responsibilities:
 - `GRAPHQL_SCHEMA_URL` is used only by `npm run schema:pull` and `npm run schema:check`. It points directly to a running backend schema endpoint.
 - `TURNSTILE_SITE_KEY` and `GOOGLE_CLIENT_ID` are public browser identifiers, not secrets.
 
+Webpack validates these build variables before compilation. Production builds require an HTTPS GraphQL URL plus valid Google and Turnstile public identifiers.
+
 The committed `graphql/schema.graphql` file is generated from backend introspection. Do not edit it manually. Ordinary frontend builds consume the committed snapshot and do not depend on a running backend. After a backend GraphQL contract change, run `npm run schema:pull`, review the schema diff, then run `npm run codegen` and commit the schema and generated-client changes together.
 
 ## Verification
