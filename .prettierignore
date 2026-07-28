@@ -5,3 +5,4 @@ node_modules
 package-lock.json
 **/*.mdx
 src/shared/api/generated
+/graphql/schema.graphql
