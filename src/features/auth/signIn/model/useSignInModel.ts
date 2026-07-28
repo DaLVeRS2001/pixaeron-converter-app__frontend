@@ -106,8 +106,19 @@ const useSignInModel = () => {
 
   const submit = form.handleSubmit((values) => executeIntent({ kind: 'password', values }));
   const submitGoogle = useCallback(
-    (idToken: string) => executeIntent({ kind: 'google', idToken }),
-    [executeIntent]
+    (idToken: string) => {
+      if (busy || challenge) return;
+
+      const intent: SignInIntent = { kind: 'google', idToken };
+
+      if (__TURNSTILE_SITE_KEY__) {
+        activate(CAPTCHA_ACTION.googleLogin, intent);
+        return;
+      }
+
+      void executeIntent(intent);
+    },
+    [activate, busy, challenge, executeIntent]
   );
   const onCaptchaToken = useCallback(
     (token: string) => {

@@ -1,6 +1,6 @@
 ﻿import { useApolloClient, useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -52,12 +52,7 @@ const useSignUpModel = () => {
   );
   const [registerUser] = useMutation(RegisterDocument);
   const [googleLogin] = useMutation(GoogleLoginDocument);
-  const { activate, challenge, clear, consumeToken, receiveToken } =
-    useCaptchaChallenge<SignUpIntent>();
-
-  useEffect(() => {
-    if (__TURNSTILE_SITE_KEY__) activate(CAPTCHA_ACTION.register);
-  }, [activate]);
+  const { activate, challenge, clear, receiveToken } = useCaptchaChallenge<SignUpIntent>();
 
   const completeLogin = useCallback(
     (user: { id: string; email: string; username: string; emailVerified: boolean }) => {
@@ -125,19 +120,34 @@ const useSignUpModel = () => {
   );
 
   const submit = form.handleSubmit((values) => {
-    const captchaToken = consumeToken(CAPTCHA_ACTION.register);
-    return executeIntent({ kind: 'register', values }, captchaToken);
+    const intent: SignUpIntent = { kind: 'register', values };
+
+    if (__TURNSTILE_SITE_KEY__) {
+      activate(CAPTCHA_ACTION.register, intent);
+      return;
+    }
+
+    return executeIntent(intent);
   });
   const submitGoogle = useCallback(
     (idToken: string) => {
+      if (busy || challenge) return;
+
       if (!form.getValues('termsAccepted')) {
         form.setError('termsAccepted', { message: t('validation.terms') });
         return;
       }
-      clear();
-      void executeIntent({ kind: 'google', idToken });
+
+      const intent: SignUpIntent = { kind: 'google', idToken };
+
+      if (__TURNSTILE_SITE_KEY__) {
+        activate(CAPTCHA_ACTION.googleLogin, intent);
+        return;
+      }
+
+      void executeIntent(intent);
     },
-    [clear, executeIntent, form, t]
+    [activate, busy, challenge, executeIntent, form, t]
   );
   const onCaptchaToken = useCallback(
     (token: string) => {

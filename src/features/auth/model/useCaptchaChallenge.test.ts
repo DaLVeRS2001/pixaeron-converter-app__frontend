@@ -3,7 +3,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useCaptchaChallenge } from './useCaptchaChallenge';
 
 describe('useCaptchaChallenge', () => {
-  it('returns a pending intent exactly once when a token arrives', () => {
+  it('returns a pending intent exactly once and closes the challenge', () => {
     const { result } = renderHook(() => useCaptchaChallenge<{ email: string }>());
 
     act(() => result.current.activate('login', { email: 'user@example.com' }));
@@ -17,19 +17,17 @@ describe('useCaptchaChallenge', () => {
 
     expect(firstIntent).toEqual({ email: 'user@example.com' });
     expect(secondIntent).toBeUndefined();
+    expect(result.current.challenge).toBeUndefined();
   });
 
-  it('stores a proactive token until the matching action consumes it', () => {
-    const { result } = renderHook(() => useCaptchaChallenge<never>());
+  it('increments the version when the same challenge is restarted', () => {
+    const { result } = renderHook(() => useCaptchaChallenge<string>());
 
-    act(() => result.current.activate('register'));
-    act(() => {
-      expect(result.current.receiveToken('captcha-token')).toBeUndefined();
-    });
+    act(() => result.current.activate('login', 'first attempt'));
+    expect(result.current.challenge).toEqual({ action: 'login', version: 1 });
 
-    expect(result.current.consumeToken('google_login')).toBeUndefined();
-    expect(result.current.consumeToken('register')).toBe('captcha-token');
-    expect(result.current.consumeToken('register')).toBeUndefined();
+    act(() => result.current.activate('login', 'second attempt'));
+    expect(result.current.challenge).toEqual({ action: 'login', version: 2 });
   });
 
   it('drops the pending intent when the challenge is cleared', () => {
