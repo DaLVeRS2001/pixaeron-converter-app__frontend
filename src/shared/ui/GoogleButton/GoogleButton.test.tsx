@@ -65,4 +65,30 @@ describe('GoogleButton', () => {
     expect(onCredential).not.toHaveBeenCalled();
     expect(onUnavailable).not.toHaveBeenCalled();
   });
+
+  it('initializes Google Identity once across auth route changes', async () => {
+    let receiveCredential: ((response: { credential: string }) => void) | undefined;
+    const initialize = jest.fn(
+      (options: { callback: (response: { credential: string }) => void }) => {
+        receiveCredential = options.callback;
+      }
+    );
+    const renderButton = jest.fn();
+    window.google = { accounts: { id: { initialize, renderButton } } };
+    const firstOnCredential = jest.fn();
+    const first = render(<GoogleButton mode="signin_with" onCredential={firstOnCredential} />);
+
+    await waitFor(() => expect(initialize).toHaveBeenCalledTimes(1));
+    first.unmount();
+
+    const secondOnCredential = jest.fn();
+    render(<GoogleButton mode="signup_with" onCredential={secondOnCredential} />);
+
+    await waitFor(() => expect(renderButton).toHaveBeenCalledTimes(2));
+    act(() => receiveCredential?.({ credential: 'id-token' }));
+
+    expect(initialize).toHaveBeenCalledTimes(1);
+    expect(firstOnCredential).not.toHaveBeenCalled();
+    expect(secondOnCredential).toHaveBeenCalledWith('id-token');
+  });
 });
