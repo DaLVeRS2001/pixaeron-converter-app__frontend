@@ -7,16 +7,9 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 import { IBuildOptions } from './types/config';
 
-const resolveGraphqlApiUrl = (isDev: boolean) => {
-  const configuredUrl = process.env.GRAPHQL_API_URL?.trim();
-
-  if (configuredUrl) return configuredUrl;
-  if (isDev) return '/graphql';
-
-  throw new Error('GRAPHQL_API_URL is required for production builds.');
-};
 export function plugins(options: IBuildOptions): webpack.WebpackPluginInstance[] {
-  const { paths, isDev, analyze } = options;
+  const { paths, isDev, analyze, environment } = options;
+
   return [
     new HTMLWebpackPlugin({
       title: 'Pixaeron',
@@ -47,9 +40,9 @@ export function plugins(options: IBuildOptions): webpack.WebpackPluginInstance[]
       : []),
     new webpack.DefinePlugin({
       __IS_DEV__: JSON.stringify(isDev),
-      __GRAPHQL_API_URL__: JSON.stringify(resolveGraphqlApiUrl(isDev)),
-      __TURNSTILE_SITE_KEY__: JSON.stringify(process.env.TURNSTILE_SITE_KEY ?? ''),
-      __GOOGLE_CLIENT_ID__: JSON.stringify(process.env.GOOGLE_CLIENT_ID ?? ''),
+      __GRAPHQL_API_URL__: JSON.stringify(environment.graphqlApiUrl),
+      __TURNSTILE_SITE_KEY__: JSON.stringify(environment.turnstileSiteKey),
+      __GOOGLE_CLIENT_ID__: JSON.stringify(environment.googleClientId),
     }),
   ];
 }

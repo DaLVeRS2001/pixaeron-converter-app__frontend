@@ -3,16 +3,17 @@ import { Configuration as DevServerConfig } from 'webpack-dev-server';
 import { IBuildOptions } from './types/config';
 
 export function devServer(options: IBuildOptions): DevServerConfig {
-  const { port } = options;
+  const { environment } = options;
+
   return {
-    port,
+    port: environment.port,
     open: false,
     historyApiFallback: true,
     hot: true,
     proxy: [
       {
         context: ['/graphql'],
-        target: process.env.AUTH_API_URL ?? 'http://127.0.0.1:3001',
+        target: environment.authApiUrl,
         changeOrigin: false,
         pathRewrite: { '^/graphql': '/auth' },
       },

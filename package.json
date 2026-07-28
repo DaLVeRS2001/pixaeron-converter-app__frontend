@@ -22,7 +22,7 @@
     "codegen": "graphql-codegen --config codegen.ts",
     "typecheck": "tsc --noEmit",
     "check": "npm run codegen:check && npm run lint:ts && npm run lint:scss && npm run typecheck && npm run test:unit && npm run build:prod && npm run cloudflare:check",
-    "codegen:check": "npm run codegen && node scripts/check-generated-graphql.mjs",
+    "codegen:check": "graphql-codegen --config codegen.ts --check",
     "cloudflare:check": "node scripts/check-cloudflare-build.mjs",
     "cloudflare:deploy": "wrangler deploy",
     "cloudflare:deploy:dry-run": "wrangler deploy --dry-run"
