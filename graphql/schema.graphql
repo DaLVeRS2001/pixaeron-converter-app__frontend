@@ -1,76 +1,8 @@
-type AuthRequestResult {
-  accepted: Boolean!
-}
-
-input AuthTokenInput {
-  token: String!
-}
-
-input EmailActionInput {
-  captchaToken: String
+type User {
+  id: ID!
   email: String!
-}
-
-type EmailVerificationResult {
-  status: EmailVerificationStatus!
-}
-
-enum EmailVerificationStatus {
-  ALREADY_VERIFIED
-  EXPIRED
-  INVALID
-  VERIFIED
-}
-
-input GoogleLoginInput {
-  captchaToken: String
-  idToken: String!
-  legalConsentAccepted: Boolean
-  legalConsentVersion: String
-  rememberMe: Boolean
-}
-
-input LoginInput {
-  captchaToken: String
-  email: String!
-  password: String!
-  rememberMe: Boolean
-}
-
-type Mutation {
-  googleLogin(googleLoginInput: GoogleLoginInput!): User!
-  login(loginInput: LoginInput!): User!
-  logout: Boolean!
-  logoutAll: Boolean!
-  register(registerInput: RegisterInput!): RegistrationResult!
-  requestPasswordReset(input: EmailActionInput!): AuthRequestResult!
-  resendEmailVerification(input: EmailActionInput!): AuthRequestResult!
-  resetPassword(input: ResetPasswordInput!): PasswordResetResult!
-  verifyEmail(input: AuthTokenInput!): EmailVerificationResult!
-}
-
-type PasswordResetResult {
-  status: PasswordResetStatus!
-}
-
-enum PasswordResetStatus {
-  ALREADY_USED
-  EXPIRED
-  INVALID
-  RESET
-}
-
-type Query {
-  me: User!
-}
-
-input RegisterInput {
-  captchaToken: String
-  email: String!
-  legalConsentAccepted: Boolean
-  legalConsentVersion: String
-  password: String!
   username: String!
+  emailVerified: Boolean!
 }
 
 type RegistrationResult {
@@ -78,14 +10,82 @@ type RegistrationResult {
   email: String!
 }
 
-input ResetPasswordInput {
+type AuthRequestResult {
+  accepted: Boolean!
+}
+
+type EmailVerificationResult {
+  status: EmailVerificationStatus!
+}
+
+enum EmailVerificationStatus {
+  VERIFIED
+  ALREADY_VERIFIED
+  EXPIRED
+  INVALID
+}
+
+type PasswordResetResult {
+  status: PasswordResetStatus!
+}
+
+enum PasswordResetStatus {
+  RESET
+  EXPIRED
+  INVALID
+  ALREADY_USED
+}
+
+type Query {
+  me: User!
+}
+
+type Mutation {
+  login(loginInput: LoginInput!): User!
+  register(registerInput: RegisterInput!): RegistrationResult!
+  resendEmailVerification(input: EmailActionInput!): AuthRequestResult!
+  verifyEmail(input: AuthTokenInput!): EmailVerificationResult!
+  requestPasswordReset(input: EmailActionInput!): AuthRequestResult!
+  resetPassword(input: ResetPasswordInput!): PasswordResetResult!
+  googleLogin(googleLoginInput: GoogleLoginInput!): User!
+  logout: Boolean!
+  logoutAll: Boolean!
+}
+
+input LoginInput {
+  email: String!
   password: String!
+  rememberMe: Boolean
+  captchaToken: String
+}
+
+input RegisterInput {
+  username: String!
+  email: String!
+  password: String!
+  legalConsentAccepted: Boolean
+  legalConsentVersion: String
+  captchaToken: String
+}
+
+input EmailActionInput {
+  email: String!
+  captchaToken: String
+}
+
+input AuthTokenInput {
   token: String!
 }
 
-type User {
-  email: String!
-  emailVerified: Boolean!
-  id: ID!
-  username: String!
+input ResetPasswordInput {
+  token: String!
+  password: String!
+}
+
+input GoogleLoginInput {
+  idToken: String!
+  rememberMe: Boolean
+  captchaToken: String
+  legalConsentAccepted: Boolean
+  legalConsentVersion: String
 }

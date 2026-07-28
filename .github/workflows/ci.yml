@@ -17,11 +17,14 @@ jobs:
     permissions:
       actions: read
       contents: read
-    uses: DaLVeRS2001/ci/.github/workflows/pixaeron-frontend.yml@b865e9fd9db38eae47381d54d67d7d9f73743bf2
+    uses: DaLVeRS2001/ci/.github/workflows/pixaeron-frontend.yml@4b9e622032be938bf425a87eddc38d86a451fceb
     with:
       graphql_api_url: ${{ vars.GRAPHQL_API_URL }}
       google_client_id: ${{ vars.GOOGLE_CLIENT_ID }}
       turnstile_site_key: ${{ vars.TURNSTILE_SITE_KEY }}
+      apollo_graph_ref: ${{ vars.APOLLO_GRAPH_REF }}
+    secrets:
+      APOLLO_KEY: ${{ secrets.APOLLO_KEY }}
 
   deploy:
     name: Deploy frontend
