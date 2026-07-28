@@ -107,16 +107,7 @@ const SignUpForm = () => {
           {errors.termsAccepted?.message && (
             <p className={cn('checkbox-error')}>{errors.termsAccepted.message}</p>
           )}
-          <Button
-            type="submit"
-            disabled={
-              model.busy ||
-              Boolean(
-                model.captcha &&
-                (model.captcha.action !== 'register' || !model.captcha.hasToken)
-              )
-            }
-          >
+          <Button type="submit" disabled={model.busy || Boolean(model.captcha)}>
             {model.busy ? t('signUp.submitting') : t('signUp.submit')}
           </Button>
           <p className={cn('security-note')}>

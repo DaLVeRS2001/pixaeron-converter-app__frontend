@@ -14,6 +14,11 @@ type GoogleButtonProps = {
 const cn = block('google-button');
 const scriptId = 'google-identity-script';
 
+type GoogleIdentityClient = NonNullable<Window['google']>['accounts']['id'];
+
+let initializedGoogleIdentity: GoogleIdentityClient | undefined;
+let activeCredentialHandler: ((credential: string) => void) | undefined;
+
 const GoogleButton = ({ mode, onCredential, onUnavailable }: GoogleButtonProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const onCredentialRef = useRef(onCredential);
@@ -31,6 +36,8 @@ const GoogleButton = ({ mode, onCredential, onUnavailable }: GoogleButtonProps) 
     if (!container) return;
 
     let cancelled = false;
+    const handleCredential = (credential: string) => onCredentialRef.current(credential);
+    activeCredentialHandler = handleCredential;
     const notifyUnavailable = () => onUnavailableRef.current?.();
     const initialize = async () => {
       try {
@@ -47,14 +54,18 @@ const GoogleButton = ({ mode, onCredential, onUnavailable }: GoogleButtonProps) 
           throw new Error('Google Identity Services did not initialize.');
         }
 
+        const googleIdentity = window.google.accounts.id;
         container.replaceChildren();
-        window.google.accounts.id.initialize({
-          client_id: __GOOGLE_CLIENT_ID__,
-          callback: ({ credential }) => {
-            if (!cancelled && credential) onCredentialRef.current(credential);
-          },
-        });
-        window.google.accounts.id.renderButton(container, {
+        if (initializedGoogleIdentity !== googleIdentity) {
+          googleIdentity.initialize({
+            client_id: __GOOGLE_CLIENT_ID__,
+            callback: ({ credential }) => {
+              if (credential) activeCredentialHandler?.(credential);
+            },
+          });
+          initializedGoogleIdentity = googleIdentity;
+        }
+        googleIdentity.renderButton(container, {
           theme: 'outline',
           size: 'large',
           width: Math.min(container.clientWidth, 400),
@@ -72,6 +83,7 @@ const GoogleButton = ({ mode, onCredential, onUnavailable }: GoogleButtonProps) 
 
     return () => {
       cancelled = true;
+      if (activeCredentialHandler === handleCredential) activeCredentialHandler = undefined;
       container.replaceChildren();
     };
   }, [mode]);

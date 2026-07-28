@@ -12,6 +12,9 @@ const mockNavigate = jest.fn();
 const mockUseMutation = jest.fn();
 const mockWriteQuery = jest.fn();
 
+const setTurnstileSiteKey = (value: string) =>
+  Object.assign(globalThis, { __TURNSTILE_SITE_KEY__: value });
+
 jest.mock('@apollo/client/react', () => ({
   useApolloClient: () => ({ writeQuery: mockWriteQuery }),
   useMutation: (...args: unknown[]) => mockUseMutation(...args),
@@ -35,6 +38,17 @@ const legalConsentError = () =>
     ],
   });
 
+const captchaRequiredError = (action: string) =>
+  new CombinedGraphQLErrors({
+    data: null,
+    errors: [
+      {
+        message: 'Captcha verification is required',
+        extensions: { action, code: 'CAPTCHA_REQUIRED' },
+      },
+    ],
+  });
+
 const renderModel = () => {
   mockUseMutation.mockImplementation((document) =>
     document === GoogleLoginDocument ? [mockGoogleLogin] : [mockLogin]
@@ -42,7 +56,105 @@ const renderModel = () => {
   return renderHook(() => useSignInModel());
 };
 
+describe('useSignInModel CAPTCHA timing', () => {
+  beforeEach(() => setTurnstileSiteKey(''));
+
+  it('runs Google CAPTCHA after selection and before the mutation', async () => {
+    setTurnstileSiteKey('turnstile-site-key');
+    mockGoogleLogin.mockResolvedValue({ data: undefined });
+    const { result } = renderModel();
+
+    expect(result.current.captcha).toBeUndefined();
+    act(() => result.current.submitGoogle('google-id-token'));
+
+    expect(mockGoogleLogin).not.toHaveBeenCalled();
+    expect(result.current.captcha).toEqual({ action: 'google_login', version: 1 });
+
+    act(() => result.current.onCaptchaToken('google-captcha-token'));
+
+    await waitFor(() =>
+      expect(mockGoogleLogin).toHaveBeenCalledWith({
+        variables: {
+          input: {
+            idToken: 'google-id-token',
+            captchaToken: 'google-captcha-token',
+          },
+        },
+      })
+    );
+  });
+
+  it('keeps password login adaptive and retries it after a requested CAPTCHA', async () => {
+    mockLogin
+      .mockRejectedValueOnce(captchaRequiredError('login'))
+      .mockResolvedValueOnce({ data: undefined });
+    const { result } = renderModel();
+
+    act(() => {
+      result.current.form.setValue('email', 'user@example.com');
+      result.current.form.setValue('password', 'password');
+    });
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    expect(mockLogin).toHaveBeenNthCalledWith(1, {
+      variables: {
+        input: {
+          email: 'user@example.com',
+          password: 'password',
+          rememberMe: false,
+          captchaToken: undefined,
+        },
+      },
+    });
+    expect(result.current.captcha).toEqual({ action: 'login', version: 1 });
+
+    act(() => result.current.submitGoogle('ignored-google-token'));
+    expect(mockGoogleLogin).not.toHaveBeenCalled();
+    expect(result.current.captcha).toEqual({ action: 'login', version: 1 });
+
+    act(() => result.current.onCaptchaToken('login-captcha-token'));
+
+    await waitFor(() =>
+      expect(mockLogin).toHaveBeenNthCalledWith(2, {
+        variables: {
+          input: {
+            email: 'user@example.com',
+            password: 'password',
+            rememberMe: false,
+            captchaToken: 'login-captcha-token',
+          },
+        },
+      })
+    );
+  });
+  it('ignores Google credentials while password login is in flight', async () => {
+    let finishLogin!: (value: { data: undefined }) => void;
+    mockLogin.mockImplementationOnce(
+      () => new Promise<{ data: undefined }>((resolve) => (finishLogin = resolve))
+    );
+    const { result } = renderModel();
+
+    act(() => {
+      result.current.form.setValue('email', 'user@example.com');
+      result.current.form.setValue('password', 'password');
+      void result.current.submit();
+    });
+    await waitFor(() => expect(result.current.busy).toBe(true));
+
+    act(() => result.current.submitGoogle('ignored-google-token'));
+
+    expect(mockGoogleLogin).not.toHaveBeenCalled();
+    expect(result.current.captcha).toBeUndefined();
+
+    await act(async () => finishLogin({ data: undefined }));
+  });
+});
+
 describe('useSignInModel Google consent routing', () => {
+  beforeEach(() => setTurnstileSiteKey(''));
+
   it('does not send account-creation consent during an existing Google sign-in', async () => {
     mockGoogleLogin.mockResolvedValue({ data: undefined });
     const { result } = renderModel();
