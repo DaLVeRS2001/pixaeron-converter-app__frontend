@@ -10,7 +10,7 @@
     "build:prod": "webpack --env mode=production",
     "build:dev": "webpack --env mode=development",
     "prepare": "husky",
-    "app:fix": "concurrently \"npm run lint:scss:fix\" \"npm run lint:ts:fix\" \"npm run prettier\"",
+    "app:fix": "npm run lint:scss:fix && npm run lint:ts:fix && npm run prettier",
     "test:unit": "jest --config  ./jest.config.ts --passWithNoTests",
     "prettier": "npx prettier . --write",
     "lint:ts": "npx eslint \"**/*.{ts,tsx,mjs,js}\"",
@@ -25,7 +25,8 @@
     "codegen:check": "graphql-codegen --config codegen.ts --check",
     "cloudflare:check": "node scripts/check-cloudflare-build.mjs",
     "cloudflare:deploy": "wrangler deploy",
-    "cloudflare:deploy:dry-run": "wrangler deploy --dry-run"
+    "cloudflare:deploy:dry-run": "wrangler deploy --dry-run",
+    "graphql:sync": "npm run schema:pull && npm run codegen && npm run check"
   },
   "dependencies": {
     "@apollo/client": "^4.2.8",
@@ -73,7 +74,6 @@
     "@types/webpack-dev-server": "^4.7.1",
     "autoprefixer": "^10.5.0",
     "babel-loader": "^10.1.1",
-    "concurrently": "^9.2.3",
     "copy-webpack-plugin": "14.0.0",
     "css-loader": "^7.1.4",
     "dotenv": "^17.4.2",
