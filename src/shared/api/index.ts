@@ -5,6 +5,7 @@ export {
   LoginDocument,
   LogoutDocument,
   MeDocument,
+  RefreshSessionDocument,
   RegisterDocument,
   RequestPasswordResetDocument,
   ResendEmailVerificationDocument,

@@ -1,7 +1,6 @@
 import { useApolloClient, useMutation } from '@apollo/client/react';
 import block from 'bem-cn';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
 import { LanguageSwitcher } from 'features/changeLanguage';
 
@@ -15,7 +14,6 @@ const cn = block('header');
 
 const Header = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const apolloClient = useApolloClient();
   const [logout, { loading }] = useMutation(LogoutDocument);
 
@@ -24,9 +22,9 @@ const Header = () => {
       await logout();
     } finally {
       try {
-        await apolloClient.resetStore();
+        await apolloClient.cache.reset({ discardWatches: false });
       } finally {
-        navigate('/sign-in', { replace: true });
+        window.location.replace('/sign-in');
       }
     }
   };

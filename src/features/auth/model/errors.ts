@@ -9,7 +9,7 @@ const AUTH_ERROR_CODE = {
   tooManyLoginAttempts: 'TOO_MANY_LOGIN_ATTEMPTS',
   tooManyAuthAttempts: 'TOO_MANY_AUTH_ATTEMPTS',
   actionCooldown: 'AUTH_ACTION_COOLDOWN',
-  unauthenticated: 'UNAUTHENTICATED',
+  invalidCredentials: 'INVALID_CREDENTIALS',
   emailNotVerified: 'EMAIL_NOT_VERIFIED',
   emailAlreadyRegistered: 'EMAIL_ALREADY_REGISTERED',
   googleEmailNotVerified: 'GOOGLE_EMAIL_NOT_VERIFIED',
@@ -65,7 +65,7 @@ const translateAuthError = (error: unknown, t: TFunction<'auth'>): AuthError => 
       return { ...details, message: t('errors.captchaRequired') };
     case AUTH_ERROR_CODE.captchaUnavailable:
       return { ...details, message: t('errors.captchaUnavailable') };
-    case AUTH_ERROR_CODE.unauthenticated:
+    case AUTH_ERROR_CODE.invalidCredentials:
       return { ...details, message: t('errors.invalidCredentials') };
     case AUTH_ERROR_CODE.emailNotVerified:
       return { ...details, message: t('errors.emailNotVerified') };

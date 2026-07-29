@@ -26,7 +26,7 @@ describe('translateAuthError', () => {
     [AUTH_ERROR_CODE.captchaRequired, 'errors.captchaRequired'],
     [AUTH_ERROR_CODE.captchaInvalid, 'errors.captchaRequired'],
     [AUTH_ERROR_CODE.captchaUnavailable, 'errors.captchaUnavailable'],
-    [AUTH_ERROR_CODE.unauthenticated, 'errors.invalidCredentials'],
+    [AUTH_ERROR_CODE.invalidCredentials, 'errors.invalidCredentials'],
     [AUTH_ERROR_CODE.emailNotVerified, 'errors.emailNotVerified'],
     [AUTH_ERROR_CODE.emailAlreadyRegistered, 'errors.emailAlreadyRegistered'],
     [AUTH_ERROR_CODE.googleEmailNotVerified, 'errors.googleEmailNotVerified'],
