@@ -6,11 +6,25 @@ import { Observable } from 'rxjs';
 import { RefreshSessionDocument } from './generated/graphql';
 
 let refreshPromise: Promise<void> | undefined;
+let cacheResetPromise: Promise<void> | undefined;
 
 const isUnauthenticated = (error: unknown) =>
   CombinedGraphQLErrors.is(error)
     ? error.errors.some(({ extensions }) => extensions?.code === 'UNAUTHENTICATED')
     : ServerError.is(error) && error.statusCode === 401;
+
+const resetAuthCache = (client: ApolloClient): Promise<void> => {
+  if (!cacheResetPromise) {
+    cacheResetPromise = client.cache
+      .reset({ discardWatches: false })
+      .catch(() => undefined)
+      .finally(() => {
+        cacheResetPromise = undefined;
+      });
+  }
+
+  return cacheResetPromise;
+};
 
 const refreshSession = (client: ApolloClient): Promise<void> => {
   if (!refreshPromise) {
@@ -23,7 +37,7 @@ const refreshSession = (client: ApolloClient): Promise<void> => {
       .then(() => undefined)
       .catch(async (error: unknown) => {
         if (isUnauthenticated(error)) {
-          await client.cache.reset({ discardWatches: false });
+          await resetAuthCache(client);
         }
         throw error;
       })
@@ -55,7 +69,24 @@ const authErrorLink = new ErrorLink(({ error, operation, forward }) => {
 
     void refreshSession(operation.client)
       .then(() => {
-        if (active) retrySubscription = forward(operation).subscribe(observer);
+        if (!active) return;
+
+        const subscription = forward(operation).subscribe({
+          next: (result) => {
+            if (
+              result.errors?.some(({ extensions }) => extensions?.code === 'UNAUTHENTICATED')
+            )
+              void resetAuthCache(operation.client);
+            observer.next(result);
+          },
+          error: (retryError: unknown) => {
+            if (isUnauthenticated(retryError)) void resetAuthCache(operation.client);
+            observer.error(retryError);
+          },
+          complete: () => observer.complete(),
+        });
+        retrySubscription = subscription;
+        if (!active) subscription.unsubscribe();
       })
       .catch((refreshError: unknown) => {
         if (active) observer.error(refreshError);
