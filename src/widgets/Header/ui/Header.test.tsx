@@ -3,18 +3,12 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Header } from './Header';
 
 const mockLogout = jest.fn();
-const mockNavigate = jest.fn();
-const mockResetStore = jest.fn();
+const mockResetCache = jest.fn();
 let mockButtonOnClick: (() => Promise<void>) | undefined;
 
 jest.mock('@apollo/client/react', () => ({
-  useApolloClient: () => ({ resetStore: mockResetStore }),
+  useApolloClient: () => ({ cache: { reset: mockResetCache } }),
   useMutation: () => [mockLogout, { loading: false }],
-}));
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
 }));
 
 jest.mock('features/changeLanguage', () => ({
@@ -44,31 +38,25 @@ describe('Header', () => {
   beforeEach(() => {
     mockButtonOnClick = undefined;
     mockLogout.mockResolvedValue({ data: { logout: true } });
-    mockResetStore.mockResolvedValue([]);
+    mockResetCache.mockResolvedValue([]);
   });
 
-  it('resets active Apollo queries before navigating to the guest route', async () => {
+  it('resets the Apollo cache after logout', async () => {
     render(<Header />);
 
     fireEvent.click(screen.getByRole('button', { name: 'header.signOut' }));
 
     await waitFor(() => expect(mockLogout).toHaveBeenCalledTimes(1));
-    expect(mockResetStore).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith('/sign-in', { replace: true });
+    expect(mockResetCache).toHaveBeenCalledWith({ discardWatches: false });
     expect(mockLogout.mock.invocationCallOrder[0]).toBeLessThan(
-      mockResetStore.mock.invocationCallOrder[0]
-    );
-    expect(mockResetStore.mock.invocationCallOrder[0]).toBeLessThan(
-      mockNavigate.mock.invocationCallOrder[0]
+      mockResetCache.mock.invocationCallOrder[0]
     );
   });
 
-  it('navigates to the guest route even when Apollo store reset rejects', async () => {
-    mockResetStore.mockRejectedValueOnce(new Error('reset failed'));
+  it('propagates a cache cleanup failure after logout', async () => {
+    mockResetCache.mockRejectedValueOnce(new Error('cleanup failed'));
     render(<Header />);
 
-    await expect(mockButtonOnClick?.()).rejects.toThrow('reset failed');
-
-    expect(mockNavigate).toHaveBeenCalledWith('/sign-in', { replace: true });
+    await expect(mockButtonOnClick?.()).rejects.toThrow('cleanup failed');
   });
 });

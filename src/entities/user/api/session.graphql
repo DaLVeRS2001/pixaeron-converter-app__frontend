@@ -7,6 +7,10 @@ query Me {
   }
 }
 
+mutation RefreshSession {
+  refreshSession
+}
+
 mutation Logout {
   logout
 }
