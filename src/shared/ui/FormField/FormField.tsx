@@ -21,7 +21,7 @@ const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
         <Input ref={ref} id={id} invalid={Boolean(error)} {...props} />
         {error ? (
           <span className={cn('message', { error: true })} role="alert">
-            <span aria-hidden="true">▲</span>
+            <span aria-hidden="true">⚠</span>
             {error}
           </span>
         ) : hint ? (

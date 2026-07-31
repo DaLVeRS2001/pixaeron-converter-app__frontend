@@ -1,11 +1,11 @@
-import { useApolloClient, useMutation } from '@apollo/client/react';
+import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { GoogleLoginDocument, LoginDocument, MeDocument } from 'shared/api';
+import { GoogleLoginDocument, LoginDocument } from 'shared/api';
 
 import {
   AUTH_ERROR_CODE,
@@ -17,6 +17,7 @@ import { LEGAL_CONSENT_ACTION, LEGAL_CONSENT_NOTICE } from '../../model/legalCon
 import { createSignInSchema } from '../../model/schemas';
 import type { SignInFormValues } from '../../model/schemas';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
+import { useCompleteLogin } from '../../model/useCompleteLogin';
 
 type SignInIntent =
   | { kind: 'password'; values: SignInFormValues }
@@ -25,7 +26,6 @@ type SignInIntent =
 const useSignInModel = () => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
-  const apolloClient = useApolloClient();
   const [errorMessage, setErrorMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const schema = useMemo(() => createSignInSchema(t), [t]);
@@ -37,12 +37,47 @@ const useSignInModel = () => {
   const [googleLogin] = useMutation(GoogleLoginDocument);
   const { activate, challenge, clear, receiveToken } = useCaptchaChallenge<SignInIntent>();
 
-  const completeLogin = useCallback(
-    (user: { id: string; email: string; username: string; emailVerified: boolean }) => {
-      apolloClient.writeQuery({ query: MeDocument, data: { me: user } });
-      navigate('/app', { replace: true });
+  const completeLogin = useCompleteLogin();
+  const handleSignInError = useCallback(
+    (error: unknown, intent: SignInIntent) => {
+      const translated = translateAuthError(error, t);
+      const fallbackCaptchaAction =
+        intent.kind === 'password' ? CAPTCHA_ACTION.login : CAPTCHA_ACTION.googleLogin;
+      const requiresCaptcha = isCaptchaChallenge(translated.code);
+      const requiresGoogleConsent =
+        intent.kind === 'google' &&
+        (translated.code === AUTH_ERROR_CODE.legalConsentRequired ||
+          translated.action === LEGAL_CONSENT_ACTION);
+      const requiresEmailVerification =
+        intent.kind === 'password' &&
+        translated.code === AUTH_ERROR_CODE.emailNotVerified;
+
+      if (requiresCaptcha) {
+        activate(translated.action ?? fallbackCaptchaAction, intent);
+        setErrorMessage(translated.message);
+        return;
+      }
+
+      if (requiresGoogleConsent) {
+        clear();
+        navigate('/sign-up', {
+          replace: true,
+          state: { notice: LEGAL_CONSENT_NOTICE },
+        });
+        return;
+      }
+
+      if (requiresEmailVerification) {
+        const email = intent.values.email.trim().toLowerCase();
+        sessionStorage.setItem('pendingVerificationEmail', email);
+        navigate('/verify-email', { state: { email } });
+        return;
+      }
+
+      clear();
+      setErrorMessage(translated.message);
     },
-    [apolloClient, navigate]
+    [activate, clear, navigate, t]
   );
 
   const executeIntent = useCallback(
@@ -65,43 +100,12 @@ const useSignInModel = () => {
         });
         if (data?.googleLogin) completeLogin(data.googleLogin);
       } catch (error) {
-        const translated = translateAuthError(error, t);
-        const fallbackAction =
-          intent.kind === 'password' ? CAPTCHA_ACTION.login : CAPTCHA_ACTION.googleLogin;
-
-        if (isCaptchaChallenge(translated.code)) {
-          activate(translated.action ?? fallbackAction, intent);
-        } else if (translated.code === AUTH_ERROR_CODE.captchaUnavailable) {
-          clear();
-        } else if (
-          intent.kind === 'google' &&
-          (translated.code === AUTH_ERROR_CODE.legalConsentRequired ||
-            translated.action === LEGAL_CONSENT_ACTION)
-        ) {
-          clear();
-          navigate('/sign-up', {
-            replace: true,
-            state: { notice: LEGAL_CONSENT_NOTICE },
-          });
-          return;
-        } else if (
-          translated.code === AUTH_ERROR_CODE.emailNotVerified &&
-          intent.kind === 'password'
-        ) {
-          const email = intent.values.email.trim().toLowerCase();
-          sessionStorage.setItem('pendingVerificationEmail', email);
-          navigate('/verify-email', { state: { email } });
-          return;
-        } else {
-          clear();
-        }
-
-        setErrorMessage(translated.message);
+        handleSignInError(error, intent);
       } finally {
         setBusy(false);
       }
     },
-    [activate, busy, clear, completeLogin, googleLogin, login, navigate, t]
+    [busy, completeLogin, googleLogin, handleSignInError, login]
   );
 
   const submit = form.handleSubmit((values) => executeIntent({ kind: 'password', values }));

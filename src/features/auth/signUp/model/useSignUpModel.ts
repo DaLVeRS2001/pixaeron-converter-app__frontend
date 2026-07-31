@@ -1,14 +1,13 @@
-﻿import { useApolloClient, useMutation } from '@apollo/client/react';
+﻿import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { GoogleLoginDocument, MeDocument, RegisterDocument } from 'shared/api';
+import { GoogleLoginDocument, RegisterDocument } from 'shared/api';
 
 import {
-  AUTH_ERROR_CODE,
   CAPTCHA_ACTION,
   isCaptchaChallenge,
   translateAuthError,
@@ -17,6 +16,7 @@ import { CURRENT_LEGAL_CONSENT } from '../../model/legalConsent';
 import { createSignUpSchema } from '../../model/schemas';
 import type { SignUpFormValues } from '../../model/schemas';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
+import { useCompleteLogin } from '../../model/useCompleteLogin';
 
 type SignUpIntent =
   | { kind: 'register'; values: SignUpFormValues }
@@ -25,7 +25,6 @@ type SignUpIntent =
 const useSignUpModel = () => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
-  const apolloClient = useApolloClient();
   const [errorMessage, setErrorMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const schema = useMemo(() => createSignUpSchema(t), [t]);
@@ -54,13 +53,7 @@ const useSignUpModel = () => {
   const [googleLogin] = useMutation(GoogleLoginDocument);
   const { activate, challenge, clear, receiveToken } = useCaptchaChallenge<SignUpIntent>();
 
-  const completeLogin = useCallback(
-    (user: { id: string; email: string; username: string; emailVerified: boolean }) => {
-      apolloClient.writeQuery({ query: MeDocument, data: { me: user } });
-      navigate('/app', { replace: true });
-    },
-    [apolloClient, navigate]
-  );
+  const completeLogin = useCompleteLogin();
 
   const executeIntent = useCallback(
     async (intent: SignUpIntent, captchaToken?: string) => {
@@ -106,8 +99,6 @@ const useSignUpModel = () => {
 
         if (isCaptchaChallenge(translated.code)) {
           activate(translated.action ?? fallbackAction, intent);
-        } else if (translated.code === AUTH_ERROR_CODE.captchaUnavailable) {
-          clear();
         } else {
           clear();
         }

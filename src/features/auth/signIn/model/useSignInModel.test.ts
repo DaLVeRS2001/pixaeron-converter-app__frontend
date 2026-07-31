@@ -1,7 +1,7 @@
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { GoogleLoginDocument } from 'shared/api';
+import { GoogleLoginDocument, MeDocument } from 'shared/api';
 
 import { LEGAL_CONSENT_NOTICE } from '../../model/legalConsent';
 import { useSignInModel } from './useSignInModel';
@@ -34,6 +34,17 @@ const legalConsentError = () =>
           action: 'accept_legal_terms',
           code: 'LEGAL_CONSENT_REQUIRED',
         },
+      },
+    ],
+  });
+
+const emailNotVerifiedError = () =>
+  new CombinedGraphQLErrors({
+    data: null,
+    errors: [
+      {
+        message: 'Email is not verified',
+        extensions: { code: 'EMAIL_NOT_VERIFIED' },
       },
     ],
   });
@@ -152,8 +163,54 @@ describe('useSignInModel CAPTCHA timing', () => {
   });
 });
 
-describe('useSignInModel Google consent routing', () => {
-  beforeEach(() => setTurnstileSiteKey(''));
+describe('useSignInModel routing', () => {
+  beforeEach(() => {
+    setTurnstileSiteKey('');
+    sessionStorage.clear();
+  });
+
+  it('writes the authenticated user to Apollo cache before entering the app', async () => {
+    const user = {
+      id: 'user-id',
+      email: 'user@example.com',
+      username: 'User',
+      emailVerified: true,
+    };
+    mockLogin.mockResolvedValue({ data: { login: user } });
+    const { result } = renderModel();
+
+    act(() => {
+      result.current.form.setValue('email', 'user@example.com');
+      result.current.form.setValue('password', 'password');
+    });
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    expect(mockWriteQuery).toHaveBeenCalledWith({
+      query: MeDocument,
+      data: { me: user },
+    });
+    expect(mockNavigate).toHaveBeenCalledWith('/app', { replace: true });
+  });
+
+  it('routes an unverified password login using the normalized email', async () => {
+    mockLogin.mockRejectedValue(emailNotVerifiedError());
+    const { result } = renderModel();
+
+    act(() => {
+      result.current.form.setValue('email', 'USER@EXAMPLE.COM');
+      result.current.form.setValue('password', 'password');
+    });
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    expect(sessionStorage.getItem('pendingVerificationEmail')).toBe('user@example.com');
+    expect(mockNavigate).toHaveBeenCalledWith('/verify-email', {
+      state: { email: 'user@example.com' },
+    });
+  });
 
   it('does not send account-creation consent during an existing Google sign-in', async () => {
     mockGoogleLogin.mockResolvedValue({ data: undefined });

@@ -7,7 +7,7 @@ import { Alert } from 'shared/ui/Alert';
 import { Button } from 'shared/ui/Button';
 import { Captcha } from 'shared/ui/Captcha';
 import { FormField } from 'shared/ui/FormField';
-import { GoogleButton } from 'shared/ui/GoogleButton';
+import { GoogleButton } from '../../google/ui/GoogleButton';
 
 import { LEGAL_CONSENT_NOTICE } from '../../model/legalConsent';
 import { useSignUpModel } from '../model/useSignUpModel';

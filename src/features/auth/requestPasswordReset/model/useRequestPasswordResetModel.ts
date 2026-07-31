@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { RequestPasswordResetDocument } from 'shared/api';
 
 import {
-  AUTH_ERROR_CODE,
   CAPTCHA_ACTION,
   isCaptchaChallenge,
   translateAuthError,
@@ -50,8 +49,6 @@ const useRequestPasswordResetModel = () => {
         const translated = translateAuthError(error, t);
         if (isCaptchaChallenge(translated.code)) {
           activate(translated.action ?? CAPTCHA_ACTION.forgotPassword, intent);
-        } else if (translated.code === AUTH_ERROR_CODE.captchaUnavailable) {
-          clear();
         } else {
           clear();
         }

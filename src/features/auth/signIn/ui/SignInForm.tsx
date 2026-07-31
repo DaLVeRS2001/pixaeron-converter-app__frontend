@@ -6,7 +6,7 @@ import { Alert } from 'shared/ui/Alert';
 import { Button } from 'shared/ui/Button';
 import { Captcha } from 'shared/ui/Captcha';
 import { FormField } from 'shared/ui/FormField';
-import { GoogleButton } from 'shared/ui/GoogleButton';
+import { GoogleButton } from '../../google/ui/GoogleButton';
 
 import { useSignInModel } from '../model/useSignInModel';
 

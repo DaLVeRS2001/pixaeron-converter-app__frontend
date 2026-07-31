@@ -7,7 +7,6 @@ import { ResendEmailVerificationDocument, VerifyEmailDocument } from 'shared/api
 import type { EmailVerificationStatus } from 'shared/api';
 
 import {
-  AUTH_ERROR_CODE,
   CAPTCHA_ACTION,
   isCaptchaChallenge,
   translateAuthError,
@@ -102,8 +101,6 @@ const useVerifyEmailModel = () => {
         }
         if (isCaptchaChallenge(translated.code)) {
           activate(translated.action ?? CAPTCHA_ACTION.resendConfirmation, intent);
-        } else if (translated.code === AUTH_ERROR_CODE.captchaUnavailable) {
-          clear();
         } else {
           clear();
         }
