@@ -7,11 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { GoogleLoginDocument, RegisterDocument } from 'shared/api';
 
-import {
-  CAPTCHA_ACTION,
-  isCaptchaChallenge,
-  translateAuthError,
-} from '../../model/errors';
+import { CAPTCHA_ACTION, isCaptchaChallenge, translateAuthError } from '../../model/errors';
 import { CURRENT_LEGAL_CONSENT } from '../../model/legalConsent';
 import { createSignUpSchema } from '../../model/schemas';
 import type { SignUpFormValues } from '../../model/schemas';

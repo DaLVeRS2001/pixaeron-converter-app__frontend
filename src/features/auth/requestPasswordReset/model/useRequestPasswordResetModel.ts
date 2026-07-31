@@ -6,11 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { RequestPasswordResetDocument } from 'shared/api';
 
-import {
-  CAPTCHA_ACTION,
-  isCaptchaChallenge,
-  translateAuthError,
-} from '../../model/errors';
+import { CAPTCHA_ACTION, isCaptchaChallenge, translateAuthError } from '../../model/errors';
 import { createEmailSchema } from '../../model/schemas';
 import type { EmailFormValues } from '../../model/schemas';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';

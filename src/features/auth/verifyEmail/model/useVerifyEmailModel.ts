@@ -6,11 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { ResendEmailVerificationDocument, VerifyEmailDocument } from 'shared/api';
 import type { EmailVerificationStatus } from 'shared/api';
 
-import {
-  CAPTCHA_ACTION,
-  isCaptchaChallenge,
-  translateAuthError,
-} from '../../model/errors';
+import { CAPTCHA_ACTION, isCaptchaChallenge, translateAuthError } from '../../model/errors';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
 
 type VerificationViewStatus = EmailVerificationStatus | 'CHECK_EMAIL' | 'RESENT';

@@ -49,8 +49,7 @@ const useSignInModel = () => {
         (translated.code === AUTH_ERROR_CODE.legalConsentRequired ||
           translated.action === LEGAL_CONSENT_ACTION);
       const requiresEmailVerification =
-        intent.kind === 'password' &&
-        translated.code === AUTH_ERROR_CODE.emailNotVerified;
+        intent.kind === 'password' && translated.code === AUTH_ERROR_CODE.emailNotVerified;
 
       if (requiresCaptcha) {
         activate(translated.action ?? fallbackCaptchaAction, intent);
