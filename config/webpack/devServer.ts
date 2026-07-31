@@ -13,9 +13,8 @@ export function devServer(options: IBuildOptions): DevServerConfig {
     proxy: [
       {
         context: ['/graphql'],
-        target: environment.authApiUrl,
+        target: environment.gatewayApiUrl,
         changeOrigin: false,
-        pathRewrite: { '^/graphql': '/auth' },
       },
     ],
   };

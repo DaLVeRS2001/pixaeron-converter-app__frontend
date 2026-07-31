@@ -8,10 +8,22 @@ import { RefreshSessionDocument } from './generated/graphql';
 let refreshPromise: Promise<void> | undefined;
 let cacheResetPromise: Promise<void> | undefined;
 
-const isUnauthenticated = (error: unknown) =>
-  CombinedGraphQLErrors.is(error)
-    ? error.errors.some(({ extensions }) => extensions?.code === 'UNAUTHENTICATED')
-    : ServerError.is(error) && error.statusCode === 401;
+const isRefreshableAuthErrorCode = (code: unknown) =>
+  code === 'UNAUTHENTICATED' || code === 'UNAUTHORIZED_FIELD_OR_TYPE';
+
+const isTerminalAuthErrorCode = (code: unknown) => code === 'UNAUTHENTICATED';
+
+const hasGraphQLErrorCode = (error: unknown, predicate: (code: unknown) => boolean): boolean =>
+  CombinedGraphQLErrors.is(error) &&
+  error.errors.some(({ extensions }) => predicate(extensions?.code));
+
+const isRefreshableAuthError = (error: unknown) =>
+  hasGraphQLErrorCode(error, isRefreshableAuthErrorCode) ||
+  (ServerError.is(error) && error.statusCode === 401);
+
+const isTerminalAuthError = (error: unknown) =>
+  hasGraphQLErrorCode(error, isTerminalAuthErrorCode) ||
+  (ServerError.is(error) && error.statusCode === 401);
 
 const resetAuthCache = (client: ApolloClient): Promise<void> => {
   if (!cacheResetPromise) {
@@ -36,7 +48,7 @@ const refreshSession = (client: ApolloClient): Promise<void> => {
       })
       .then(() => undefined)
       .catch(async (error: unknown) => {
-        if (isUnauthenticated(error)) {
+        if (isTerminalAuthError(error)) {
           await resetAuthCache(client);
         }
         throw error;
@@ -53,9 +65,11 @@ const authErrorLink = new ErrorLink(({ error, operation, forward }) => {
   const retryableGraphQLError =
     (operation.operationType === 'query' || operation.operationType === 'mutation') &&
     CombinedGraphQLErrors.is(error) &&
-    isUnauthenticated(error);
+    isRefreshableAuthError(error);
   const retryableNetworkError =
-    operation.operationType === 'query' && ServerError.is(error) && isUnauthenticated(error);
+    operation.operationType === 'query' &&
+    ServerError.is(error) &&
+    isRefreshableAuthError(error);
 
   if (
     operation.operationName === 'RefreshSession' ||
@@ -74,13 +88,15 @@ const authErrorLink = new ErrorLink(({ error, operation, forward }) => {
         const subscription = forward(operation).subscribe({
           next: (result) => {
             if (
-              result.errors?.some(({ extensions }) => extensions?.code === 'UNAUTHENTICATED')
+              result.errors?.some(({ extensions }) =>
+                isTerminalAuthErrorCode(extensions?.code)
+              )
             )
               void resetAuthCache(operation.client);
             observer.next(result);
           },
           error: (retryError: unknown) => {
-            if (isUnauthenticated(retryError)) void resetAuthCache(operation.client);
+            if (isTerminalAuthError(retryError)) void resetAuthCache(operation.client);
             observer.error(retryError);
           },
           complete: () => observer.complete(),

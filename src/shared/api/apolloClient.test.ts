@@ -23,6 +23,15 @@ const unauthorizedResult = {
     },
   ],
 };
+const routerUnauthorizedResult = {
+  data: null,
+  errors: [
+    {
+      message: 'Unauthorized field or type',
+      extensions: { code: 'UNAUTHORIZED_FIELD_OR_TYPE' },
+    },
+  ],
+};
 const invalidCredentialsResult = {
   data: null,
   errors: [
@@ -92,6 +101,33 @@ describe('Apollo session refresh', () => {
       expect.objectContaining({ data: { viewer: 'ready' } }),
     ]);
     expect(queryAttempts).toBe(4);
+  });
+
+  it('refreshes after the Gateway rejects a protected operation', async () => {
+    let queryAttempts = 0;
+    let refreshAttempts = 0;
+    const transport = new ApolloLink(
+      (operation) =>
+        new Observable<ApolloLink.Result>((observer) => {
+          if (operation.operationName === 'RefreshSession') {
+            refreshAttempts += 1;
+            observer.next({ data: { refreshSession: true } });
+          } else {
+            queryAttempts += 1;
+            observer.next(
+              queryAttempts === 1 ? routerUnauthorizedResult : { data: { viewer: 'ready' } }
+            );
+          }
+          observer.complete();
+        })
+    );
+    const client = createClient(transport);
+
+    await expect(
+      client.query<{ viewer: string }>({ query: viewerQuery, fetchPolicy: 'no-cache' })
+    ).resolves.toMatchObject({ data: { viewer: 'ready' } });
+    expect(refreshAttempts).toBe(1);
+    expect(queryAttempts).toBe(2);
   });
 
   it('refreshes once and retries a protected mutation', async () => {
@@ -199,6 +235,31 @@ describe('Apollo session refresh', () => {
       CombinedGraphQLErrors
     );
     expect(refreshAttempts).toBe(0);
+  });
+
+  it('does not clear the session when Router authorization remains denied', async () => {
+    let refreshAttempts = 0;
+    const transport = new ApolloLink(
+      (operation) =>
+        new Observable<ApolloLink.Result>((observer) => {
+          if (operation.operationName === 'RefreshSession') {
+            refreshAttempts += 1;
+            observer.next({ data: { refreshSession: true } });
+          } else {
+            observer.next(routerUnauthorizedResult);
+          }
+          observer.complete();
+        })
+    );
+    const client = createClient(transport);
+    const resetCache = jest.spyOn(client.cache, 'reset');
+
+    await expect(
+      client.query({ query: viewerQuery, fetchPolicy: 'no-cache' })
+    ).rejects.toBeInstanceOf(CombinedGraphQLErrors);
+
+    expect(refreshAttempts).toBe(1);
+    expect(resetCache).not.toHaveBeenCalled();
   });
 
   it('resets the cache once when concurrent retries stay unauthenticated', async () => {

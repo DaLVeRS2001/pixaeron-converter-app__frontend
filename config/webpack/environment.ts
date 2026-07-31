@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { BuildEnvironment, BuildMode } from './types/config';
 
 const DEFAULT_PORT = 3000;
-const DEFAULT_AUTH_API_URL = 'http://127.0.0.1:3001';
+const DEFAULT_GATEWAY_API_URL = 'http://127.0.0.1:4000';
 
 const httpUrl = z.url({ protocol: /^https?$/ });
 const googleClientId = z
@@ -18,7 +18,7 @@ const port = z.coerce.number()
 
 const commonEnvironment = {
   PORT: port.default(DEFAULT_PORT),
-  AUTH_API_URL: httpUrl.default(DEFAULT_AUTH_API_URL),
+  GATEWAY_API_URL: httpUrl.default(DEFAULT_GATEWAY_API_URL),
 };
 
 const developmentEnvironmentSchema = z.object({
@@ -57,7 +57,7 @@ export function readBuildEnvironment(
 
   return {
     port: result.data.PORT,
-    authApiUrl: result.data.AUTH_API_URL,
+    gatewayApiUrl: result.data.GATEWAY_API_URL,
     graphqlApiUrl: result.data.GRAPHQL_API_URL,
     googleClientId: result.data.GOOGLE_CLIENT_ID,
     turnstileSiteKey: result.data.TURNSTILE_SITE_KEY,

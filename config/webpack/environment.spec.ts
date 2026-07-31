@@ -8,7 +8,7 @@ const productionEnvironment = {
 
 const expectedProductionEnvironment = {
   port: 3000,
-  authApiUrl: 'http://127.0.0.1:3001',
+  gatewayApiUrl: 'http://127.0.0.1:4000',
   graphqlApiUrl: productionEnvironment.GRAPHQL_API_URL,
   googleClientId: productionEnvironment.GOOGLE_CLIENT_ID,
   turnstileSiteKey: productionEnvironment.TURNSTILE_SITE_KEY,
@@ -18,7 +18,7 @@ describe('readBuildEnvironment', () => {
   it('uses safe local defaults', () => {
     expect(readBuildEnvironment('development', {})).toEqual({
       port: 3000,
-      authApiUrl: 'http://127.0.0.1:3001',
+      gatewayApiUrl: 'http://127.0.0.1:4000',
       graphqlApiUrl: '/graphql',
       googleClientId: '',
       turnstileSiteKey: '',
@@ -29,15 +29,15 @@ describe('readBuildEnvironment', () => {
     expect(
       readBuildEnvironment('development', {
         PORT: '3100',
-        AUTH_API_URL: 'http://localhost:3001',
-        GRAPHQL_API_URL: 'http://localhost:3001/auth',
+        GATEWAY_API_URL: 'http://localhost:4000',
+        GRAPHQL_API_URL: 'http://localhost:4000/graphql',
         GOOGLE_CLIENT_ID: productionEnvironment.GOOGLE_CLIENT_ID,
         TURNSTILE_SITE_KEY: productionEnvironment.TURNSTILE_SITE_KEY,
       })
     ).toEqual({
       port: 3100,
-      authApiUrl: 'http://localhost:3001',
-      graphqlApiUrl: 'http://localhost:3001/auth',
+      gatewayApiUrl: 'http://localhost:4000',
+      graphqlApiUrl: 'http://localhost:4000/graphql',
       googleClientId: productionEnvironment.GOOGLE_CLIENT_ID,
       turnstileSiteKey: productionEnvironment.TURNSTILE_SITE_KEY,
     });
@@ -54,7 +54,7 @@ describe('readBuildEnvironment', () => {
       readBuildEnvironment('production', {
         ...productionEnvironment,
         PORT: '0',
-        AUTH_API_URL: 'not-a-url',
+        GATEWAY_API_URL: 'not-a-url',
       })
     ).toEqual(expectedProductionEnvironment);
   });

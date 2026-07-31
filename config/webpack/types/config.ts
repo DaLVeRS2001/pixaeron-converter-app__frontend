@@ -11,7 +11,7 @@ interface IBuildPaths {
 
 interface BuildEnvironment {
   port: number;
-  authApiUrl: string;
+  gatewayApiUrl: string;
   graphqlApiUrl: string;
   googleClientId: string;
   turnstileSiteKey: string;
