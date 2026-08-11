@@ -88,6 +88,7 @@ const routes: RouteObject[] = [
   {
     path: '*',
     hydrateFallbackElement: <PageLoader />,
+    errorElement: <RouteErrorBoundary />,
     lazy: { Component: async () => (await import('pages/NotFoundPage')).NotFoundPage },
   },
 ];
