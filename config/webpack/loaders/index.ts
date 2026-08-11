@@ -5,10 +5,6 @@ import { buildStyleLoader } from './buildStyleLoader';
 
 export const sideEffectLoaders = [
   {
-    test: /\.(js|jsx|ts|tsx)$/,
-    sideEffects: false,
-  },
-  {
     test: /\.s?css$/,
     sideEffects: true,
   },
