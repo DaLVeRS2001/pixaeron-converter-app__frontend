@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { ResetPasswordDocument } from 'shared/api';
 import type { PasswordResetStatus } from 'shared/api';
 
-import { translateAuthError } from '../../model/errors';
+import { authErrorMessage, resolveAuthError } from '../../model/errors';
+import type { AuthError } from '../../model/errors';
 import { createResetPasswordSchema } from '../../model/schemas';
 import type { ResetPasswordFormValues } from '../../model/schemas';
 
@@ -17,7 +18,7 @@ const useResetPasswordModel = () => {
     () => new URLSearchParams(window.location.hash.slice(1)).get('token') ?? ''
   );
   const [status, setStatus] = useState<PasswordResetStatus>();
-  const [errorMessage, setErrorMessage] = useState('');
+  const [authError, setAuthError] = useState<AuthError>();
   const schema = useMemo(() => createResetPasswordSchema(t), [t]);
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(schema),
@@ -35,18 +36,19 @@ const useResetPasswordModel = () => {
 
   const submit = form.handleSubmit(async ({ password }) => {
     if (!token) return;
-    setErrorMessage('');
+    setAuthError(undefined);
     try {
       const { data } = await resetPassword({ variables: { input: { token, password } } });
       if (data?.resetPassword.status) setStatus(data.resetPassword.status);
     } catch (error) {
-      setErrorMessage(translateAuthError(error, t).message);
+      setAuthError(resolveAuthError(error));
     }
   });
 
   return {
     complete: status === 'RESET',
-    errorMessage,
+    error: authError,
+    errorMessage: authError ? authErrorMessage(authError, t) : '',
     form,
     loading,
     status,

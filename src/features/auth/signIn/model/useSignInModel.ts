@@ -10,9 +10,11 @@ import { GoogleLoginDocument, LoginDocument } from 'shared/api';
 import {
   AUTH_ERROR_CODE,
   CAPTCHA_ACTION,
+  authErrorMessage,
   isCaptchaChallenge,
-  translateAuthError,
+  resolveAuthError,
 } from '../../model/errors';
+import type { AuthError } from '../../model/errors';
 import { LEGAL_CONSENT_ACTION, LEGAL_CONSENT_NOTICE } from '../../model/legalConsent';
 import { createSignInSchema } from '../../model/schemas';
 import type { SignInFormValues } from '../../model/schemas';
@@ -27,7 +29,7 @@ const useSignInModel = () => {
   const { t } = useTranslation('auth');
   const { state: locationState } = useLocation();
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState('');
+  const [authError, setAuthError] = useState<AuthError>();
   const [busy, setBusy] = useState(false);
   const schema = useMemo(() => createSignInSchema(t), [t]);
   const form = useForm<SignInFormValues>({
@@ -41,20 +43,20 @@ const useSignInModel = () => {
   const completeLogin = useCompleteLogin();
   const handleSignInError = useCallback(
     (error: unknown, intent: SignInIntent) => {
-      const translated = translateAuthError(error, t);
+      const resolved = resolveAuthError(error);
       const fallbackCaptchaAction =
         intent.kind === 'password' ? CAPTCHA_ACTION.login : CAPTCHA_ACTION.googleLogin;
-      const requiresCaptcha = isCaptchaChallenge(translated.code);
+      const requiresCaptcha = isCaptchaChallenge(resolved.code);
       const requiresGoogleConsent =
         intent.kind === 'google' &&
-        (translated.code === AUTH_ERROR_CODE.legalConsentRequired ||
-          translated.action === LEGAL_CONSENT_ACTION);
+        (resolved.code === AUTH_ERROR_CODE.legalConsentRequired ||
+          resolved.action === LEGAL_CONSENT_ACTION);
       const requiresEmailVerification =
-        intent.kind === 'password' && translated.code === AUTH_ERROR_CODE.emailNotVerified;
+        intent.kind === 'password' && resolved.code === AUTH_ERROR_CODE.emailNotVerified;
 
       if (requiresCaptcha) {
-        activate(translated.action ?? fallbackCaptchaAction, intent);
-        setErrorMessage(translated.message);
+        activate(resolved.action ?? fallbackCaptchaAction, intent);
+        setAuthError(resolved);
         return;
       }
 
@@ -80,16 +82,16 @@ const useSignInModel = () => {
       }
 
       clear();
-      setErrorMessage(translated.message);
+      setAuthError(resolved);
     },
-    [activate, clear, locationState, navigate, t]
+    [activate, clear, locationState, navigate]
   );
 
   const executeIntent = useCallback(
     async (intent: SignInIntent, captchaToken?: string) => {
       if (busy) return;
       setBusy(true);
-      setErrorMessage('');
+      setAuthError(undefined);
 
       try {
         if (intent.kind === 'password') {
@@ -138,17 +140,18 @@ const useSignInModel = () => {
   );
   const handleCaptchaUnavailable = useCallback(() => {
     clear();
-    setErrorMessage(t('errors.captchaUnavailable'));
-  }, [clear, t]);
+    setAuthError({ code: AUTH_ERROR_CODE.captchaUnavailable });
+  }, [clear]);
   const handleGoogleUnavailable = useCallback(() => {
     clear();
-    setErrorMessage(t('errors.googleUnavailable'));
-  }, [clear, t]);
+    setAuthError({ code: AUTH_ERROR_CODE.googleUnavailable });
+  }, [clear]);
 
   return {
     busy,
     captcha: challenge,
-    errorMessage,
+    error: authError,
+    errorMessage: authError ? authErrorMessage(authError, t) : '',
     form,
     onCaptchaToken,
     onCaptchaUnavailable: handleCaptchaUnavailable,
