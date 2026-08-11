@@ -1,4 +1,4 @@
-import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { CombinedGraphQLErrors, ServerError } from '@apollo/client/errors';
 
 import { getGraphQLErrorDetails } from './errors';
 
@@ -9,6 +9,17 @@ const graphQLError = (
   new CombinedGraphQLErrors({
     data: null,
     errors: [{ message, extensions }],
+  });
+
+const serverError = (status: number, retryAfter?: string) =>
+  new ServerError('private HTTP response', {
+    response: {
+      status,
+      headers: {
+        get: () => retryAfter ?? null,
+      },
+    } as unknown as Response,
+    bodyText: 'private response body',
   });
 
 describe('getGraphQLErrorDetails', () => {
@@ -48,6 +59,28 @@ describe('getGraphQLErrorDetails', () => {
     expect(
       getGraphQLErrorDetails(graphQLError({ code: 'BAD_REQUEST', retryAfter: -1 }))
     ).toEqual({ code: 'BAD_REQUEST' });
+  });
+
+  it('preserves a safe Retry-After value for HTTP rate limits', () => {
+    expect(getGraphQLErrorDetails(serverError(429, '45'))).toEqual({
+      code: 'TOO_MANY_REQUESTS',
+      retryAfter: 45,
+    });
+  });
+
+  it.each(['not-a-number', '-1', '1.5'])(
+    'ignores an invalid HTTP Retry-After value: %s',
+    (retryAfter) => {
+      expect(getGraphQLErrorDetails(serverError(429, retryAfter))).toEqual({
+        code: 'TOO_MANY_REQUESTS',
+      });
+    }
+  );
+
+  it('classifies HTTP service unavailability without exposing the response body', () => {
+    expect(getGraphQLErrorDetails(serverError(503))).toEqual({
+      code: 'SERVICE_UNAVAILABLE',
+    });
   });
 
   it('classifies non-GraphQL failures as network errors', () => {

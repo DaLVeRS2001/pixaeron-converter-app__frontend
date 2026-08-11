@@ -1,4 +1,4 @@
-import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { CombinedGraphQLErrors, ServerError } from '@apollo/client/errors';
 
 type GraphQLErrorDetails = {
   code?: string;
@@ -6,7 +6,35 @@ type GraphQLErrorDetails = {
   retryAfter?: number;
 };
 
+const parseRetryAfter = (value: string | null) => {
+  if (!value || !/^\d+$/.test(value)) return undefined;
+
+  const seconds = Number(value);
+  return Number.isSafeInteger(seconds) ? seconds : undefined;
+};
+
+const getServerErrorDetails = (error: ServerError): GraphQLErrorDetails => {
+  if (error.statusCode === 429) {
+    const retryAfter = parseRetryAfter(error.response.headers.get('retry-after'));
+
+    return {
+      code: 'TOO_MANY_REQUESTS',
+      ...(retryAfter !== undefined ? { retryAfter } : {}),
+    };
+  }
+
+  if (error.statusCode === 503) {
+    return { code: 'SERVICE_UNAVAILABLE' };
+  }
+
+  return { code: 'NETWORK_ERROR' };
+};
+
 const getGraphQLErrorDetails = (error: unknown): GraphQLErrorDetails => {
+  if (ServerError.is(error)) {
+    return getServerErrorDetails(error);
+  }
+
   if (!CombinedGraphQLErrors.is(error)) {
     return { code: 'NETWORK_ERROR' };
   }
