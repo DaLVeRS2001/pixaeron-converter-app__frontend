@@ -8,6 +8,7 @@ import { Button } from 'shared/ui/Button';
 import { Captcha } from 'shared/ui/Captcha';
 import { FormField } from 'shared/ui/FormField';
 
+import { validationMessage } from '../../model/schemas';
 import { useRequestPasswordResetModel } from '../model/useRequestPasswordResetModel';
 
 import '../../ui/AuthForm.scss';
@@ -42,7 +43,7 @@ const RequestPasswordResetForm = () => {
             type="email"
             autoComplete="email"
             placeholder={t('common.emailPlaceholder')}
-            error={errors.email?.message}
+            error={validationMessage(t, errors.email?.message)}
             {...model.form.register('email')}
           />
           {model.captcha && (

@@ -10,6 +10,7 @@ import { FormField } from 'shared/ui/FormField';
 
 import { GoogleButton } from '../../google/ui/GoogleButton';
 import { LEGAL_CONSENT_NOTICE } from '../../model/legalConsent';
+import { validationMessage } from '../../model/schemas';
 import { useSignUpModel } from '../model/useSignUpModel';
 
 import '../../ui/AuthForm.scss';
@@ -47,7 +48,7 @@ const SignUpForm = () => {
             label={t('common.username')}
             autoComplete="username"
             placeholder={t('signUp.usernamePlaceholder')}
-            error={errors.username?.message}
+            error={validationMessage(t, errors.username?.message)}
             {...model.form.register('username')}
           />
           <FormField
@@ -56,7 +57,7 @@ const SignUpForm = () => {
             type="email"
             autoComplete="email"
             placeholder={t('common.emailPlaceholder')}
-            error={errors.email?.message}
+            error={validationMessage(t, errors.email?.message)}
             {...model.form.register('email')}
           />
           <FormField
@@ -64,7 +65,7 @@ const SignUpForm = () => {
             label={t('common.password')}
             type="password"
             autoComplete="new-password"
-            error={errors.password?.message}
+            error={validationMessage(t, errors.password?.message)}
             {...model.form.register('password')}
           />
           <div
@@ -86,7 +87,7 @@ const SignUpForm = () => {
             label={t('common.confirmPassword')}
             type="password"
             autoComplete="new-password"
-            error={errors.confirmPassword?.message}
+            error={validationMessage(t, errors.confirmPassword?.message)}
             {...model.form.register('confirmPassword')}
           />
           {model.captcha && (
@@ -105,7 +106,7 @@ const SignUpForm = () => {
             </span>
           </label>
           {errors.termsAccepted?.message && (
-            <p className={cn('checkbox-error')}>{errors.termsAccepted.message}</p>
+            <p className={cn('checkbox-error')}>{validationMessage(t, errors.termsAccepted.message)}</p>
           )}
           <Button type="submit" disabled={model.busy || Boolean(model.captcha)}>
             {model.busy ? t('signUp.submitting') : t('signUp.submit')}

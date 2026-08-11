@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ import {
 } from '../../model/errors';
 import type { AuthError } from '../../model/errors';
 import { LEGAL_CONSENT_ACTION, LEGAL_CONSENT_NOTICE } from '../../model/legalConsent';
-import { createSignInSchema } from '../../model/schemas';
+import { signInSchema } from '../../model/schemas';
 import type { SignInFormValues } from '../../model/schemas';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
 import { getSafePostLoginLocation, useCompleteLogin } from '../../model/useCompleteLogin';
@@ -31,9 +31,8 @@ const useSignInModel = () => {
   const navigate = useNavigate();
   const [authError, setAuthError] = useState<AuthError>();
   const [busy, setBusy] = useState(false);
-  const schema = useMemo(() => createSignInSchema(t), [t]);
   const form = useForm<SignInFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(signInSchema),
     defaultValues: { email: '', password: '', rememberMe: false },
   });
   const [login] = useMutation(LoginDocument);
