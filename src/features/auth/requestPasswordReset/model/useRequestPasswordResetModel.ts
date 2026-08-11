@@ -32,6 +32,7 @@ const useRequestPasswordResetModel = () => {
       if (busy) return;
       setBusy(true);
       setErrorMessage('');
+      setSent(false);
 
       try {
         await requestReset({
