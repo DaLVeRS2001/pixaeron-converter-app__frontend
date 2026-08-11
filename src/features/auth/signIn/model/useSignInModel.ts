@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { GoogleLoginDocument, LoginDocument } from 'shared/api';
 
@@ -17,7 +17,7 @@ import { LEGAL_CONSENT_ACTION, LEGAL_CONSENT_NOTICE } from '../../model/legalCon
 import { createSignInSchema } from '../../model/schemas';
 import type { SignInFormValues } from '../../model/schemas';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
-import { useCompleteLogin } from '../../model/useCompleteLogin';
+import { getSafePostLoginLocation, useCompleteLogin } from '../../model/useCompleteLogin';
 
 type SignInIntent =
   | { kind: 'password'; values: SignInFormValues }
@@ -25,6 +25,7 @@ type SignInIntent =
 
 const useSignInModel = () => {
   const { t } = useTranslation('auth');
+  const { state: locationState } = useLocation();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -58,10 +59,15 @@ const useSignInModel = () => {
       }
 
       if (requiresGoogleConsent) {
+        const from = getSafePostLoginLocation(locationState);
+
         clear();
         navigate('/sign-up', {
           replace: true,
-          state: { notice: LEGAL_CONSENT_NOTICE },
+          state: {
+            notice: LEGAL_CONSENT_NOTICE,
+            ...(from ? { from } : {}),
+          },
         });
         return;
       }
@@ -76,7 +82,7 @@ const useSignInModel = () => {
       clear();
       setErrorMessage(translated.message);
     },
-    [activate, clear, navigate, t]
+    [activate, clear, locationState, navigate, t]
   );
 
   const executeIntent = useCallback(

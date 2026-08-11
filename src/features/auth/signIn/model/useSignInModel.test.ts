@@ -11,6 +11,7 @@ const mockLogin = jest.fn();
 const mockNavigate = jest.fn();
 const mockUseMutation = jest.fn();
 const mockWriteQuery = jest.fn();
+let mockLocationState: unknown = null;
 
 const setTurnstileSiteKey = (value: string) =>
   Object.assign(globalThis, { __TURNSTILE_SITE_KEY__: value });
@@ -21,6 +22,7 @@ jest.mock('@apollo/client/react', () => ({
 }));
 
 jest.mock('react-router-dom', () => ({
+  useLocation: () => ({ state: mockLocationState }),
   useNavigate: () => mockNavigate,
 }));
 
@@ -166,6 +168,7 @@ describe('useSignInModel CAPTCHA timing', () => {
 describe('useSignInModel routing', () => {
   beforeEach(() => {
     setTurnstileSiteKey('');
+    mockLocationState = null;
     sessionStorage.clear();
   });
 
@@ -230,7 +233,10 @@ describe('useSignInModel routing', () => {
     });
   });
 
-  it('routes unknown Google identity to explicit signup without persisting its token', async () => {
+  it('preserves a safe return location when routing an unknown Google identity to signup', async () => {
+    mockLocationState = {
+      from: { pathname: '/app', search: '?view=queue', hash: '#latest' },
+    };
     mockGoogleLogin.mockRejectedValue(legalConsentError());
     const { result } = renderModel();
 
@@ -241,7 +247,10 @@ describe('useSignInModel routing', () => {
     await waitFor(() =>
       expect(mockNavigate).toHaveBeenCalledWith('/sign-up', {
         replace: true,
-        state: { notice: LEGAL_CONSENT_NOTICE },
+        state: {
+          notice: LEGAL_CONSENT_NOTICE,
+          from: { pathname: '/app', search: '?view=queue', hash: '#latest' },
+        },
       })
     );
     expect(JSON.stringify(mockNavigate.mock.calls)).not.toContain('new-google-token');

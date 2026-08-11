@@ -20,6 +20,7 @@ jest.mock('@apollo/client/react', () => ({
 }));
 
 jest.mock('react-router-dom', () => ({
+  useLocation: () => ({ state: null }),
   useNavigate: () => mockNavigate,
 }));
 
