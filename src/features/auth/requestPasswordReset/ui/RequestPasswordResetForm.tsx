@@ -58,6 +58,10 @@ const RequestPasswordResetForm = () => {
           </Button>
         </form>
       </div>
+      {/* Shown unconditionally: a Google-only account has no password to reset,
+          so no mail is ever sent. The hint must not react to the entered
+          address, otherwise it would reveal how an account was registered. */}
+      <p className={cn('footer')}>{t('forgot.googleHint')}</p>
       <p className={cn('footer')}>
         {t('forgot.remember')}
         <Link className={cn('link')} to="/sign-in">
