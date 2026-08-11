@@ -7,7 +7,14 @@ import { useNavigate } from 'react-router-dom';
 
 import { GoogleLoginDocument, RegisterDocument } from 'shared/api';
 
-import { CAPTCHA_ACTION, isCaptchaChallenge, translateAuthError } from '../../model/errors';
+import {
+  AUTH_ERROR_CODE,
+  CAPTCHA_ACTION,
+  authErrorMessage,
+  isCaptchaChallenge,
+  resolveAuthError,
+} from '../../model/errors';
+import type { AuthError } from '../../model/errors';
 import { CURRENT_LEGAL_CONSENT } from '../../model/legalConsent';
 import { createSignUpSchema } from '../../model/schemas';
 import type { SignUpFormValues } from '../../model/schemas';
@@ -21,7 +28,7 @@ type SignUpIntent =
 const useSignUpModel = () => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState('');
+  const [authError, setAuthError] = useState<AuthError>();
   const [busy, setBusy] = useState(false);
   const schema = useMemo(() => createSignUpSchema(t), [t]);
   const form = useForm<SignUpFormValues>({
@@ -55,7 +62,7 @@ const useSignUpModel = () => {
     async (intent: SignUpIntent, captchaToken?: string) => {
       if (busy) return;
       setBusy(true);
-      setErrorMessage('');
+      setAuthError(undefined);
 
       try {
         if (intent.kind === 'register') {
@@ -89,21 +96,21 @@ const useSignUpModel = () => {
         });
         if (data?.googleLogin) completeLogin(data.googleLogin);
       } catch (error) {
-        const translated = translateAuthError(error, t);
+        const resolved = resolveAuthError(error);
         const fallbackAction =
           intent.kind === 'register' ? CAPTCHA_ACTION.register : CAPTCHA_ACTION.googleLogin;
 
-        if (isCaptchaChallenge(translated.code)) {
-          activate(translated.action ?? fallbackAction, intent);
+        if (isCaptchaChallenge(resolved.code)) {
+          activate(resolved.action ?? fallbackAction, intent);
         } else {
           clear();
         }
-        setErrorMessage(translated.message);
+        setAuthError(resolved);
       } finally {
         setBusy(false);
       }
     },
-    [activate, busy, clear, completeLogin, googleLogin, navigate, registerUser, t]
+    [activate, busy, clear, completeLogin, googleLogin, navigate, registerUser]
   );
 
   const submit = form.handleSubmit((values) => {
@@ -145,17 +152,18 @@ const useSignUpModel = () => {
   );
   const handleCaptchaUnavailable = useCallback(() => {
     clear();
-    setErrorMessage(t('errors.captchaUnavailable'));
-  }, [clear, t]);
+    setAuthError({ code: AUTH_ERROR_CODE.captchaUnavailable });
+  }, [clear]);
   const handleGoogleUnavailable = useCallback(() => {
     clear();
-    setErrorMessage(t('errors.googleUnavailable'));
-  }, [clear, t]);
+    setAuthError({ code: AUTH_ERROR_CODE.googleUnavailable });
+  }, [clear]);
 
   return {
     busy,
     captcha: challenge,
-    errorMessage,
+    error: authError,
+    errorMessage: authError ? authErrorMessage(authError, t) : '',
     form,
     onCaptchaToken,
     onCaptchaUnavailable: handleCaptchaUnavailable,

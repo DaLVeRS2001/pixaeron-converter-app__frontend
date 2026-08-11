@@ -8,6 +8,7 @@ const AUTH_ERROR_CODE = {
   captchaUnavailable: 'CAPTCHA_UNAVAILABLE',
   tooManyLoginAttempts: 'TOO_MANY_LOGIN_ATTEMPTS',
   tooManyAuthAttempts: 'TOO_MANY_AUTH_ATTEMPTS',
+  tooManyRequests: 'TOO_MANY_REQUESTS',
   actionCooldown: 'AUTH_ACTION_COOLDOWN',
   invalidCredentials: 'INVALID_CREDENTIALS',
   emailNotVerified: 'EMAIL_NOT_VERIFIED',
@@ -17,6 +18,8 @@ const AUTH_ERROR_CODE = {
   accountLinkRequired: 'ACCOUNT_LINK_REQUIRED',
   googleTokenInvalid: 'GOOGLE_TOKEN_INVALID',
   legalConsentRequired: 'LEGAL_CONSENT_REQUIRED',
+  googleUnavailable: 'GOOGLE_UNAVAILABLE',
+  serviceUnavailable: 'SERVICE_UNAVAILABLE',
   network: 'NETWORK_ERROR',
 } as const;
 
@@ -34,59 +37,68 @@ type AuthError = {
   code?: string;
   action?: string;
   retryAfter?: number;
-  message: string;
 };
 
 const isCaptchaChallenge = (code?: string) =>
   code === AUTH_ERROR_CODE.captchaRequired || code === AUTH_ERROR_CODE.captchaInvalid;
 
-const translateAuthError = (error: unknown, t: TFunction<'auth'>): AuthError => {
-  const details = getGraphQLErrorDetails(error);
+const resolveAuthError = (error: unknown): AuthError => getGraphQLErrorDetails(error);
 
-  if (details.retryAfter !== undefined) {
-    if (details.code === AUTH_ERROR_CODE.actionCooldown) {
-      return {
-        ...details,
-        message: t('errors.cooldown', { seconds: Math.max(1, Math.ceil(details.retryAfter)) }),
-      };
+const authErrorMessage = (error: AuthError, t: TFunction<'auth'>): string => {
+  if (error.retryAfter !== undefined) {
+    if (error.code === AUTH_ERROR_CODE.actionCooldown) {
+      return t('errors.cooldown', { seconds: Math.max(1, Math.ceil(error.retryAfter)) });
     }
 
-    return {
-      ...details,
-      message: t('errors.tooManyAttempts', {
-        minutes: Math.max(1, Math.ceil(details.retryAfter / 60)),
-      }),
-    };
+    return t('errors.tooManyAttempts', {
+      minutes: Math.max(1, Math.ceil(error.retryAfter / 60)),
+    });
   }
 
-  switch (details.code) {
+  switch (error.code) {
     case AUTH_ERROR_CODE.captchaRequired:
+      return t('errors.captchaRequired');
     case AUTH_ERROR_CODE.captchaInvalid:
-      return { ...details, message: t('errors.captchaRequired') };
+      return t('errors.captchaInvalid');
     case AUTH_ERROR_CODE.captchaUnavailable:
-      return { ...details, message: t('errors.captchaUnavailable') };
+      return t('errors.captchaUnavailable');
+    case AUTH_ERROR_CODE.tooManyLoginAttempts:
+    case AUTH_ERROR_CODE.tooManyAuthAttempts:
+    case AUTH_ERROR_CODE.tooManyRequests:
+    case AUTH_ERROR_CODE.actionCooldown:
+      return t('errors.tooManyAttemptsUnknown');
     case AUTH_ERROR_CODE.invalidCredentials:
-      return { ...details, message: t('errors.invalidCredentials') };
+      return t('errors.invalidCredentials');
     case AUTH_ERROR_CODE.emailNotVerified:
-      return { ...details, message: t('errors.emailNotVerified') };
+      return t('errors.emailNotVerified');
     case AUTH_ERROR_CODE.emailAlreadyRegistered:
-      return { ...details, message: t('errors.emailAlreadyRegistered') };
+      return t('errors.emailAlreadyRegistered');
     case AUTH_ERROR_CODE.googleEmailNotVerified:
-      return { ...details, message: t('errors.googleEmailNotVerified') };
+      return t('errors.googleEmailNotVerified');
     case AUTH_ERROR_CODE.emailDeliveryUnavailable:
-      return { ...details, message: t('errors.emailDeliveryUnavailable') };
+      return t('errors.emailDeliveryUnavailable');
     case AUTH_ERROR_CODE.accountLinkRequired:
-      return { ...details, message: t('errors.accountLinkRequired') };
+      return t('errors.accountLinkRequired');
     case AUTH_ERROR_CODE.googleTokenInvalid:
-      return { ...details, message: t('errors.googleTokenInvalid') };
+      return t('errors.googleTokenInvalid');
     case AUTH_ERROR_CODE.legalConsentRequired:
-      return { ...details, message: t('errors.legalConsentRequired') };
+      return t('errors.legalConsentRequired');
+    case AUTH_ERROR_CODE.googleUnavailable:
+      return t('errors.googleUnavailable');
+    case AUTH_ERROR_CODE.serviceUnavailable:
+      return t('errors.serviceUnavailable');
     case AUTH_ERROR_CODE.network:
-      return { ...details, message: t('errors.network') };
+      return t('errors.network');
     default:
-      return { ...details, message: t('errors.generic') };
+      return t('errors.generic');
   }
 };
 
-export { AUTH_ERROR_CODE, CAPTCHA_ACTION, isCaptchaChallenge, translateAuthError };
+export {
+  AUTH_ERROR_CODE,
+  CAPTCHA_ACTION,
+  authErrorMessage,
+  isCaptchaChallenge,
+  resolveAuthError,
+};
 export type { AuthError, CaptchaAction };

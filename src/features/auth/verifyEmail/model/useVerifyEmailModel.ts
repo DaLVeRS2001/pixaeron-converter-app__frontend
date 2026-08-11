@@ -3,10 +3,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
+import { useCurrentUser } from 'entities/user';
+
 import { ResendEmailVerificationDocument, VerifyEmailDocument } from 'shared/api';
 import type { EmailVerificationStatus } from 'shared/api';
 
-import { CAPTCHA_ACTION, isCaptchaChallenge, translateAuthError } from '../../model/errors';
+import {
+  AUTH_ERROR_CODE,
+  CAPTCHA_ACTION,
+  authErrorMessage,
+  isCaptchaChallenge,
+  resolveAuthError,
+} from '../../model/errors';
+import type { AuthError } from '../../model/errors';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
 
 type VerificationViewStatus = EmailVerificationStatus | 'CHECK_EMAIL' | 'RESENT';
@@ -23,6 +32,7 @@ const maskEmail = (email: string) => {
 
 const useVerifyEmailModel = () => {
   const { t } = useTranslation('auth');
+  const session = useCurrentUser();
   const location = useLocation();
   const stateEmail = (location.state as { email?: string } | null)?.email;
   const initialEmail = stateEmail ?? sessionStorage.getItem('pendingVerificationEmail') ?? '';
@@ -32,7 +42,7 @@ const useVerifyEmailModel = () => {
     () => new URLSearchParams(window.location.hash.slice(1)).get('token') ?? ''
   );
   const [status, setStatus] = useState<VerificationViewStatus>('CHECK_EMAIL');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [authError, setAuthError] = useState<AuthError>();
   const [cooldown, setCooldown] = useState(0);
   const [busy, setBusy] = useState(Boolean(verificationToken));
   const [verifyEmail] = useMutation(VerifyEmailDocument);
@@ -65,7 +75,7 @@ const useVerifyEmailModel = () => {
         }
       })
       .catch((error) => {
-        if (active) setErrorMessage(translateAuthError(error, t).message);
+        if (active) setAuthError(resolveAuthError(error));
       })
       .finally(() => {
         if (active) setBusy(false);
@@ -74,7 +84,7 @@ const useVerifyEmailModel = () => {
     return () => {
       active = false;
     };
-  }, [t, verificationToken, verifyEmail]);
+  }, [verificationToken, verifyEmail]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -89,7 +99,7 @@ const useVerifyEmailModel = () => {
     async (intent: ResendIntent, captchaToken?: string) => {
       if (busy) return;
       setBusy(true);
-      setErrorMessage('');
+      setAuthError(undefined);
 
       try {
         await resend({ variables: { input: { email: intent.email, captchaToken } } });
@@ -100,21 +110,21 @@ const useVerifyEmailModel = () => {
         setCooldown(60);
         clear();
       } catch (error) {
-        const translated = translateAuthError(error, t);
-        if (translated.retryAfter !== undefined) {
-          setCooldown(Math.max(1, Math.ceil(translated.retryAfter)));
+        const resolved = resolveAuthError(error);
+        if (resolved.retryAfter !== undefined) {
+          setCooldown(Math.max(1, Math.ceil(resolved.retryAfter)));
         }
-        if (isCaptchaChallenge(translated.code)) {
-          activate(translated.action ?? CAPTCHA_ACTION.resendConfirmation, intent);
+        if (isCaptchaChallenge(resolved.code)) {
+          activate(resolved.action ?? CAPTCHA_ACTION.resendConfirmation, intent);
         } else {
           clear();
         }
-        setErrorMessage(translated.message);
+        setAuthError(resolved);
       } finally {
         setBusy(false);
       }
     },
-    [activate, busy, clear, resend, t]
+    [activate, busy, clear, resend]
   );
 
   const resendEmail = useCallback(() => {
@@ -131,10 +141,13 @@ const useVerifyEmailModel = () => {
   );
   const handleCaptchaUnavailable = useCallback(() => {
     clear();
-    setErrorMessage(t('errors.captchaUnavailable'));
-  }, [clear, t]);
+    setAuthError({ code: AUTH_ERROR_CODE.captchaUnavailable });
+  }, [clear]);
 
-  const verified = isVerifiedStatus(status);
+  const sessionVerified = session.status === 'authenticated' && session.user.emailVerified;
+  const viewStatus: VerificationViewStatus =
+    status === 'CHECK_EMAIL' && sessionVerified ? 'ALREADY_VERIFIED' : status;
+  const verified = isVerifiedStatus(viewStatus);
 
   return {
     busy,
@@ -142,13 +155,14 @@ const useVerifyEmailModel = () => {
     cooldown,
     editingEmail,
     email,
-    errorMessage,
+    error: authError,
+    errorMessage: authError ? authErrorMessage(authError, t) : '',
     maskedEmail: email ? maskEmail(email) : '',
     onCaptchaToken,
     onCaptchaUnavailable: handleCaptchaUnavailable,
     resendEmail,
     setEmail,
-    status,
+    status: viewStatus,
     verified,
   };
 };

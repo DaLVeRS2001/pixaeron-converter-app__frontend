@@ -1,7 +1,7 @@
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import type { TFunction } from 'i18next';
 
-import { AUTH_ERROR_CODE, translateAuthError } from './errors';
+import { AUTH_ERROR_CODE, authErrorMessage, resolveAuthError } from './errors';
 
 const translate = jest.fn((key: string, options?: Record<string, unknown>) =>
   options ? `${key}:${JSON.stringify(options)}` : key
@@ -17,15 +17,35 @@ const authError = (
     errors: [{ message, extensions: { code, ...extensions } }],
   });
 
-describe('translateAuthError', () => {
+describe('resolveAuthError', () => {
+  it('keeps the error identity instead of a rendered message', () => {
+    expect(
+      resolveAuthError(
+        authError(AUTH_ERROR_CODE.captchaRequired, { action: 'login', retryAfter: 30 })
+      )
+    ).toEqual({ code: AUTH_ERROR_CODE.captchaRequired, action: 'login', retryAfter: 30 });
+  });
+
+  it('reports an unrecognized failure as a network error', () => {
+    expect(resolveAuthError(new Error('socket details'))).toEqual({
+      code: AUTH_ERROR_CODE.network,
+    });
+  });
+});
+
+describe('authErrorMessage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it.each([
     [AUTH_ERROR_CODE.captchaRequired, 'errors.captchaRequired'],
-    [AUTH_ERROR_CODE.captchaInvalid, 'errors.captchaRequired'],
+    [AUTH_ERROR_CODE.captchaInvalid, 'errors.captchaInvalid'],
     [AUTH_ERROR_CODE.captchaUnavailable, 'errors.captchaUnavailable'],
+    [AUTH_ERROR_CODE.tooManyLoginAttempts, 'errors.tooManyAttemptsUnknown'],
+    [AUTH_ERROR_CODE.tooManyAuthAttempts, 'errors.tooManyAttemptsUnknown'],
+    [AUTH_ERROR_CODE.tooManyRequests, 'errors.tooManyAttemptsUnknown'],
+    [AUTH_ERROR_CODE.actionCooldown, 'errors.tooManyAttemptsUnknown'],
     [AUTH_ERROR_CODE.invalidCredentials, 'errors.invalidCredentials'],
     [AUTH_ERROR_CODE.emailNotVerified, 'errors.emailNotVerified'],
     [AUTH_ERROR_CODE.emailAlreadyRegistered, 'errors.emailAlreadyRegistered'],
@@ -34,36 +54,37 @@ describe('translateAuthError', () => {
     [AUTH_ERROR_CODE.accountLinkRequired, 'errors.accountLinkRequired'],
     [AUTH_ERROR_CODE.googleTokenInvalid, 'errors.googleTokenInvalid'],
     [AUTH_ERROR_CODE.legalConsentRequired, 'errors.legalConsentRequired'],
-  ])('maps %s to %s without displaying the backend message', (code, translationKey) => {
-    const result = translateAuthError(authError(code), translate);
+    [AUTH_ERROR_CODE.googleUnavailable, 'errors.googleUnavailable'],
+    [AUTH_ERROR_CODE.serviceUnavailable, 'errors.serviceUnavailable'],
+    [AUTH_ERROR_CODE.network, 'errors.network'],
+  ])('maps %s to %s', (code, translationKey) => {
+    expect(authErrorMessage({ code }, translate)).toBe(translationKey);
+  });
 
-    expect(result.message).toBe(translationKey);
-    expect(result.message).not.toContain('private backend message');
+  it('never displays the backend message', () => {
+    const resolved = resolveAuthError(authError(AUTH_ERROR_CODE.invalidCredentials));
+
+    expect(authErrorMessage(resolved, translate)).not.toContain('private backend message');
   });
 
   it('converts a cooldown retryAfter to localized seconds', () => {
-    const result = translateAuthError(
-      authError(AUTH_ERROR_CODE.actionCooldown, { retryAfter: 12.2 }),
-      translate
+    const resolved = resolveAuthError(
+      authError(AUTH_ERROR_CODE.actionCooldown, { retryAfter: 12.2 })
     );
 
-    expect(result.message).toBe('errors.cooldown:{"seconds":13}');
+    expect(authErrorMessage(resolved, translate)).toBe('errors.cooldown:{"seconds":13}');
   });
 
   it('converts an attempt retryAfter to localized minutes', () => {
-    const result = translateAuthError(
-      authError(AUTH_ERROR_CODE.tooManyLoginAttempts, { retryAfter: 61 }),
-      translate
+    const resolved = resolveAuthError(
+      authError(AUTH_ERROR_CODE.tooManyLoginAttempts, { retryAfter: 61 })
     );
 
-    expect(result.message).toBe('errors.tooManyAttempts:{"minutes":2}');
+    expect(authErrorMessage(resolved, translate)).toBe('errors.tooManyAttempts:{"minutes":2}');
   });
 
-  it('localizes network and unknown errors without exposing their messages', () => {
-    expect(translateAuthError(new Error('socket details'), translate).message).toBe(
-      'errors.network'
-    );
-    expect(translateAuthError(authError('UNKNOWN_PUBLIC_CODE'), translate).message).toBe(
+  it('falls back to the generic message only for an unknown code', () => {
+    expect(authErrorMessage({ code: 'UNKNOWN_PUBLIC_CODE' }, translate)).toBe(
       'errors.generic'
     );
   });

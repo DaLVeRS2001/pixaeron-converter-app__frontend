@@ -6,7 +6,14 @@ import { useTranslation } from 'react-i18next';
 
 import { RequestPasswordResetDocument } from 'shared/api';
 
-import { CAPTCHA_ACTION, isCaptchaChallenge, translateAuthError } from '../../model/errors';
+import {
+  AUTH_ERROR_CODE,
+  CAPTCHA_ACTION,
+  authErrorMessage,
+  isCaptchaChallenge,
+  resolveAuthError,
+} from '../../model/errors';
+import type { AuthError } from '../../model/errors';
 import { createEmailSchema } from '../../model/schemas';
 import type { EmailFormValues } from '../../model/schemas';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
@@ -16,7 +23,7 @@ type ResetRequestIntent = EmailFormValues;
 const useRequestPasswordResetModel = () => {
   const { t } = useTranslation('auth');
   const [sent, setSent] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [authError, setAuthError] = useState<AuthError>();
   const [busy, setBusy] = useState(false);
   const schema = useMemo(() => createEmailSchema(t), [t]);
   const form = useForm<EmailFormValues>({
@@ -31,7 +38,7 @@ const useRequestPasswordResetModel = () => {
     async (intent: ResetRequestIntent, captchaToken?: string) => {
       if (busy) return;
       setBusy(true);
-      setErrorMessage('');
+      setAuthError(undefined);
       setSent(false);
 
       try {
@@ -43,18 +50,18 @@ const useRequestPasswordResetModel = () => {
         clear();
         setSent(true);
       } catch (error) {
-        const translated = translateAuthError(error, t);
-        if (isCaptchaChallenge(translated.code)) {
-          activate(translated.action ?? CAPTCHA_ACTION.forgotPassword, intent);
+        const resolved = resolveAuthError(error);
+        if (isCaptchaChallenge(resolved.code)) {
+          activate(resolved.action ?? CAPTCHA_ACTION.forgotPassword, intent);
         } else {
           clear();
         }
-        setErrorMessage(translated.message);
+        setAuthError(resolved);
       } finally {
         setBusy(false);
       }
     },
-    [activate, busy, clear, requestReset, t]
+    [activate, busy, clear, requestReset]
   );
 
   const submit = form.handleSubmit((intent) => executeIntent(intent));
@@ -67,13 +74,14 @@ const useRequestPasswordResetModel = () => {
   );
   const handleCaptchaUnavailable = useCallback(() => {
     clear();
-    setErrorMessage(t('errors.captchaUnavailable'));
-  }, [clear, t]);
+    setAuthError({ code: AUTH_ERROR_CODE.captchaUnavailable });
+  }, [clear]);
 
   return {
     busy,
     captcha: challenge,
-    errorMessage,
+    error: authError,
+    errorMessage: authError ? authErrorMessage(authError, t) : '',
     form,
     onCaptchaToken,
     onCaptchaUnavailable: handleCaptchaUnavailable,
