@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
-import { VerifyEmailPanel } from './VerifyEmailPanel';
 import type { useVerifyEmailModel } from '../model/useVerifyEmailModel';
+import { VerifyEmailPanel } from './VerifyEmailPanel';
 
 type VerifyEmailModel = ReturnType<typeof useVerifyEmailModel>;
 
@@ -36,7 +36,11 @@ const createModel = (overrides: Partial<VerifyEmailModel> = {}): VerifyEmailMode
 
 describe('VerifyEmailPanel', () => {
   it('drops the pending instructions once the address is confirmed', () => {
-    mockModel = createModel({ status: 'VERIFIED', verified: true, maskedEmail: 'u****@example.com' });
+    mockModel = createModel({
+      status: 'VERIFIED',
+      verified: true,
+      maskedEmail: 'u****@example.com',
+    });
 
     render(<VerifyEmailPanel />);
 

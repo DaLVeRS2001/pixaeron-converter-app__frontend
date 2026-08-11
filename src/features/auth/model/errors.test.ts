@@ -84,6 +84,8 @@ describe('authErrorMessage', () => {
   });
 
   it('falls back to the generic message only for an unknown code', () => {
-    expect(authErrorMessage({ code: 'UNKNOWN_PUBLIC_CODE' }, translate)).toBe('errors.generic');
+    expect(authErrorMessage({ code: 'UNKNOWN_PUBLIC_CODE' }, translate)).toBe(
+      'errors.generic'
+    );
   });
 });

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
 import { useCurrentUser } from 'entities/user';
+
 import { ResendEmailVerificationDocument, VerifyEmailDocument } from 'shared/api';
 import type { EmailVerificationStatus } from 'shared/api';
 
