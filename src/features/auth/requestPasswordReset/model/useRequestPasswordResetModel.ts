@@ -6,12 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { RequestPasswordResetDocument } from 'shared/api';
 
-import {
-  AUTH_ERROR_CODE,
-  CAPTCHA_ACTION,
-  isCaptchaChallenge,
-  translateAuthError,
-} from '../../model/errors';
+import { CAPTCHA_ACTION, isCaptchaChallenge, translateAuthError } from '../../model/errors';
 import { createEmailSchema } from '../../model/schemas';
 import type { EmailFormValues } from '../../model/schemas';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
@@ -37,6 +32,7 @@ const useRequestPasswordResetModel = () => {
       if (busy) return;
       setBusy(true);
       setErrorMessage('');
+      setSent(false);
 
       try {
         await requestReset({
@@ -50,8 +46,6 @@ const useRequestPasswordResetModel = () => {
         const translated = translateAuthError(error, t);
         if (isCaptchaChallenge(translated.code)) {
           activate(translated.action ?? CAPTCHA_ACTION.forgotPassword, intent);
-        } else if (translated.code === AUTH_ERROR_CODE.captchaUnavailable) {
-          clear();
         } else {
           clear();
         }

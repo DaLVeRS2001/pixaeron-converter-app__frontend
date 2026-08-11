@@ -1,37 +1,47 @@
 import block from 'bem-cn';
-import { ButtonHTMLAttributes } from 'react';
-import { Link, To } from 'react-router-dom';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
+import type { LinkProps } from 'react-router-dom';
 
 import './Button.scss';
 
-type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
-  to?: To;
+type CommonButtonProps = {
+  className?: string;
   variant?: 'primary' | 'secondary' | 'text' | 'danger';
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
+type NativeButtonProps = CommonButtonProps &
+  Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'className'> & {
+    to?: never;
+  };
+
+type LinkButtonProps = CommonButtonProps &
+  Omit<LinkProps, 'children' | 'className'> & {
+    to: LinkProps['to'];
+  };
+
+type ButtonProps = NativeButtonProps | LinkButtonProps;
+
 const cn = block('button');
+const getClasses = (variant: CommonButtonProps['variant'], className?: string) =>
+  [cn({ variant: variant ?? 'primary' }), className].filter(Boolean).join(' ');
 
-const Button = ({
-  className,
-  variant = 'primary',
-  to,
-  children,
-  type = 'button',
-  ...props
-}: ButtonProps) => {
-  const classes = [cn({ variant }), className].filter(Boolean).join(' ');
+const Button = (props: ButtonProps) => {
+  if (props.to !== undefined) {
+    const { children, className, variant, ...linkProps } = props;
 
-  if (to) {
     return (
-      <Link className={classes} to={to}>
+      <Link {...linkProps} className={getClasses(variant, className)}>
         {children}
       </Link>
     );
   }
 
+  const { children, className, variant, type = 'button', ...buttonProps } = props;
+
   return (
-    <button className={classes} type={type} {...props}>
+    <button {...buttonProps} className={getClasses(variant, className)} type={type}>
       {children}
     </button>
   );

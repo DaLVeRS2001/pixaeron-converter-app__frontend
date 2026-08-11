@@ -58,6 +58,7 @@ const RequestPasswordResetForm = () => {
           </Button>
         </form>
       </div>
+      <p className={cn('footer')}>{t('forgot.googleHint')}</p>
       <p className={cn('footer')}>
         {t('forgot.remember')}
         <Link className={cn('link')} to="/sign-in">

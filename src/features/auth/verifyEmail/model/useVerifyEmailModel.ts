@@ -6,16 +6,14 @@ import { useLocation } from 'react-router-dom';
 import { ResendEmailVerificationDocument, VerifyEmailDocument } from 'shared/api';
 import type { EmailVerificationStatus } from 'shared/api';
 
-import {
-  AUTH_ERROR_CODE,
-  CAPTCHA_ACTION,
-  isCaptchaChallenge,
-  translateAuthError,
-} from '../../model/errors';
+import { CAPTCHA_ACTION, isCaptchaChallenge, translateAuthError } from '../../model/errors';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
 
 type VerificationViewStatus = EmailVerificationStatus | 'CHECK_EMAIL' | 'RESENT';
 type ResendIntent = { email: string };
+
+const isVerifiedStatus = (status: VerificationViewStatus) =>
+  status === 'VERIFIED' || status === 'ALREADY_VERIFIED';
 
 const maskEmail = (email: string) => {
   const [local, domain] = email.split('@');
@@ -58,7 +56,13 @@ const useVerifyEmailModel = () => {
     }
     verificationRequestRef.current
       .then(({ data }) => {
-        if (active && data?.verifyEmail.status) setStatus(data.verifyEmail.status);
+        const nextStatus = data?.verifyEmail.status;
+        if (!active || !nextStatus) return;
+
+        setStatus(nextStatus);
+        if (isVerifiedStatus(nextStatus)) {
+          sessionStorage.removeItem('pendingVerificationEmail');
+        }
       })
       .catch((error) => {
         if (active) setErrorMessage(translateAuthError(error, t).message);
@@ -102,8 +106,6 @@ const useVerifyEmailModel = () => {
         }
         if (isCaptchaChallenge(translated.code)) {
           activate(translated.action ?? CAPTCHA_ACTION.resendConfirmation, intent);
-        } else if (translated.code === AUTH_ERROR_CODE.captchaUnavailable) {
-          clear();
         } else {
           clear();
         }
@@ -132,7 +134,7 @@ const useVerifyEmailModel = () => {
     setErrorMessage(t('errors.captchaUnavailable'));
   }, [clear, t]);
 
-  const verified = status === 'VERIFIED' || status === 'ALREADY_VERIFIED';
+  const verified = isVerifiedStatus(status);
 
   return {
     busy,

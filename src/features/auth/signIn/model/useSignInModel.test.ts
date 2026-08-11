@@ -1,7 +1,7 @@
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { GoogleLoginDocument } from 'shared/api';
+import { GoogleLoginDocument, MeDocument } from 'shared/api';
 
 import { LEGAL_CONSENT_NOTICE } from '../../model/legalConsent';
 import { useSignInModel } from './useSignInModel';
@@ -11,6 +11,7 @@ const mockLogin = jest.fn();
 const mockNavigate = jest.fn();
 const mockUseMutation = jest.fn();
 const mockWriteQuery = jest.fn();
+let mockLocationState: unknown = null;
 
 const setTurnstileSiteKey = (value: string) =>
   Object.assign(globalThis, { __TURNSTILE_SITE_KEY__: value });
@@ -21,6 +22,7 @@ jest.mock('@apollo/client/react', () => ({
 }));
 
 jest.mock('react-router-dom', () => ({
+  useLocation: () => ({ state: mockLocationState }),
   useNavigate: () => mockNavigate,
 }));
 
@@ -34,6 +36,17 @@ const legalConsentError = () =>
           action: 'accept_legal_terms',
           code: 'LEGAL_CONSENT_REQUIRED',
         },
+      },
+    ],
+  });
+
+const emailNotVerifiedError = () =>
+  new CombinedGraphQLErrors({
+    data: null,
+    errors: [
+      {
+        message: 'Email is not verified',
+        extensions: { code: 'EMAIL_NOT_VERIFIED' },
       },
     ],
   });
@@ -152,8 +165,55 @@ describe('useSignInModel CAPTCHA timing', () => {
   });
 });
 
-describe('useSignInModel Google consent routing', () => {
-  beforeEach(() => setTurnstileSiteKey(''));
+describe('useSignInModel routing', () => {
+  beforeEach(() => {
+    setTurnstileSiteKey('');
+    mockLocationState = null;
+    sessionStorage.clear();
+  });
+
+  it('writes the authenticated user to Apollo cache before entering the app', async () => {
+    const user = {
+      id: 'user-id',
+      email: 'user@example.com',
+      username: 'User',
+      emailVerified: true,
+    };
+    mockLogin.mockResolvedValue({ data: { login: user } });
+    const { result } = renderModel();
+
+    act(() => {
+      result.current.form.setValue('email', 'user@example.com');
+      result.current.form.setValue('password', 'password');
+    });
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    expect(mockWriteQuery).toHaveBeenCalledWith({
+      query: MeDocument,
+      data: { me: user },
+    });
+    expect(mockNavigate).toHaveBeenCalledWith('/app', { replace: true });
+  });
+
+  it('routes an unverified password login using the normalized email', async () => {
+    mockLogin.mockRejectedValue(emailNotVerifiedError());
+    const { result } = renderModel();
+
+    act(() => {
+      result.current.form.setValue('email', 'USER@EXAMPLE.COM');
+      result.current.form.setValue('password', 'password');
+    });
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    expect(sessionStorage.getItem('pendingVerificationEmail')).toBe('user@example.com');
+    expect(mockNavigate).toHaveBeenCalledWith('/verify-email', {
+      state: { email: 'user@example.com' },
+    });
+  });
 
   it('does not send account-creation consent during an existing Google sign-in', async () => {
     mockGoogleLogin.mockResolvedValue({ data: undefined });
@@ -173,7 +233,10 @@ describe('useSignInModel Google consent routing', () => {
     });
   });
 
-  it('routes unknown Google identity to explicit signup without persisting its token', async () => {
+  it('preserves a safe return location when routing an unknown Google identity to signup', async () => {
+    mockLocationState = {
+      from: { pathname: '/app', search: '?view=queue', hash: '#latest' },
+    };
     mockGoogleLogin.mockRejectedValue(legalConsentError());
     const { result } = renderModel();
 
@@ -184,7 +247,10 @@ describe('useSignInModel Google consent routing', () => {
     await waitFor(() =>
       expect(mockNavigate).toHaveBeenCalledWith('/sign-up', {
         replace: true,
-        state: { notice: LEGAL_CONSENT_NOTICE },
+        state: {
+          notice: LEGAL_CONSENT_NOTICE,
+          from: { pathname: '/app', search: '?view=queue', hash: '#latest' },
+        },
       })
     );
     expect(JSON.stringify(mockNavigate.mock.calls)).not.toContain('new-google-token');

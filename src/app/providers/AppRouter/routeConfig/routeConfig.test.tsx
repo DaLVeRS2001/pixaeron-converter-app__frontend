@@ -20,4 +20,10 @@ describe('routeConfig', () => {
       expect.arrayContaining(['/verify-email', '/reset-password'])
     );
   });
+
+  it('uses the application error boundary for the wildcard lazy route', () => {
+    const wildcardRoute = routes.find((route) => route.path === '*');
+
+    expect(wildcardRoute?.errorElement).toBeDefined();
+  });
 });

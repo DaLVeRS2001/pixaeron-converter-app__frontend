@@ -57,6 +57,13 @@ const VerifyEmailStatus = ({ status }: { status: VerificationViewStatus }) => {
 const VerifyEmailPanel = () => {
   const { t } = useTranslation('auth');
   const model = useVerifyEmailModel();
+  const hasResendCooldown = model.cooldown > 0;
+  const canResend =
+    !model.busy && Boolean(model.email.trim()) && !hasResendCooldown && !model.captcha;
+  const availableResendLabel = hasResendCooldown
+    ? t('verify.resendIn', { seconds: model.cooldown })
+    : t('verify.resend');
+  const resendButtonLabel = model.busy ? t('verify.sending') : availableResendLabel;
 
   return (
     <div className={cn({ centered: true })}>
@@ -98,20 +105,8 @@ const VerifyEmailPanel = () => {
                 onUnavailable={model.onCaptchaUnavailable}
               />
             )}
-            <Button
-              onClick={model.resendEmail}
-              disabled={
-                model.busy ||
-                !model.email.trim() ||
-                model.cooldown > 0 ||
-                Boolean(model.captcha)
-              }
-            >
-              {model.busy
-                ? t('verify.sending')
-                : model.cooldown > 0
-                  ? t('verify.resendIn', { seconds: model.cooldown })
-                  : t('verify.resend')}
+            <Button onClick={model.resendEmail} disabled={!canResend}>
+              {resendButtonLabel}
             </Button>
           </>
         )}
