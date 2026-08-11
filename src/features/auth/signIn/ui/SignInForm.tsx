@@ -8,6 +8,7 @@ import { Captcha } from 'shared/ui/Captcha';
 import { FormField } from 'shared/ui/FormField';
 
 import { GoogleButton } from '../../google/ui/GoogleButton';
+import { validationMessage } from '../../model/schemas';
 import { useSignInModel } from '../model/useSignInModel';
 
 import '../../ui/AuthForm.scss';
@@ -38,7 +39,7 @@ const SignInForm = () => {
             type="email"
             autoComplete="email"
             placeholder={t('common.emailPlaceholder')}
-            error={errors.email?.message}
+            error={validationMessage(t, errors.email?.message)}
             {...model.form.register('email')}
           />
           <div>
@@ -53,7 +54,7 @@ const SignInForm = () => {
               label=""
               type="password"
               autoComplete="current-password"
-              error={errors.password?.message}
+              error={validationMessage(t, errors.password?.message)}
               {...model.form.register('password')}
             />
           </div>

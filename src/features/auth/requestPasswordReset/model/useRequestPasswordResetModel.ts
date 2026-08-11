@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +14,7 @@ import {
   resolveAuthError,
 } from '../../model/errors';
 import type { AuthError } from '../../model/errors';
-import { createEmailSchema } from '../../model/schemas';
+import { emailSchema } from '../../model/schemas';
 import type { EmailFormValues } from '../../model/schemas';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
 
@@ -25,9 +25,8 @@ const useRequestPasswordResetModel = () => {
   const [sent, setSent] = useState(false);
   const [authError, setAuthError] = useState<AuthError>();
   const [busy, setBusy] = useState(false);
-  const schema = useMemo(() => createEmailSchema(t), [t]);
   const form = useForm<EmailFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(emailSchema),
     defaultValues: { email: '' },
   });
   const [requestReset] = useMutation(RequestPasswordResetDocument);

@@ -16,7 +16,7 @@ import {
 } from '../../model/errors';
 import type { AuthError } from '../../model/errors';
 import { CURRENT_LEGAL_CONSENT } from '../../model/legalConsent';
-import { createSignUpSchema } from '../../model/schemas';
+import { signUpSchema } from '../../model/schemas';
 import type { SignUpFormValues } from '../../model/schemas';
 import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
 import { useCompleteLogin } from '../../model/useCompleteLogin';
@@ -30,9 +30,8 @@ const useSignUpModel = () => {
   const navigate = useNavigate();
   const [authError, setAuthError] = useState<AuthError>();
   const [busy, setBusy] = useState(false);
-  const schema = useMemo(() => createSignUpSchema(t), [t]);
   const form = useForm<SignUpFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       username: '',
       email: '',
@@ -128,7 +127,7 @@ const useSignUpModel = () => {
       if (busy || challenge) return;
 
       if (!form.getValues('termsAccepted')) {
-        form.setError('termsAccepted', { message: t('validation.terms') });
+        form.setError('termsAccepted', { message: 'validation.terms' });
         return;
       }
 
@@ -141,7 +140,7 @@ const useSignUpModel = () => {
 
       void executeIntent(intent);
     },
-    [activate, busy, challenge, executeIntent, form, t]
+    [activate, busy, challenge, executeIntent, form]
   );
   const onCaptchaToken = useCallback(
     (token: string) => {

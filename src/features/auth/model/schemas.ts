@@ -3,68 +3,67 @@ import { z } from 'zod';
 
 const passwordFitsBcrypt = (value: string) => new TextEncoder().encode(value).length <= 72;
 
-const createPasswordSchema = (t: TFunction<'auth'>) =>
-  z
-    .string()
-    .min(8, t('validation.passwordMin'))
-    .regex(/[a-z]/, t('validation.passwordLowercase'))
-    .regex(/[A-Z]/, t('validation.passwordUppercase'))
-    .regex(/\d/, t('validation.passwordNumber'))
-    .regex(/[^A-Za-z0-9]/, t('validation.passwordSymbol'))
-    .refine(passwordFitsBcrypt, t('validation.passwordBytes'));
+const passwordSchema = z
+  .string()
+  .min(8, 'validation.passwordMin')
+  .regex(/[a-z]/, 'validation.passwordLowercase')
+  .regex(/[A-Z]/, 'validation.passwordUppercase')
+  .regex(/\d/, 'validation.passwordNumber')
+  .regex(/[^A-Za-z0-9]/, 'validation.passwordSymbol')
+  .refine(passwordFitsBcrypt, 'validation.passwordBytes');
 
-const createSignInSchema = (t: TFunction<'auth'>) =>
-  z.object({
-    email: z.email(t('validation.email')).max(254),
-    password: z
+const signInSchema = z.object({
+  email: z.email('validation.email').max(254),
+  password: z
+    .string()
+    .min(1, 'validation.passwordRequired')
+    .refine(passwordFitsBcrypt, 'validation.passwordBytes'),
+  rememberMe: z.boolean(),
+});
+
+const signUpSchema = z
+  .object({
+    username: z
       .string()
-      .min(1, t('validation.passwordRequired'))
-      .refine(passwordFitsBcrypt, t('validation.passwordBytes')),
-    rememberMe: z.boolean(),
+      .trim()
+      .min(3, 'validation.usernameMin')
+      .max(32, 'validation.usernameMax'),
+    email: z.email('validation.email').max(254),
+    password: passwordSchema,
+    confirmPassword: z.string(),
+    termsAccepted: z.boolean().refine(Boolean, 'validation.terms'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'validation.passwordMismatch',
   });
 
-const createSignUpSchema = (t: TFunction<'auth'>) =>
-  z
-    .object({
-      username: z
-        .string()
-        .trim()
-        .min(3, t('validation.usernameMin'))
-        .max(32, t('validation.usernameMax')),
-      email: z.email(t('validation.email')).max(254),
-      password: createPasswordSchema(t),
-      confirmPassword: z.string(),
-      termsAccepted: z.boolean().refine(Boolean, t('validation.terms')),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      path: ['confirmPassword'],
-      message: t('validation.passwordMismatch'),
-    });
+const emailSchema = z.object({ email: z.email('validation.email').max(254) });
 
-const createEmailSchema = (t: TFunction<'auth'>) =>
-  z.object({ email: z.email(t('validation.email')).max(254) });
+const resetPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'validation.passwordMismatch',
+  });
 
-const createResetPasswordSchema = (t: TFunction<'auth'>) =>
-  z
-    .object({
-      password: createPasswordSchema(t),
-      confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      path: ['confirmPassword'],
-      message: t('validation.passwordMismatch'),
-    });
+const validationMessage = (t: TFunction<'auth'>, message: string | undefined) =>
+  message === undefined ? undefined : (t as unknown as (key: string) => string)(message);
 
-type SignInFormValues = z.infer<ReturnType<typeof createSignInSchema>>;
-type SignUpFormValues = z.infer<ReturnType<typeof createSignUpSchema>>;
-type EmailFormValues = z.infer<ReturnType<typeof createEmailSchema>>;
-type ResetPasswordFormValues = z.infer<ReturnType<typeof createResetPasswordSchema>>;
+type SignInFormValues = z.infer<typeof signInSchema>;
+type SignUpFormValues = z.infer<typeof signUpSchema>;
+type EmailFormValues = z.infer<typeof emailSchema>;
+type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
 export {
-  createEmailSchema,
-  createPasswordSchema,
-  createResetPasswordSchema,
-  createSignInSchema,
-  createSignUpSchema,
+  emailSchema,
+  passwordSchema,
+  resetPasswordSchema,
+  signInSchema,
+  signUpSchema,
+  validationMessage,
 };
 export type { EmailFormValues, ResetPasswordFormValues, SignInFormValues, SignUpFormValues };

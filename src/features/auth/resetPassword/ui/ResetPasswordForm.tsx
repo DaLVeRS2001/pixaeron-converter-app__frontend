@@ -6,6 +6,7 @@ import { Alert } from 'shared/ui/Alert';
 import { Button } from 'shared/ui/Button';
 import { FormField } from 'shared/ui/FormField';
 
+import { validationMessage } from '../../model/schemas';
 import { useResetPasswordModel } from '../model/useResetPasswordModel';
 
 import '../../ui/AuthForm.scss';
@@ -56,7 +57,7 @@ const ResetPasswordForm = () => {
               label={t('common.newPassword')}
               type="password"
               autoComplete="new-password"
-              error={errors.password?.message}
+              error={validationMessage(t, errors.password?.message)}
               {...model.form.register('password')}
             />
             <FormField
@@ -64,7 +65,7 @@ const ResetPasswordForm = () => {
               label={t('common.confirmPassword')}
               type="password"
               autoComplete="new-password"
-              error={errors.confirmPassword?.message}
+              error={validationMessage(t, errors.confirmPassword?.message)}
               {...model.form.register('confirmPassword')}
             />
             <Button type="submit" disabled={model.loading}>
