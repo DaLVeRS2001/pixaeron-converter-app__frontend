@@ -72,11 +72,13 @@ const VerifyEmailPanel = () => {
       </div>
       <header className={cn('header')}>
         <h1>{model.verified ? t('verify.confirmedTitle') : t('verify.checkTitle')}</h1>
-        <p>
-          {model.maskedEmail
-            ? t('verify.sentTo', { email: model.maskedEmail })
-            : t('verify.openLink')}
-        </p>
+        {!model.verified && (
+          <p>
+            {model.maskedEmail
+              ? t('verify.sentTo', { email: model.maskedEmail })
+              : t('verify.openLink')}
+          </p>
+        )}
       </header>
       <div className={cn('stack')}>
         {model.errorMessage ? (

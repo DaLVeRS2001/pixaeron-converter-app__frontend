@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
+import { useCurrentUser } from 'entities/user';
 import { ResendEmailVerificationDocument, VerifyEmailDocument } from 'shared/api';
 import type { EmailVerificationStatus } from 'shared/api';
 
@@ -30,6 +31,7 @@ const maskEmail = (email: string) => {
 
 const useVerifyEmailModel = () => {
   const { t } = useTranslation('auth');
+  const session = useCurrentUser();
   const location = useLocation();
   const stateEmail = (location.state as { email?: string } | null)?.email;
   const initialEmail = stateEmail ?? sessionStorage.getItem('pendingVerificationEmail') ?? '';
@@ -141,7 +143,10 @@ const useVerifyEmailModel = () => {
     setAuthError({ code: AUTH_ERROR_CODE.captchaUnavailable });
   }, [clear]);
 
-  const verified = isVerifiedStatus(status);
+  const sessionVerified = session.status === 'authenticated' && session.user.emailVerified;
+  const viewStatus: VerificationViewStatus =
+    status === 'CHECK_EMAIL' && sessionVerified ? 'ALREADY_VERIFIED' : status;
+  const verified = isVerifiedStatus(viewStatus);
 
   return {
     busy,
@@ -156,7 +161,7 @@ const useVerifyEmailModel = () => {
     onCaptchaUnavailable: handleCaptchaUnavailable,
     resendEmail,
     setEmail,
-    status,
+    status: viewStatus,
     verified,
   };
 };
