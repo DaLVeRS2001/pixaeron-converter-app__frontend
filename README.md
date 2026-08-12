@@ -71,9 +71,11 @@ npx prettier . --check
 
 `npm run check` starts with the non-writing `codegen:check`, then runs ESLint, Stylelint, TypeScript type checking, unit tests, the production Webpack build, and Cloudflare asset validation. Because it performs a production build, the PowerShell command above overrides the development-only `/graphql` value for the current terminal; `GOOGLE_CLIENT_ID` and `TURNSTILE_SITE_KEY` must also contain valid public values. Use a fresh terminal or restore `$env:GRAPHQL_API_URL = '/graphql'` before `npm start`. The check uses the committed schema and does not contact GraphOS; `schema:check` is the separate remote comparison.
 
+The Cloudflare step is `scripts/check-cloudflare-build.mjs`. It parses `build/_headers` the way Cloudflare does and asserts the security policy directive by directive, then asserts that `build/_headers` is byte-identical to `public/_headers`. Treat it as the only gate on that file: Wrangler never parses `_headers`, so `cloudflare:deploy:dry-run` reports success on a malformed or silently reclassified rule. The policy itself and the traps it protects are documented in `docs/frontend-ci-cd-guide.md`.
+
 ## CI/CD and hosting
 
-Pull requests call the immutable central Pixaeron frontend workflow. The repository is configured for the Gateway cutover, but a successful public deployment and live auth smoke test through `https://api.pixaeron.com/graphql` have not been verified from this worktree. Trusted runs fetch the composed GraphOS API schema before `npm run check` and require the committed snapshot to match it. Fork and Dependabot pull requests cannot receive GitHub secrets, so they verify against the committed snapshot. Trusted `main` runs preserve the exact verified `build/` as a short-lived workflow artifact, then the repository-local protected job deploys it to Cloudflare Workers Static Assets.
+Pull requests call the immutable central Pixaeron frontend workflow. The public site is deployed and live: real registration and sign-in have completed against `https://api.pixaeron.com/graphql`, and the enforcing security headers were observed against the live Google and Turnstile flows on the apex before being switched out of report-only. Trusted runs fetch the composed GraphOS API schema before `npm run check` and require the committed snapshot to match it. Fork and Dependabot pull requests cannot receive GitHub secrets, so they verify against the committed snapshot. Trusted `main` runs preserve the exact verified `build/` as a short-lived workflow artifact, then the repository-local protected job deploys it to Cloudflare Workers Static Assets.
 
 GitHub repository variables:
 
@@ -105,6 +107,8 @@ CLOUDFLARE_API_TOKEN
 ```
 
 The deployment token is available only to the local protected job's final Wrangler deploy step.
+
+This repository is public, and so are its Actions logs. A `Secret scan` workflow runs gitleaks, pinned by image digest, over the full history on every push and pull request; this repository is clean. `GOOGLE_CLIENT_ID` and `TURNSTILE_SITE_KEY` are public browser identifiers and belong in the tree; nothing else does.
 
 Use Node.js 24. Detailed API, schema, CI/CD, Cloudflare, Google, Turnstile, AWS, and production operator instructions are indexed in `docs/AGENTS.md`. The `docs/` directory is intentionally ignored by repository policy.
 
