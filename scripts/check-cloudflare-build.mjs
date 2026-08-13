@@ -100,10 +100,20 @@ const requiredDirectives = {
   'frame-ancestors': ["'none'"],
   'form-action': ["'self'"],
   'script-src': ["'self'", 'https://accounts.google.com', 'https://challenges.cloudflare.com'],
-  'style-src': ["'self'", "'unsafe-inline'", 'https://accounts.google.com'],
+  'style-src': [
+    "'self'",
+    "'unsafe-inline'",
+    'https://accounts.google.com',
+    'https://challenges.cloudflare.com',
+  ],
   'img-src': ["'self'", 'data:'],
   'font-src': ["'self'"],
-  'connect-src': ["'self'", 'https://api.pixaeron.com'],
+  'connect-src': [
+    "'self'",
+    'https://api.pixaeron.com',
+    'https://accounts.google.com',
+    'https://challenges.cloudflare.com',
+  ],
   'frame-src': ['https://accounts.google.com', 'https://challenges.cloudflare.com'],
 };
 
