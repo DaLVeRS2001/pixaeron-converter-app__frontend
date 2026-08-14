@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 
-import { getGraphQLErrorDetails } from 'shared/api';
+import type { GraphQLErrorDetails } from 'shared/api';
 
 const AUTH_ERROR_CODE = {
   captchaRequired: 'CAPTCHA_REQUIRED',
@@ -33,18 +33,10 @@ const CAPTCHA_ACTION = {
 
 type CaptchaAction = (typeof CAPTCHA_ACTION)[keyof typeof CAPTCHA_ACTION];
 
-type AuthError = {
-  code?: string;
-  action?: string;
-  retryAfter?: number;
-};
-
 const isCaptchaChallenge = (code?: string) =>
   code === AUTH_ERROR_CODE.captchaRequired || code === AUTH_ERROR_CODE.captchaInvalid;
 
-const resolveAuthError = (error: unknown): AuthError => getGraphQLErrorDetails(error);
-
-const authErrorMessage = (error: AuthError, t: TFunction<'auth'>): string => {
+const authErrorMessage = (error: GraphQLErrorDetails, t: TFunction<'auth'>): string => {
   if (error.retryAfter !== undefined) {
     if (error.code === AUTH_ERROR_CODE.actionCooldown) {
       return t('errors.cooldown', { seconds: Math.max(1, Math.ceil(error.retryAfter)) });
@@ -94,11 +86,5 @@ const authErrorMessage = (error: AuthError, t: TFunction<'auth'>): string => {
   }
 };
 
-export {
-  AUTH_ERROR_CODE,
-  CAPTCHA_ACTION,
-  authErrorMessage,
-  isCaptchaChallenge,
-  resolveAuthError,
-};
-export type { AuthError, CaptchaAction };
+export { AUTH_ERROR_CODE, CAPTCHA_ACTION, authErrorMessage, isCaptchaChallenge };
+export type { CaptchaAction };

@@ -1,4 +1,4 @@
-﻿import { routes } from './routeConfig';
+import { routes } from './routeConfig';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -6,9 +6,12 @@ jest.mock('react-router-dom', () => ({
 }));
 
 describe('routeConfig', () => {
+  const [rootRoute] = routes;
+  const topLevelRoutes = rootRoute.children ?? [];
+
   it('keeps one-time token routes public even when another session is active', () => {
-    const publicPaths = routes.flatMap((route) => (route.path ? [route.path] : []));
-    const guestBoundary = routes.find((route) =>
+    const publicPaths = topLevelRoutes.flatMap((route) => (route.path ? [route.path] : []));
+    const guestBoundary = topLevelRoutes.find((route) =>
       route.children?.some((child) => child.path === '/sign-in')
     );
     const guestPaths = guestBoundary?.children?.flatMap((route) =>
@@ -21,9 +24,10 @@ describe('routeConfig', () => {
     );
   });
 
-  it('uses the application error boundary for the wildcard lazy route', () => {
-    const wildcardRoute = routes.find((route) => route.path === '*');
-
-    expect(wildcardRoute?.errorElement).toBeDefined();
+  it('covers every route, including the wildcard, with one root error boundary', () => {
+    expect(rootRoute.path).toBeUndefined();
+    expect(rootRoute.errorElement).toBeDefined();
+    expect(rootRoute.hydrateFallbackElement).toBeDefined();
+    expect(topLevelRoutes.some((route) => route.path === '*')).toBe(true);
   });
 });

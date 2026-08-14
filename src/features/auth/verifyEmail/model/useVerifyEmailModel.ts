@@ -1,22 +1,18 @@
 import { useMutation } from '@apollo/client/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
 import { useCurrentUser } from 'entities/user';
 
-import { ResendEmailVerificationDocument, VerifyEmailDocument } from 'shared/api';
-import type { EmailVerificationStatus } from 'shared/api';
-
 import {
-  AUTH_ERROR_CODE,
-  CAPTCHA_ACTION,
-  authErrorMessage,
-  isCaptchaChallenge,
-  resolveAuthError,
-} from '../../model/errors';
-import type { AuthError } from '../../model/errors';
-import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
+  ResendEmailVerificationDocument,
+  VerifyEmailDocument,
+  getGraphQLErrorDetails,
+} from 'shared/api';
+import type { EmailVerificationStatus, GraphQLErrorDetails } from 'shared/api';
+
+import { CAPTCHA_ACTION } from '../../model/errors';
+import { useAuthAction } from '../../model/useAuthAction';
 
 type VerificationViewStatus = EmailVerificationStatus | 'CHECK_EMAIL' | 'RESENT';
 type ResendIntent = { email: string };
@@ -31,7 +27,6 @@ const maskEmail = (email: string) => {
 };
 
 const useVerifyEmailModel = () => {
-  const { t } = useTranslation('auth');
   const session = useCurrentUser();
   const location = useLocation();
   const stateEmail = (location.state as { email?: string } | null)?.email;
@@ -42,13 +37,36 @@ const useVerifyEmailModel = () => {
     () => new URLSearchParams(window.location.hash.slice(1)).get('token') ?? ''
   );
   const [status, setStatus] = useState<VerificationViewStatus>('CHECK_EMAIL');
-  const [authError, setAuthError] = useState<AuthError>();
   const [cooldown, setCooldown] = useState(0);
-  const [busy, setBusy] = useState(Boolean(verificationToken));
   const [verifyEmail] = useMutation(VerifyEmailDocument);
   const [resend] = useMutation(ResendEmailVerificationDocument);
   const verificationRequestRef = useRef<ReturnType<typeof verifyEmail> | null>(null);
-  const { activate, challenge, clear, receiveToken } = useCaptchaChallenge<ResendIntent>();
+
+  const executeResend = useCallback(
+    async (intent: ResendIntent, captchaToken?: string) => {
+      await resend({ variables: { input: { email: intent.email, captchaToken } } });
+      setEmail(intent.email);
+      sessionStorage.setItem('pendingVerificationEmail', intent.email);
+      setEditingEmail(false);
+      setStatus('RESENT');
+      setCooldown(60);
+    },
+    [resend]
+  );
+
+  const applyCooldown = useCallback((details: GraphQLErrorDetails) => {
+    if (details.retryAfter !== undefined) {
+      setCooldown(Math.max(1, Math.ceil(details.retryAfter)));
+    }
+  }, []);
+
+  const auth = useAuthAction<ResendIntent>({
+    execute: executeResend,
+    fallbackCaptchaAction: () => CAPTCHA_ACTION.resendConfirmation,
+    initialBusy: Boolean(verificationToken),
+    onError: applyCooldown,
+  });
+  const { run, setAuthError, setBusy } = auth;
 
   useEffect(() => {
     if (!verificationToken) return;
@@ -75,7 +93,7 @@ const useVerifyEmailModel = () => {
         }
       })
       .catch((error) => {
-        if (active) setAuthError(resolveAuthError(error));
+        if (active) setAuthError(getGraphQLErrorDetails(error));
       })
       .finally(() => {
         if (active) setBusy(false);
@@ -84,7 +102,7 @@ const useVerifyEmailModel = () => {
     return () => {
       active = false;
     };
-  }, [verificationToken, verifyEmail]);
+  }, [setAuthError, setBusy, verificationToken, verifyEmail]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -95,54 +113,11 @@ const useVerifyEmailModel = () => {
     return () => window.clearInterval(timer);
   }, [cooldown]);
 
-  const executeResend = useCallback(
-    async (intent: ResendIntent, captchaToken?: string) => {
-      if (busy) return;
-      setBusy(true);
-      setAuthError(undefined);
-
-      try {
-        await resend({ variables: { input: { email: intent.email, captchaToken } } });
-        setEmail(intent.email);
-        sessionStorage.setItem('pendingVerificationEmail', intent.email);
-        setEditingEmail(false);
-        setStatus('RESENT');
-        setCooldown(60);
-        clear();
-      } catch (error) {
-        const resolved = resolveAuthError(error);
-        if (resolved.retryAfter !== undefined) {
-          setCooldown(Math.max(1, Math.ceil(resolved.retryAfter)));
-        }
-        if (isCaptchaChallenge(resolved.code)) {
-          activate(resolved.action ?? CAPTCHA_ACTION.resendConfirmation, intent);
-        } else {
-          clear();
-        }
-        setAuthError(resolved);
-      } finally {
-        setBusy(false);
-      }
-    },
-    [activate, busy, clear, resend]
-  );
-
   const resendEmail = useCallback(() => {
     const normalizedEmail = email.trim().toLowerCase();
     if (!normalizedEmail || cooldown > 0) return;
-    void executeResend({ email: normalizedEmail });
-  }, [cooldown, email, executeResend]);
-  const onCaptchaToken = useCallback(
-    (token: string) => {
-      const intent = receiveToken(token);
-      if (intent) void executeResend(intent, token);
-    },
-    [executeResend, receiveToken]
-  );
-  const handleCaptchaUnavailable = useCallback(() => {
-    clear();
-    setAuthError({ code: AUTH_ERROR_CODE.captchaUnavailable });
-  }, [clear]);
+    void run({ email: normalizedEmail });
+  }, [cooldown, email, run]);
 
   const sessionVerified = session.status === 'authenticated' && session.user.emailVerified;
   const viewStatus: VerificationViewStatus =
@@ -150,16 +125,16 @@ const useVerifyEmailModel = () => {
   const verified = isVerifiedStatus(viewStatus);
 
   return {
-    busy,
-    captcha: challenge,
+    busy: auth.busy,
+    captcha: auth.captcha,
     cooldown,
     editingEmail,
     email,
-    error: authError,
-    errorMessage: authError ? authErrorMessage(authError, t) : '',
+    error: auth.error,
+    errorMessage: auth.errorMessage,
     maskedEmail: email ? maskEmail(email) : '',
-    onCaptchaToken,
-    onCaptchaUnavailable: handleCaptchaUnavailable,
+    onCaptchaToken: auth.onCaptchaToken,
+    onCaptchaUnavailable: auth.onCaptchaUnavailable,
     resendEmail,
     setEmail,
     status: viewStatus,

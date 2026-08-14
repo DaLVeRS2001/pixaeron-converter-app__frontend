@@ -1,24 +1,16 @@
-﻿import { useMutation } from '@apollo/client/react';
+import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { GoogleLoginDocument, RegisterDocument } from 'shared/api';
 
-import {
-  AUTH_ERROR_CODE,
-  CAPTCHA_ACTION,
-  authErrorMessage,
-  isCaptchaChallenge,
-  resolveAuthError,
-} from '../../model/errors';
-import type { AuthError } from '../../model/errors';
+import { AUTH_ERROR_CODE, CAPTCHA_ACTION } from '../../model/errors';
 import { CURRENT_LEGAL_CONSENT } from '../../model/legalConsent';
 import { signUpSchema } from '../../model/schemas';
 import type { SignUpFormValues } from '../../model/schemas';
-import { useCaptchaChallenge } from '../../model/useCaptchaChallenge';
+import { useAuthAction } from '../../model/useAuthAction';
 import { useCompleteLogin } from '../../model/useCompleteLogin';
 
 type SignUpIntent =
@@ -26,10 +18,7 @@ type SignUpIntent =
   | { kind: 'google'; idToken: string };
 
 const useSignUpModel = () => {
-  const { t } = useTranslation('auth');
   const navigate = useNavigate();
-  const [authError, setAuthError] = useState<AuthError>();
-  const [busy, setBusy] = useState(false);
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -53,78 +42,63 @@ const useSignUpModel = () => {
   );
   const [registerUser] = useMutation(RegisterDocument);
   const [googleLogin] = useMutation(GoogleLoginDocument);
-  const { activate, challenge, clear, receiveToken } = useCaptchaChallenge<SignUpIntent>();
-
   const completeLogin = useCompleteLogin();
 
-  const executeIntent = useCallback(
+  const execute = useCallback(
     async (intent: SignUpIntent, captchaToken?: string) => {
-      if (busy) return;
-      setBusy(true);
-      setAuthError(undefined);
-
-      try {
-        if (intent.kind === 'register') {
-          const { username, email, password: nextPassword } = intent.values;
-          const { data } = await registerUser({
-            variables: {
-              input: {
-                username,
-                email,
-                password: nextPassword,
-                captchaToken,
-                ...CURRENT_LEGAL_CONSENT,
-              },
-            },
-          });
-          if (data?.register.accepted) {
-            sessionStorage.setItem('pendingVerificationEmail', data.register.email);
-            navigate('/verify-email', { state: { email: data.register.email } });
-          }
-          return;
-        }
-
-        const { data } = await googleLogin({
+      if (intent.kind === 'register') {
+        const { username, email, password: nextPassword } = intent.values;
+        const { data } = await registerUser({
           variables: {
             input: {
-              idToken: intent.idToken,
+              username,
+              email,
+              password: nextPassword,
               captchaToken,
               ...CURRENT_LEGAL_CONSENT,
             },
           },
         });
-        if (data?.googleLogin) completeLogin(data.googleLogin);
-      } catch (error) {
-        const resolved = resolveAuthError(error);
-        const fallbackAction =
-          intent.kind === 'register' ? CAPTCHA_ACTION.register : CAPTCHA_ACTION.googleLogin;
-
-        if (isCaptchaChallenge(resolved.code)) {
-          activate(resolved.action ?? fallbackAction, intent);
-        } else {
-          clear();
+        if (data?.register.accepted) {
+          sessionStorage.setItem('pendingVerificationEmail', data.register.email);
+          navigate('/verify-email', { state: { email: data.register.email } });
         }
-        setAuthError(resolved);
-      } finally {
-        setBusy(false);
+        return;
       }
+
+      const { data } = await googleLogin({
+        variables: {
+          input: {
+            idToken: intent.idToken,
+            captchaToken,
+            ...CURRENT_LEGAL_CONSENT,
+          },
+        },
+      });
+      if (data?.googleLogin) completeLogin(data.googleLogin);
     },
-    [activate, busy, clear, completeLogin, googleLogin, navigate, registerUser]
+    [completeLogin, googleLogin, navigate, registerUser]
   );
+  const fallbackCaptchaAction = useCallback(
+    (intent: SignUpIntent) =>
+      intent.kind === 'register' ? CAPTCHA_ACTION.register : CAPTCHA_ACTION.googleLogin,
+    []
+  );
+  const action = useAuthAction<SignUpIntent>({ execute, fallbackCaptchaAction });
 
   const submit = form.handleSubmit((values) => {
     const intent: SignUpIntent = { kind: 'register', values };
 
     if (__TURNSTILE_SITE_KEY__) {
-      activate(CAPTCHA_ACTION.register, intent);
+      action.activate(CAPTCHA_ACTION.register, intent);
       return;
     }
 
-    return executeIntent(intent);
+    return action.run(intent);
   });
   const submitGoogle = useCallback(
     (idToken: string) => {
-      if (busy || challenge) return;
+      if (action.busy || action.captcha) return;
 
       if (!form.getValues('termsAccepted')) {
         form.setError('termsAccepted', { message: 'validation.terms' });
@@ -134,38 +108,27 @@ const useSignUpModel = () => {
       const intent: SignUpIntent = { kind: 'google', idToken };
 
       if (__TURNSTILE_SITE_KEY__) {
-        activate(CAPTCHA_ACTION.googleLogin, intent);
+        action.activate(CAPTCHA_ACTION.googleLogin, intent);
         return;
       }
 
-      void executeIntent(intent);
+      void action.run(intent);
     },
-    [activate, busy, challenge, executeIntent, form]
+    [action, form]
   );
-  const onCaptchaToken = useCallback(
-    (token: string) => {
-      const intent = receiveToken(token);
-      if (intent) void executeIntent(intent, token);
-    },
-    [executeIntent, receiveToken]
-  );
-  const handleCaptchaUnavailable = useCallback(() => {
-    clear();
-    setAuthError({ code: AUTH_ERROR_CODE.captchaUnavailable });
-  }, [clear]);
   const handleGoogleUnavailable = useCallback(() => {
-    clear();
-    setAuthError({ code: AUTH_ERROR_CODE.googleUnavailable });
-  }, [clear]);
+    action.clear();
+    action.setAuthError({ code: AUTH_ERROR_CODE.googleUnavailable });
+  }, [action]);
 
   return {
-    busy,
-    captcha: challenge,
-    error: authError,
-    errorMessage: authError ? authErrorMessage(authError, t) : '',
+    busy: action.busy,
+    captcha: action.captcha,
+    error: action.error,
+    errorMessage: action.errorMessage,
     form,
-    onCaptchaToken,
-    onCaptchaUnavailable: handleCaptchaUnavailable,
+    onCaptchaToken: action.onCaptchaToken,
+    onCaptchaUnavailable: action.onCaptchaUnavailable,
     onGoogleUnavailable: handleGoogleUnavailable,
     strength,
     submit,

@@ -20,7 +20,26 @@ const outputPath = temporaryDirectory
   : schemaPath;
 
 try {
-  await runRoverGraphFetch(outputPath);
+  await new Promise((resolve, reject) => {
+    const rover = spawn(
+      'rover',
+      ['--skip-update-check', 'graph', 'fetch', graphRef, '--output', outputPath],
+      { stdio: 'inherit', windowsHide: true }
+    );
+
+    rover.once('error', (error) => {
+      reject(
+        new Error(
+          'Unable to start Rover 0.41.0. Install it from https://www.apollographql.com/docs/rover/getting-started.',
+          { cause: error }
+        )
+      );
+    });
+    rover.once('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`Rover graph fetch exited with code ${code}.`));
+    });
+  });
 
   if (checkOnly) {
     const [currentSchema, fetchedSchema] = await Promise.all([
@@ -40,27 +59,4 @@ try {
   if (temporaryDirectory) {
     await rm(temporaryDirectory, { recursive: true, force: true });
   }
-}
-
-function runRoverGraphFetch(output) {
-  return new Promise((resolve, reject) => {
-    const rover = spawn(
-      'rover',
-      ['--skip-update-check', 'graph', 'fetch', graphRef, '--output', output],
-      { stdio: 'inherit', windowsHide: true }
-    );
-
-    rover.once('error', (error) => {
-      reject(
-        new Error(
-          'Unable to start Rover 0.41.0. Install it from https://www.apollographql.com/docs/rover/getting-started.',
-          { cause: error }
-        )
-      );
-    });
-    rover.once('close', (code) => {
-      if (code === 0) resolve();
-      else reject(new Error(`Rover graph fetch exited with code ${code}.`));
-    });
-  });
 }

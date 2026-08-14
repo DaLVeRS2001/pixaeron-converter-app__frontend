@@ -4,11 +4,10 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { ResetPasswordDocument } from 'shared/api';
-import type { PasswordResetStatus } from 'shared/api';
+import { ResetPasswordDocument, getGraphQLErrorDetails } from 'shared/api';
+import type { GraphQLErrorDetails, PasswordResetStatus } from 'shared/api';
 
-import { authErrorMessage, resolveAuthError } from '../../model/errors';
-import type { AuthError } from '../../model/errors';
+import { authErrorMessage } from '../../model/errors';
 import { resetPasswordSchema } from '../../model/schemas';
 import type { ResetPasswordFormValues } from '../../model/schemas';
 
@@ -18,7 +17,7 @@ const useResetPasswordModel = () => {
     () => new URLSearchParams(window.location.hash.slice(1)).get('token') ?? ''
   );
   const [status, setStatus] = useState<PasswordResetStatus>();
-  const [authError, setAuthError] = useState<AuthError>();
+  const [authError, setAuthError] = useState<GraphQLErrorDetails>();
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: { password: '', confirmPassword: '' },
@@ -40,7 +39,7 @@ const useResetPasswordModel = () => {
       const { data } = await resetPassword({ variables: { input: { token, password } } });
       if (data?.resetPassword.status) setStatus(data.resetPassword.status);
     } catch (error) {
-      setAuthError(resolveAuthError(error));
+      setAuthError(getGraphQLErrorDetails(error));
     }
   });
 

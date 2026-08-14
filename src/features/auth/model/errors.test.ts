@@ -1,7 +1,9 @@
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import type { TFunction } from 'i18next';
 
-import { AUTH_ERROR_CODE, authErrorMessage, resolveAuthError } from './errors';
+import { getGraphQLErrorDetails } from 'shared/api';
+
+import { AUTH_ERROR_CODE, authErrorMessage } from './errors';
 
 const translate = jest.fn((key: string, options?: Record<string, unknown>) =>
   options ? `${key}:${JSON.stringify(options)}` : key
@@ -16,22 +18,6 @@ const authError = (
     data: null,
     errors: [{ message, extensions: { code, ...extensions } }],
   });
-
-describe('resolveAuthError', () => {
-  it('keeps the error identity instead of a rendered message', () => {
-    expect(
-      resolveAuthError(
-        authError(AUTH_ERROR_CODE.captchaRequired, { action: 'login', retryAfter: 30 })
-      )
-    ).toEqual({ code: AUTH_ERROR_CODE.captchaRequired, action: 'login', retryAfter: 30 });
-  });
-
-  it('reports an unrecognized failure as a network error', () => {
-    expect(resolveAuthError(new Error('socket details'))).toEqual({
-      code: AUTH_ERROR_CODE.network,
-    });
-  });
-});
 
 describe('authErrorMessage', () => {
   beforeEach(() => {
@@ -62,13 +48,13 @@ describe('authErrorMessage', () => {
   });
 
   it('never displays the backend message', () => {
-    const resolved = resolveAuthError(authError(AUTH_ERROR_CODE.invalidCredentials));
+    const resolved = getGraphQLErrorDetails(authError(AUTH_ERROR_CODE.invalidCredentials));
 
     expect(authErrorMessage(resolved, translate)).not.toContain('private backend message');
   });
 
   it('converts a cooldown retryAfter to localized seconds', () => {
-    const resolved = resolveAuthError(
+    const resolved = getGraphQLErrorDetails(
       authError(AUTH_ERROR_CODE.actionCooldown, { retryAfter: 12.2 })
     );
 
@@ -76,7 +62,7 @@ describe('authErrorMessage', () => {
   });
 
   it('converts an attempt retryAfter to localized minutes', () => {
-    const resolved = resolveAuthError(
+    const resolved = getGraphQLErrorDetails(
       authError(AUTH_ERROR_CODE.tooManyLoginAttempts, { retryAfter: 61 })
     );
 
