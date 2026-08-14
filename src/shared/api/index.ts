@@ -1,5 +1,6 @@
 export { apolloClient } from './apolloClient';
 export { getGraphQLErrorDetails } from './errors';
+export type { GraphQLErrorDetails } from './errors';
 export {
   GoogleLoginDocument,
   LoginDocument,

@@ -17,10 +17,6 @@ const hasGraphQLErrorCode = (error: unknown, predicate: (code: unknown) => boole
   CombinedGraphQLErrors.is(error) &&
   error.errors.some(({ extensions }) => predicate(extensions?.code));
 
-const isRefreshableAuthError = (error: unknown) =>
-  hasGraphQLErrorCode(error, isRefreshableAuthErrorCode) ||
-  (ServerError.is(error) && error.statusCode === 401);
-
 const isTerminalAuthError = (error: unknown) =>
   hasGraphQLErrorCode(error, isTerminalAuthErrorCode) ||
   (ServerError.is(error) && error.statusCode === 401);
@@ -64,12 +60,9 @@ const refreshSession = (client: ApolloClient): Promise<void> => {
 const authErrorLink = new ErrorLink(({ error, operation, forward }) => {
   const retryableGraphQLError =
     (operation.operationType === 'query' || operation.operationType === 'mutation') &&
-    CombinedGraphQLErrors.is(error) &&
-    isRefreshableAuthError(error);
+    hasGraphQLErrorCode(error, isRefreshableAuthErrorCode);
   const retryableNetworkError =
-    operation.operationType === 'query' &&
-    ServerError.is(error) &&
-    isRefreshableAuthError(error);
+    operation.operationType === 'query' && ServerError.is(error) && error.statusCode === 401;
 
   if (
     operation.operationName === 'RefreshSession' ||

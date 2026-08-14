@@ -1,9 +1,9 @@
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { RuleSetRule } from 'webpack';
 
-import { IBuildOptions } from '../types/config';
-import { buildStyleLoader } from './buildStyleLoader';
+import { IBuildOptions } from './types/config';
 
-export const sideEffectLoaders = [
+const sideEffectLoaders = [
   {
     test: /\.s?css$/,
     sideEffects: true,
@@ -19,18 +19,38 @@ export function loaders(options: IBuildOptions): RuleSetRule[] {
     use: {
       loader: 'babel-loader',
       options: {
-        presets: ['@babel/preset-env'],
+        plugins: isDev ? ['react-refresh/babel'] : [],
       },
     },
   };
 
-  const tsLoader = {
-    test: /\.tsx?$/,
-    use: 'ts-loader',
-    exclude: /node_modules/,
-  };
+  const styleLoader = {
+    test: /\.s[ac]ss$/i,
+    use: [
+      isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
 
-  const styleLoader = buildStyleLoader(isDev);
+      {
+        loader: 'css-loader',
+        options: {
+          sourceMap: isDev,
+        },
+      },
+
+      {
+        loader: 'postcss-loader',
+        options: {
+          sourceMap: isDev,
+        },
+      },
+
+      {
+        loader: 'sass-loader',
+        options: {
+          sourceMap: isDev,
+        },
+      },
+    ],
+  };
 
   const assetLoaders = [
     {
@@ -54,5 +74,5 @@ export function loaders(options: IBuildOptions): RuleSetRule[] {
     },
   ];
 
-  return [...sideEffectLoaders, babelLoader, tsLoader, styleLoader, ...assetLoaders];
+  return [...sideEffectLoaders, babelLoader, styleLoader, ...assetLoaders];
 }
