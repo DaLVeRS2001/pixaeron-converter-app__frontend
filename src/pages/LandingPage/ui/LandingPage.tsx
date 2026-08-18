@@ -49,7 +49,6 @@ const LandingPage = () => {
           <p className={cn('compressor-formats')}>{t('landing.compressorFormats')}</p>
           <CompressorWidget />
           <p className={cn('compressor-note')}>{t('landing.compressorDescription')}</p>
-          <p className={cn('compressor-note')}>{t('landing.compressorAccount')}</p>
         </section>
         <section className={cn('features')} aria-label="Pixaeron benefits">
           <article>

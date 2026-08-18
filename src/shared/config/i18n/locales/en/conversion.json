@@ -12,7 +12,8 @@
     "count_other": "{{count}} files",
     "saved": "{{percent}}% saved",
     "download": "Download",
-    "clear": "Start over"
+    "clear": "Start over",
+    "elapsed": "running {{time}}"
   },
   "status": {
     "uploading": "Uploading",
@@ -26,7 +27,7 @@
   },
   "result": {
     "noSavings": "Already optimal — the original is smaller, so we kept it",
-    "sanitizedLarger": "Metadata removed; the cleaned file is slightly larger, so we kept the original"
+    "sanitizedLarger": "Metadata stripped. The cleaned copy is slightly larger than your original — you are downloading the cleaned one"
   },
   "totals": {
     "title": "Total space saved",
@@ -37,9 +38,10 @@
   "rejected": {
     "title": "Not added",
     "UNSUPPORTED_TYPE": "{{name}} — only JPEG, PNG, WebP and AVIF are supported",
-    "TOO_LARGE": "{{name}} — larger than the {{limit}} your plan allows",
-    "OVER_BATCH_LIMIT": "{{name}} — over the {{limit}} files allowed in one batch",
-    "OVER_DAILY_LIMIT": "{{name}} — over what is left of your daily allowance"
+    "TOO_LARGE": "{{name}} — larger than the {{size}} your plan allows",
+    "OVER_BATCH_LIMIT": "{{name}} — over the {{files}} files allowed in one batch",
+    "OVER_DAILY_LIMIT": "{{name}} — over what is left of your daily allowance",
+    "EMPTY_FILE": "{{name}} — the file is empty"
   },
   "errors": {
     "BATCH_SIZE_INVALID": "That is more files than your plan allows in one batch.",
@@ -56,9 +58,31 @@
     "BATCH_TOKEN_MISMATCH": "This batch belongs to a different visitor.",
     "TOO_MANY_REQUESTS": "Too many requests in a row. Wait a moment and try again.",
     "SERVICE_UNAVAILABLE": "The service is temporarily unavailable. Try again shortly.",
-    "NETWORK_ERROR": "Could not reach Pixaeron. Check your connection and try again."
+    "NETWORK_ERROR": "Could not reach Pixaeron. Check your connection and try again.",
+    "NO_FILES_ADMITTED": "None of your uploads reached our storage, so nothing was compressed.",
+    "BATCH_MALFORMED": "Pixaeron answered with a batch we cannot use. Please try again."
   },
   "notice": {
-    "leaving": "Results are held in this tab only. If you leave, you lose access to them."
+    "leaving": "Results are held in this tab only. If you leave, you lose access to them.",
+    "missingUploads_one": "One upload never reached our storage and was not compressed.",
+    "missingUploads_other": "{{count}} uploads never reached our storage and were not compressed."
+  },
+  "failure": {
+    "ANIMATED_UNSUPPORTED": "Animated images are not supported yet",
+    "PIXELS_EXCEEDED": "Too many pixels for the compressor",
+    "UNSUPPORTED_FORMAT": "This file is not one of the supported still-image formats",
+    "DECODE_FAILED": "The file could not be read as an image",
+    "INPUT_TOO_LARGE": "Larger than the compressor accepts",
+    "INPUT_CHANGED": "The upload changed while it was being read",
+    "INPUT_MISSING": "The upload was no longer there",
+    "generic": "Compression failed"
+  },
+  "announce": {
+    "busy": "Uploading your files…",
+    "finished": "Compression finished."
+  },
+  "download": {
+    "RESULT_EXPIRED": "This result is no longer stored. Compress the file again.",
+    "STORAGE_UNREACHABLE": "The file could not be fetched. Try the download again."
   }
 }

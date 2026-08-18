@@ -6,6 +6,8 @@ type UploadTarget = {
 const UPLOAD_FAILURE = {
   rejected: 'STORAGE_REJECTED',
   unreachable: 'STORAGE_UNREACHABLE',
+  notAdmitted: 'NO_FILES_ADMITTED',
+  malformedBatch: 'BATCH_MALFORMED',
 } as const;
 
 type UploadFailureReason = (typeof UPLOAD_FAILURE)[keyof typeof UPLOAD_FAILURE];
@@ -43,10 +45,8 @@ const uploadToStorage = async (
     throw new UploadFailedError(UPLOAD_FAILURE.unreachable);
   }
 
-  if (!response.ok) {
-    throw new UploadFailedError(UPLOAD_FAILURE.rejected, response.status);
-  }
+  if (!response.ok) throw new UploadFailedError(UPLOAD_FAILURE.rejected, response.status);
 };
 
 export { UPLOAD_FAILURE, UploadFailedError, uploadToStorage };
-export type { UploadFailureReason, UploadTarget };
+export type { UploadTarget };

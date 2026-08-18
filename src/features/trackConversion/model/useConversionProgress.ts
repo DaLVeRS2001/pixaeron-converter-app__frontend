@@ -1,9 +1,7 @@
 import { useQuery } from '@apollo/client/react';
 import { useEffect, useState } from 'react';
 
-import { isBatchSettled } from 'entities/conversion';
-
-import { ConversionBatchDocument } from 'shared/api';
+import { ConversionBatchDocument, isBatchSettled, isFileMoving } from 'entities/conversion';
 
 const ACTIVE_POLL_MS = 2000;
 
@@ -14,37 +12,39 @@ type ProgressInput = {
   batchToken: string | null;
 };
 
-const useDocumentHidden = () => {
+const useConversionProgress = ({ batchId, batchToken }: ProgressInput) => {
   const [hidden, setHidden] = useState(() => document.visibilityState === 'hidden');
 
   useEffect(() => {
-    const onChange = () => setHidden(document.visibilityState === 'hidden');
-    document.addEventListener('visibilitychange', onChange);
+    const onVisibility = () => setHidden(document.visibilityState === 'hidden');
+    document.addEventListener('visibilitychange', onVisibility);
 
-    return () => document.removeEventListener('visibilitychange', onChange);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);
 
-  return hidden;
-};
+  const { data, error, refetch, startPolling, stopPolling } = useQuery(
+    ConversionBatchDocument,
+    {
+      variables: { id: batchId ?? '', batchToken },
+      skip: !batchId,
+      fetchPolicy: 'network-only',
+    }
+  );
 
-const useConversionProgress = ({ batchId, batchToken }: ProgressInput) => {
-  const hidden = useDocumentHidden();
-
-  const query = useQuery(ConversionBatchDocument, {
-    variables: { id: batchId ?? '', batchToken },
-    skip: !batchId,
-    fetchPolicy: 'network-only',
-    pollInterval: hidden ? HIDDEN_POLL_MS : ACTIVE_POLL_MS,
-  });
-
-  const batch = query.data?.conversionBatch ?? null;
-  const settled = batch ? isBatchSettled(batch.status) : false;
+  const fetched = data?.conversionBatch ?? null;
+  const batch = fetched && fetched.id === batchId ? fetched : null;
+  const moving = batch?.files.some((file) => isFileMoving(file.status)) ?? false;
+  const pollingStopped = batch !== null && (isBatchSettled(batch.status) || !moving);
 
   useEffect(() => {
-    if (settled) query.stopPolling();
-  }, [query, settled]);
+    if (!batchId || pollingStopped) return;
 
-  return { batch, settled, refetch: query.refetch, error: query.error };
+    startPolling(hidden ? HIDDEN_POLL_MS : ACTIVE_POLL_MS);
+
+    return () => stopPolling();
+  }, [batchId, hidden, pollingStopped, startPolling, stopPolling]);
+
+  return { batch, pollingStopped, refetch, error };
 };
 
 export { ACTIVE_POLL_MS, HIDDEN_POLL_MS, useConversionProgress };

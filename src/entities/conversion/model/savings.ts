@@ -1,3 +1,5 @@
+import type { ConversionFileView } from './file';
+
 const BYTE_UNITS = ['B', 'KB', 'MB', 'GB'] as const;
 
 const STEP = 1024;
@@ -25,10 +27,7 @@ const savedPercent = (inputBytes: number, outputBytes: number): number | null =>
   return Math.round(((inputBytes - outputBytes) / inputBytes) * 100);
 };
 
-type SettledFile = {
-  inputBytes?: number | null;
-  outputBytes?: number | null;
-};
+type MeasuredFile = Partial<Pick<ConversionFileView, 'inputBytes' | 'outputBytes'>>;
 
 type ConversionTotals = {
   files: number;
@@ -38,7 +37,7 @@ type ConversionTotals = {
   savedPercent: number;
 };
 
-const totalSavings = (files: readonly SettledFile[]): ConversionTotals => {
+const totalSavings = (files: readonly MeasuredFile[]): ConversionTotals => {
   const measured = files.filter(
     (file): file is { inputBytes: number; outputBytes: number } =>
       typeof file.inputBytes === 'number' &&

@@ -30,6 +30,13 @@ describe('validateSelection', () => {
     expect(result.rejected[0].reason).toBe(SELECTION_REJECTION.unsupportedType);
   });
 
+  it('rejects an empty file the presigned policy would refuse', () => {
+    const result = validateSelection([image('empty.png', 0)], anonymousLimits);
+
+    expect(result.accepted).toHaveLength(0);
+    expect(result.rejected[0].reason).toBe(SELECTION_REJECTION.emptyFile);
+  });
+
   it('rejects a file above the plan size before a byte is uploaded', () => {
     const result = validateSelection([image('big.png', 6 * 1024 * 1024)], anonymousLimits);
 

@@ -5,6 +5,7 @@ const SELECTION_REJECTION = {
   tooLarge: 'TOO_LARGE',
   overBatchLimit: 'OVER_BATCH_LIMIT',
   overDailyLimit: 'OVER_DAILY_LIMIT',
+  emptyFile: 'EMPTY_FILE',
 } as const;
 
 type SelectionRejectionReason = (typeof SELECTION_REJECTION)[keyof typeof SELECTION_REJECTION];
@@ -42,6 +43,11 @@ const validateSelection = (
       continue;
     }
 
+    if (file.size < 1) {
+      rejected.push({ file, reason: SELECTION_REJECTION.emptyFile });
+      continue;
+    }
+
     if (file.size > limits.maxFileBytes) {
       rejected.push({ file, reason: SELECTION_REJECTION.tooLarge });
       continue;
@@ -64,4 +70,4 @@ const validateSelection = (
 };
 
 export { ACCEPTED_MIME_TYPES, SELECTION_REJECTION, validateSelection };
-export type { RejectedSelection, SelectionLimits, SelectionRejectionReason, SelectionResult };
+export type { RejectedSelection };

@@ -6,6 +6,8 @@ const ERROR_KEY = {
   BATCH_NOT_ADMITTABLE: 'errors.BATCH_NOT_ADMITTABLE',
   BATCH_TOKEN_MISMATCH: 'errors.BATCH_TOKEN_MISMATCH',
   FILE_NOT_MEASURED: 'errors.FILE_NOT_MEASURED',
+  NO_FILES_ADMITTED: 'errors.NO_FILES_ADMITTED',
+  BATCH_MALFORMED: 'errors.BATCH_MALFORMED',
   ENTITLEMENTS_UNAVAILABLE: 'errors.ENTITLEMENTS_UNAVAILABLE',
   NOT_FOUND: 'errors.NOT_FOUND',
   TOO_MANY_REQUESTS: 'errors.TOO_MANY_REQUESTS',
@@ -17,10 +19,4 @@ const ERROR_KEY = {
 
 const GENERIC_ERROR_KEY = 'errors.generic';
 
-type ErrorCopyKey = (typeof ERROR_KEY)[keyof typeof ERROR_KEY] | typeof GENERIC_ERROR_KEY;
-
-const errorKeyFor = (code: string | null): ErrorCopyKey =>
-  (code && ERROR_KEY[code as keyof typeof ERROR_KEY]) || GENERIC_ERROR_KEY;
-
-export { ERROR_KEY, GENERIC_ERROR_KEY, errorKeyFor };
-export type { ErrorCopyKey };
+export { ERROR_KEY, GENERIC_ERROR_KEY };

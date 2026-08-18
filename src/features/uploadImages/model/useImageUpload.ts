@@ -1,14 +1,18 @@
 import { useMutation } from '@apollo/client/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { CompleteConversionUploadsDocument, CreateConversionBatchDocument } from 'shared/api';
+import {
+  CompleteConversionUploadsDocument,
+  CreateConversionBatchDocument,
+} from 'entities/conversion';
 
-import { uploadToStorage } from './uploadToStorage';
+import { UPLOAD_FAILURE, UploadFailedError, uploadToStorage } from './uploadToStorage';
 
 type StartedBatch = {
   batchId: string;
   batchToken: string | null;
   fileNames: Map<string, string>;
+  missingFiles: number;
 };
 
 const useImageUpload = () => {
@@ -39,7 +43,7 @@ const useImageUpload = () => {
 
         const batch = data?.createConversionBatch;
         if (!batch || batch.files.length !== files.length) {
-          throw new Error('createConversionBatch returned an unusable batch');
+          throw new UploadFailedError(UPLOAD_FAILURE.malformedBatch);
         }
 
         const fileNames = new Map(
@@ -49,7 +53,7 @@ const useImageUpload = () => {
         try {
           await Promise.all(
             batch.files.map((slot, index) => {
-              if (!slot.upload) throw new Error(`file ${slot.id} carries no upload target`);
+              if (!slot.upload) throw new UploadFailedError(UPLOAD_FAILURE.malformedBatch);
 
               return uploadToStorage(slot.upload, files[index], controller.signal);
             })
@@ -59,11 +63,20 @@ const useImageUpload = () => {
           throw error;
         }
 
-        await completeUploads({
+        const completion = await completeUploads({
           variables: { input: { batchId: batch.id, batchToken: batch.batchToken } },
         });
+        const admitted = completion.data?.completeConversionUploads;
+        if (!admitted || admitted.admittedFiles === 0) {
+          throw new UploadFailedError(UPLOAD_FAILURE.notAdmitted);
+        }
 
-        return { batchId: batch.id, batchToken: batch.batchToken ?? null, fileNames };
+        return {
+          batchId: batch.id,
+          batchToken: batch.batchToken ?? null,
+          fileNames,
+          missingFiles: admitted.missingFiles,
+        };
       } finally {
         setUploading(false);
         abortRef.current = null;

@@ -1,11 +1,8 @@
 query ConversionEntitlement {
   conversionEntitlement {
-    planCode
     maxBatchFiles
     maxFileBytes
-    dailyFiles
     remainingToday
-    maxConcurrentFiles
   }
 }
 
@@ -13,8 +10,6 @@ query ConversionBatch($id: ID!, $batchToken: String) {
   conversionBatch(id: $id, batchToken: $batchToken) {
     id
     status
-    fileCount
-    expiresAt
     files {
       id
       status
@@ -22,8 +17,6 @@ query ConversionBatch($id: ID!, $batchToken: String) {
       outputBytes
       outputFormat
       resultKind
-      width
-      height
       failureCode
       downloadUrl
     }
@@ -33,13 +26,9 @@ query ConversionBatch($id: ID!, $batchToken: String) {
 mutation CreateConversionBatch($input: CreateConversionBatchInput!) {
   createConversionBatch(input: $input) {
     id
-    status
-    fileCount
-    expiresAt
     batchToken
     files {
       id
-      status
       upload {
         url
         fields {
@@ -54,11 +43,6 @@ mutation CreateConversionBatch($input: CreateConversionBatchInput!) {
 mutation CompleteConversionUploads($input: CompleteConversionUploadsInput!) {
   completeConversionUploads(input: $input) {
     admittedFiles
-    verifiedFiles
     missingFiles
-    batch {
-      id
-      status
-    }
   }
 }

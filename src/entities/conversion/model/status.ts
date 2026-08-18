@@ -11,7 +11,7 @@ const SETTLED_BATCH_STATUSES = new Set<ConversionBatchStatus>([
 const isBatchSettled = (status: ConversionBatchStatus): boolean =>
   SETTLED_BATCH_STATUSES.has(status);
 
-const isFileWorking = (status: ConversionFileStatus): boolean =>
-  status === 'QUEUED' || status === 'PROCESSING';
+const isFileMoving = (status: ConversionFileStatus): boolean =>
+  status === 'READY' || status === 'QUEUED' || status === 'PROCESSING';
 
-export { isBatchSettled, isFileWorking };
+export { isBatchSettled, isFileMoving };

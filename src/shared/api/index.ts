@@ -23,7 +23,6 @@ export type {
   ConversionBatchStatus,
   ConversionEntitlementQuery,
   ConversionFileStatus,
-  ConversionPlanCode,
   ConversionResultKind,
   CreateConversionBatchMutation,
   EmailVerificationStatus,

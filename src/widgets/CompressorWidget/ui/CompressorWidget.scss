@@ -45,6 +45,10 @@
     cursor: pointer;
     font-weight: 600;
 
+    &:has(:disabled) {
+      background: var(--color-slate-300);
+      cursor: not-allowed;
+    }
     &:focus-within {
       outline: 0.125rem solid var(--color-brand-700);
       outline-offset: 0.125rem;
@@ -55,6 +59,12 @@
     width: 0.0625rem;
     height: 0.0625rem;
     opacity: 0;
+  }
+  &__busy {
+    min-height: 1.25rem;
+    margin: 0;
+    color: var(--color-slate-600);
+    font-size: 0.875rem;
   }
   &__remaining {
     margin-left: 0.5rem;

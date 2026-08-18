@@ -1,25 +1,15 @@
 import block from 'bem-cn';
 import { useTranslation } from 'react-i18next';
 
-import { formatBytes, isFileWorking, savedPercent } from 'entities/conversion';
-
-import type { ConversionFileStatus, ConversionResultKind } from 'shared/api';
+import { formatBytes, isFileMoving, savedPercent } from 'entities/conversion';
+import type { ConversionFileStatus, ConversionFileView } from 'entities/conversion';
 
 import './ConversionRow.scss';
 
-type ConversionRowFile = {
-  id: string;
-  status: ConversionFileStatus;
-  inputBytes?: number | null;
-  outputBytes?: number | null;
-  resultKind?: ConversionResultKind | null;
-  failureCode?: string | null;
-  downloadUrl?: string | null;
-};
-
 type ConversionRowProps = {
-  file: ConversionRowFile;
+  file: ConversionFileView;
   name: string;
+  failedDownload: string | null;
   onDownload: (fileId: string, name: string) => void;
 };
 
@@ -36,7 +26,22 @@ const STATUS_KEY = {
   EXPIRED: 'status.expired',
 } as const satisfies Record<ConversionFileStatus, string>;
 
-const ConversionRow = ({ file, name, onDownload }: ConversionRowProps) => {
+const FAILURE_KEY = {
+  ANIMATED_UNSUPPORTED: 'failure.ANIMATED_UNSUPPORTED',
+  DECODE_FAILED: 'failure.DECODE_FAILED',
+  INPUT_CHANGED: 'failure.INPUT_CHANGED',
+  INPUT_MISSING: 'failure.INPUT_MISSING',
+  INPUT_TOO_LARGE: 'failure.INPUT_TOO_LARGE',
+  PIXELS_EXCEEDED: 'failure.PIXELS_EXCEEDED',
+  UNSUPPORTED_FORMAT: 'failure.UNSUPPORTED_FORMAT',
+} as const;
+
+const DOWNLOAD_KEY = {
+  RESULT_EXPIRED: 'download.RESULT_EXPIRED',
+  STORAGE_UNREACHABLE: 'download.STORAGE_UNREACHABLE',
+} as const;
+
+const ConversionRow = ({ file, name, failedDownload, onDownload }: ConversionRowProps) => {
   const { t } = useTranslation('conversion');
 
   const percent =
@@ -44,8 +49,17 @@ const ConversionRow = ({ file, name, onDownload }: ConversionRowProps) => {
       ? savedPercent(file.inputBytes, file.outputBytes)
       : null;
 
-  const keptOriginal =
-    file.resultKind === 'NO_SAVINGS' || file.resultKind === 'SANITIZED_LARGER';
+  const noteKey =
+    file.resultKind === 'NO_SAVINGS'
+      ? 'result.noSavings'
+      : file.resultKind === 'SANITIZED_LARGER'
+        ? 'result.sanitizedLarger'
+        : null;
+
+  const failureCode = file.failureCode ?? '';
+  const failureKey = Object.hasOwn(FAILURE_KEY, failureCode)
+    ? FAILURE_KEY[failureCode as keyof typeof FAILURE_KEY]
+    : 'failure.generic';
 
   return (
     <li className={cn({ status: file.status.toLowerCase() })}>
@@ -69,21 +83,18 @@ const ConversionRow = ({ file, name, onDownload }: ConversionRowProps) => {
         )}
       </span>
 
-      {keptOriginal ? (
-        <span className={cn('note')}>
-          {file.resultKind === 'NO_SAVINGS'
-            ? t('result.noSavings')
-            : t('result.sanitizedLarger')}
-        </span>
+      {noteKey ? (
+        <span className={cn('note')}>{t(noteKey)}</span>
+      ) : file.status === 'FAILED' ? (
+        <span className={cn('note', { failed: true })}>{t(failureKey)}</span>
       ) : (
         percent !== null &&
         percent > 0 && <span className={cn('saved')}>{t('queue.saved', { percent })}</span>
       )}
 
-      <span className={cn('status')}>
-        {isFileWorking(file.status) && <span className={cn('spinner')} aria-hidden="true" />}
-        {t(STATUS_KEY[file.status])}
-      </span>
+      <span className={cn('status')}>{t(STATUS_KEY[file.status])}</span>
+
+      {isFileMoving(file.status) && <span className={cn('progress')} aria-hidden="true" />}
 
       {file.status === 'COMPLETED' && file.downloadUrl && (
         <button
@@ -94,9 +105,14 @@ const ConversionRow = ({ file, name, onDownload }: ConversionRowProps) => {
           {t('queue.download')}
         </button>
       )}
+
+      {failedDownload && Object.hasOwn(DOWNLOAD_KEY, failedDownload) && (
+        <span className={cn('download-failure')} role="status">
+          {t(DOWNLOAD_KEY[failedDownload as keyof typeof DOWNLOAD_KEY])}
+        </span>
+      )}
     </li>
   );
 };
 
 export { ConversionRow };
-export type { ConversionRowFile };

@@ -5,7 +5,7 @@
   padding: 0.875rem 1rem;
   border: 0.0625rem solid var(--color-slate-200);
   border-radius: 0.75rem;
-  grid-template-columns: minmax(0, 2fr) auto minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 2fr) auto minmax(0, 1fr) 7rem 7.5rem;
 
   &_status {
     &_failed,
@@ -15,6 +15,7 @@
   }
   &__name {
     overflow: hidden;
+    grid-column: 1;
     color: var(--color-slate-900);
     font-weight: 600;
     text-overflow: ellipsis;
@@ -22,6 +23,7 @@
   }
   &__sizes {
     display: inline-flex;
+    grid-column: 2;
     align-items: center;
     gap: 0.375rem;
     color: var(--color-slate-500);
@@ -34,30 +36,53 @@
     }
   }
   &__saved {
+    grid-column: 3;
     color: var(--color-brand-600);
     font-size: 0.875rem;
     font-weight: 600;
   }
   &__note {
+    grid-column: 3;
     color: var(--color-slate-500);
     font-size: 0.8125rem;
+
+    &_failed {
+      color: var(--color-error-700);
+    }
   }
   &__status {
     display: inline-flex;
+    grid-column: 4;
     align-items: center;
     gap: 0.5rem;
     color: var(--color-slate-600);
     font-size: 0.875rem;
   }
-  &__spinner {
-    width: 0.875rem;
-    height: 0.875rem;
-    border: 0.125rem solid var(--color-slate-300);
-    border-radius: 50%;
-    border-top-color: var(--color-brand-600);
-    animation: conversion-row-spin 0.8s linear infinite;
+  &__download-failure {
+    grid-column: 1 / -1;
+    color: var(--color-error-700);
+    font-size: 0.8125rem;
+  }
+  &__progress {
+    position: relative;
+    overflow: hidden;
+    height: 0.25rem;
+    border-radius: 0.125rem;
+    background: var(--color-slate-200);
+    grid-column: 1 / -1;
+
+    &::after {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 40%;
+      border-radius: inherit;
+      background: var(--color-brand-500);
+      animation: conversion-row-sweep 1.4s ease-in-out infinite;
+      content: '';
+    }
   }
   &__download {
+    grid-column: 5;
     padding: 0.375rem 0.875rem;
     border: 0.0625rem solid var(--color-brand-500);
     border-radius: 0.5rem;
@@ -68,14 +93,37 @@
   }
 }
 
-@keyframes conversion-row-spin {
+@keyframes conversion-row-sweep {
+  from {
+    transform: translateX(-100%);
+  }
   to {
-    transform: rotate(360deg);
+    transform: translateX(250%);
+  }
+}
+
+@media (width <= 40rem) {
+  .conversion-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+
+    &__name,
+    &__note,
+    &__saved,
+    &__download {
+      grid-column: 1 / -1;
+    }
+    &__sizes {
+      grid-column: 1;
+    }
+    &__status {
+      grid-column: 2;
+      justify-self: end;
+    }
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .conversion-row__spinner {
-    animation: none;
+  .conversion-row__progress {
+    display: none;
   }
 }

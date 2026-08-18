@@ -1,32 +1,49 @@
 import { useQuery } from '@apollo/client/react';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
-import { useConversionProgress } from 'features/trackConversion';
+import { ConversionEntitlementDocument } from 'entities/conversion';
+
+import { DOWNLOAD_FAILURE, saveResult, useConversionProgress } from 'features/trackConversion';
 import { UploadFailedError, useImageUpload, validateSelection } from 'features/uploadImages';
-import type { RejectedSelection } from 'features/uploadImages';
+import type { RejectedSelection, StartedBatch } from 'features/uploadImages';
 
-import { ConversionEntitlementDocument, getGraphQLErrorDetails } from 'shared/api';
+import { getGraphQLErrorDetails } from 'shared/api';
+
+type ActiveBatch = StartedBatch & { startedAt: number };
+
+type DownloadFailure = { fileId: string; reason: string };
+
+const NO_NAMES: ReadonlyMap<string, string> = new Map();
 
 const useCompressorModel = () => {
   const entitlementQuery = useQuery(ConversionEntitlementDocument);
+  const { refetch: refetchEntitlement } = entitlementQuery;
   const { start, cancel, uploading } = useImageUpload();
 
-  const [batchId, setBatchId] = useState<string | null>(null);
-  const [batchToken, setBatchToken] = useState<string | null>(null);
-  const [names, setNames] = useState<Map<string, string>>(new Map());
+  const [active, setActive] = useState<ActiveBatch | null>(null);
   const [rejected, setRejected] = useState<RejectedSelection[]>([]);
   const [failure, setFailure] = useState<string | null>(null);
+  const [downloadFailure, setDownloadFailure] = useState<DownloadFailure | null>(null);
+  const attempt = useRef(0);
 
-  const progress = useConversionProgress({ batchId, batchToken });
+  const {
+    batch,
+    pollingStopped,
+    refetch: refetchBatch,
+    error: progressError,
+  } = useConversionProgress({
+    batchId: active?.batchId ?? null,
+    batchToken: active?.batchToken ?? null,
+  });
   const entitlement = entitlementQuery.data?.conversionEntitlement ?? null;
 
   const reset = useCallback(() => {
+    attempt.current += 1;
     cancel();
-    setBatchId(null);
-    setBatchToken(null);
-    setNames(new Map());
+    setActive(null);
     setRejected([]);
     setFailure(null);
+    setDownloadFailure(null);
   }, [cancel]);
 
   const submit = useCallback(
@@ -34,6 +51,7 @@ const useCompressorModel = () => {
       if (!entitlement || uploading) return;
 
       setFailure(null);
+      const run = (attempt.current += 1);
       const selection = validateSelection(files, {
         maxBatchFiles: entitlement.maxBatchFiles,
         maxFileBytes: entitlement.maxFileBytes,
@@ -44,38 +62,65 @@ const useCompressorModel = () => {
 
       try {
         const started = await start(selection.accepted);
-        setBatchId(started.batchId);
-        setBatchToken(started.batchToken);
-        setNames(started.fileNames);
-        await entitlementQuery.refetch();
+        if (run !== attempt.current) return;
+
+        setActive({ ...started, startedAt: Date.now() });
       } catch (error) {
+        if (run !== attempt.current) return;
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+
         setFailure(
           error instanceof UploadFailedError
             ? error.reason
-            : getGraphQLErrorDetails(error).code ?? null
+            : (getGraphQLErrorDetails(error).code ?? null)
         );
       }
+
+      await refetchEntitlement().catch(() => undefined);
     },
-    [entitlement, entitlementQuery, start, uploading]
+    [entitlement, refetchEntitlement, start, uploading]
+  );
+
+  const download = useCallback(
+    async (fileId: string, name: string) => {
+      setDownloadFailure(null);
+      try {
+        const { data } = await refetchBatch();
+        const fresh = data?.conversionBatch?.files.find((file) => file.id === fileId);
+        if (!fresh?.downloadUrl) {
+          setDownloadFailure({ fileId, reason: DOWNLOAD_FAILURE.expired });
+
+          return;
+        }
+
+        await saveResult(fresh.downloadUrl, name, fresh.outputFormat);
+      } catch {
+        setDownloadFailure({ fileId, reason: DOWNLOAD_FAILURE.unreachable });
+      }
+    },
+    [refetchBatch]
   );
 
   const errorCode =
     failure ??
     (entitlementQuery.error && getGraphQLErrorDetails(entitlementQuery.error).code) ??
-    (progress.error && getGraphQLErrorDetails(progress.error).code) ??
+    (progressError && getGraphQLErrorDetails(progressError).code) ??
     null;
 
   return {
     entitlement,
-    batch: progress.batch,
-    names,
+    batch,
+    pollingStopped,
+    startedAt: active?.startedAt ?? null,
+    missingUploads: active?.missingFiles ?? 0,
+    names: active?.fileNames ?? NO_NAMES,
+    downloadFailure,
     rejected,
     errorCode,
     uploading,
     submit,
     reset,
-    reportFailure: setFailure,
-    refetchBatch: progress.refetch,
+    download,
   };
 };
 

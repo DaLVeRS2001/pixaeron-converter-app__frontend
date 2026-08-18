@@ -1,16 +1,15 @@
 import block from 'bem-cn';
-import { useCallback, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { formatBytes, totalSavings } from 'entities/conversion';
+import { formatBytes, isBatchSettled, totalSavings } from 'entities/conversion';
 
-import { compressedName, saveResult } from 'features/trackConversion';
 import { ACCEPTED_MIME_TYPES } from 'features/uploadImages';
 
 import { Alert } from 'shared/ui/Alert';
 import { Button } from 'shared/ui/Button';
 
-import { errorKeyFor } from '../model/errorCopy';
+import { ERROR_KEY, GENERIC_ERROR_KEY } from '../model/errorCopy';
 import { useCompressorModel } from '../model/useCompressorModel';
 import { ConversionRow } from './ConversionRow';
 
@@ -23,36 +22,55 @@ const CompressorWidget = () => {
   const inputId = useId();
   const [dragging, setDragging] = useState(false);
 
-  const model = useCompressorModel();
-  const { entitlement, batch, names, rejected, errorCode, uploading, submit, reset } = model;
+  const {
+    entitlement,
+    batch,
+    pollingStopped,
+    startedAt,
+    missingUploads,
+    names,
+    downloadFailure,
+    rejected,
+    errorCode,
+    uploading,
+    submit,
+    reset,
+    download,
+  } = useCompressorModel();
+  const [now, setNow] = useState(() => Date.now());
 
   const files = batch?.files ?? [];
   const totals = totalSavings(files);
+  const running = batch !== null && startedAt !== null && !pollingStopped;
+  const errorKey =
+    errorCode && Object.hasOwn(ERROR_KEY, errorCode)
+      ? ERROR_KEY[errorCode as keyof typeof ERROR_KEY]
+      : GENERIC_ERROR_KEY;
+  const seconds = running ? Math.max(0, Math.round((now - startedAt) / 1000)) : 0;
+  const elapsed = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+
+  useEffect(() => {
+    if (!running) return;
+
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+
+    return () => window.clearInterval(timer);
+  }, [running]);
+
+  useEffect(() => {
+    if (!running && !uploading) return;
+
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener('beforeunload', warnBeforeLeaving);
+
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving);
+  }, [running, uploading]);
 
   const onFiles = useCallback(
     (list: FileList | null) => {
       if (list && list.length > 0) void submit([...list]);
     },
     [submit]
-  );
-
-  const onDownload = useCallback(
-    async (fileId: string, name: string) => {
-      try {
-        const { data } = await model.refetchBatch();
-        const fresh = data?.conversionBatch?.files.find((file) => file.id === fileId);
-        if (!fresh?.downloadUrl) {
-          model.reportFailure('NOT_FOUND');
-
-          return;
-        }
-
-        await saveResult(fresh.downloadUrl, compressedName(name, fresh.outputFormat));
-      } catch {
-        model.reportFailure('STORAGE_UNREACHABLE');
-      }
-    },
-    [model]
   );
 
   return (
@@ -89,6 +107,11 @@ const CompressorWidget = () => {
           <span className={cn('picker-label')}>{t('dropzone.action')}</span>
         </label>
 
+        <p className={cn('busy')} role="status">
+          {uploading && t('announce.busy')}
+          {!uploading && batch && isBatchSettled(batch.status) && t('announce.finished')}
+        </p>
+
         {entitlement && (
           <p className={cn('limits')}>
             {t('dropzone.limits', {
@@ -111,10 +134,8 @@ const CompressorWidget = () => {
               <li key={`${entry.file.name}-${entry.reason}`}>
                 {t(`rejected.${entry.reason}`, {
                   name: entry.file.name,
-                  limit:
-                    entry.reason === 'TOO_LARGE' && entitlement
-                      ? formatBytes(entitlement.maxFileBytes)
-                      : entitlement?.maxBatchFiles,
+                  size: formatBytes(entitlement?.maxFileBytes ?? 0),
+                  files: entitlement?.maxBatchFiles,
                 })}
               </li>
             ))}
@@ -122,13 +143,22 @@ const CompressorWidget = () => {
         </Alert>
       )}
 
-      {errorCode && <Alert variant="error">{t(errorKeyFor(errorCode))}</Alert>}
+      {errorCode && <Alert variant="error">{t(errorKey)}</Alert>}
+
+      {missingUploads > 0 && (
+        <Alert variant="warning">
+          {t('notice.missingUploads', { count: missingUploads })}
+        </Alert>
+      )}
 
       {files.length > 0 && (
         <div className={cn('queue')}>
           <header className={cn('queue-header')}>
             <h3>{t('queue.title')}</h3>
-            <span>{t('queue.count', { count: files.length })}</span>
+            <span>
+              {t('queue.count', { count: files.length })}
+              {running && ` · ${t('queue.elapsed', { time: elapsed })}`}
+            </span>
           </header>
 
           <ul className={cn('rows')}>
@@ -137,7 +167,10 @@ const CompressorWidget = () => {
                 key={file.id}
                 file={file}
                 name={names.get(file.id) ?? file.id}
-                onDownload={onDownload}
+                failedDownload={
+                  downloadFailure?.fileId === file.id ? downloadFailure.reason : null
+                }
+                onDownload={download}
               />
             ))}
           </ul>
@@ -158,11 +191,13 @@ const CompressorWidget = () => {
           )}
 
           <p className={cn('notice')}>{t('notice.leaving')}</p>
-
-          <Button variant="secondary" onClick={reset}>
-            {t('queue.clear')}
-          </Button>
         </div>
+      )}
+
+      {(files.length > 0 || rejected.length > 0 || errorCode) && (
+        <Button variant="secondary" onClick={reset}>
+          {t('queue.clear')}
+        </Button>
       )}
     </section>
   );
