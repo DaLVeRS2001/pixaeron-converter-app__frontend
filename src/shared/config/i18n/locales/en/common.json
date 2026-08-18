@@ -53,7 +53,7 @@
     "speed": "Designed to scale",
     "speedDescription": "The platform is structured so processing services can scale independently as image workloads are introduced.",
     "compressorTitle": "Compress images now",
-    "compressorDescription": "Files are uploaded to our servers, compressed there, and deleted automatically. Anonymous results stay available for four hours; camera and location metadata are stripped from every result.",
+    "compressorDescription": "Files are uploaded to our servers, compressed there, and deleted automatically. Camera and location metadata are stripped from every result.",
     "compressorFormats": "JPEG · PNG · WebP · AVIF"
   },
   "footer": {
