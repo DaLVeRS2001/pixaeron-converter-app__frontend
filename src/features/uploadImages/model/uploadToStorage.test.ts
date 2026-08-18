@@ -44,7 +44,10 @@ describe('uploadToStorage', () => {
     fetchMock.mockResolvedValue({ ok: true, status: 204 });
 
     await expect(uploadToStorage(target, file)).resolves.toBeUndefined();
-    expect(fetchMock).toHaveBeenCalledWith(target.url, expect.objectContaining({ method: 'POST' }));
+    expect(fetchMock).toHaveBeenCalledWith(
+      target.url,
+      expect.objectContaining({ method: 'POST' })
+    );
   });
 
   it('reports a storage rejection with its status, so an expired policy is diagnosable', async () => {

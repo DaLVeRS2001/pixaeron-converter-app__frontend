@@ -84,7 +84,10 @@ describe('validateSelection', () => {
   });
 
   it('reports the first failing rule per file, so a huge unsupported file reads as unsupported', () => {
-    const result = validateSelection([image('x.gif', 9 * 1024 * 1024, 'image/gif')], anonymousLimits);
+    const result = validateSelection(
+      [image('x.gif', 9 * 1024 * 1024, 'image/gif')],
+      anonymousLimits
+    );
 
     expect(result.rejected[0].reason).toBe(SELECTION_REJECTION.unsupportedType);
   });

@@ -17,10 +17,7 @@ const formatBytes = (bytes: number): string => {
   return `${value.toFixed(decimals)} ${BYTE_UNITS[unit]}`;
 };
 
-const savedPercent = (
-  inputBytes: number,
-  outputBytes: number
-): number | null => {
+const savedPercent = (inputBytes: number, outputBytes: number): number | null => {
   if (!Number.isFinite(inputBytes) || !Number.isFinite(outputBytes)) return null;
   if (inputBytes <= 0 || outputBytes < 0) return null;
   if (outputBytes >= inputBytes) return 0;

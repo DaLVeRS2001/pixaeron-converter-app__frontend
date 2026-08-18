@@ -1,6 +1,10 @@
 {
-  "language": { "label": "Language" },
-  "notifications": { "close": "Close notification" },
+  "language": {
+    "label": "Language"
+  },
+  "notifications": {
+    "close": "Close notification"
+  },
   "errorBoundary": {
     "title": "Something went wrong",
     "goBack": "Go back",
@@ -11,7 +15,10 @@
     "unavailable": "We could not check your session. Please try again.",
     "retry": "Try again"
   },
-  "header": { "signOut": "Sign out", "signingOut": "Signing out…" },
+  "header": {
+    "signOut": "Sign out",
+    "signingOut": "Signing out…"
+  },
   "routeError": {
     "title": "Something went wrong",
     "unknown": "Unknown application error",
@@ -27,7 +34,11 @@
     "verified": "Verified",
     "pending": "Pending"
   },
-  "notFound": { "title": "Page not found", "home": "Go home", "signIn": "Sign in" },
+  "notFound": {
+    "title": "Page not found",
+    "home": "Go home",
+    "signIn": "Sign in"
+  },
   "landing": {
     "eyebrow": "Secure access for image workflows",
     "title": "Pixaeron — convert, compress, and prepare images without losing control",
@@ -38,9 +49,13 @@
     "security": "Secure account access",
     "securityDescription": "Create and access your account with email and password or Google Sign-In, email verification, protected sessions, and password recovery.",
     "formats": "Practical image workflows",
-    "formatsDescription": "The planned workspace will support practical image conversion and compression workflows. These processing tools are not yet publicly available.",
+    "formatsDescription": "The compressor is live: drop JPEG, PNG, WebP or AVIF images and get smaller files back, no account needed.",
     "speed": "Designed to scale",
-    "speedDescription": "The platform is structured so processing services can scale independently as image workloads are introduced."
+    "speedDescription": "The platform is structured so processing services can scale independently as image workloads are introduced.",
+    "compressorTitle": "Compress images now",
+    "compressorDescription": "Files are uploaded to our servers, compressed there, and deleted automatically. Anonymous results stay available for four hours; camera and location metadata are stripped from every result.",
+    "compressorFormats": "JPEG · PNG · WebP · AVIF",
+    "compressorAccount": "Create an account for larger files, more per batch and a longer window."
   },
   "footer": {
     "privacy": "Privacy Policy",

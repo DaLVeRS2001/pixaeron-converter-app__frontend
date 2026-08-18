@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 
 import { LanguageSwitcher } from 'features/changeLanguage';
 
+import { CompressorWidget } from 'widgets/CompressorWidget';
+
 import { BrandLogo } from 'shared/ui/BrandLogo';
 import { Button } from 'shared/ui/Button';
 import { PublicFooter } from 'shared/ui/PublicFooter';
@@ -41,6 +43,13 @@ const LandingPage = () => {
               {t('landing.signIn')}
             </Button>
           </div>
+        </section>
+        <section className={cn('compressor')} aria-labelledby="compressor-heading">
+          <h2 id="compressor-heading">{t('landing.compressorTitle')}</h2>
+          <p className={cn('compressor-formats')}>{t('landing.compressorFormats')}</p>
+          <CompressorWidget />
+          <p className={cn('compressor-note')}>{t('landing.compressorDescription')}</p>
+          <p className={cn('compressor-note')}>{t('landing.compressorAccount')}</p>
         </section>
         <section className={cn('features')} aria-label="Pixaeron benefits">
           <article>

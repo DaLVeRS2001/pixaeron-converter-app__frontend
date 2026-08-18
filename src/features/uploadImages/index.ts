@@ -1,4 +1,8 @@
-export { ACCEPTED_MIME_TYPES, SELECTION_REJECTION, validateSelection } from './model/validateSelection';
+export {
+  ACCEPTED_MIME_TYPES,
+  SELECTION_REJECTION,
+  validateSelection,
+} from './model/validateSelection';
 export type {
   RejectedSelection,
   SelectionLimits,

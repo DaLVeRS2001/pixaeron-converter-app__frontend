@@ -1,0 +1,65 @@
+{
+  "dropzone": {
+    "title": "Drag & drop images here to compress",
+    "hint": "or click to browse your files",
+    "action": "Select files",
+    "limits": "Up to {{files}} files per batch, {{size}} each",
+    "remaining": "{{count}} left today",
+    "unlimited": "No daily limit on your plan"
+  },
+  "queue": {
+    "title": "Compression queue",
+    "count_one": "{{count}} file",
+    "count_other": "{{count}} files",
+    "original": "Original",
+    "compressed": "Compressed",
+    "saved": "{{percent}}% saved",
+    "download": "Download",
+    "clear": "Start over"
+  },
+  "status": {
+    "uploading": "Uploading",
+    "ready": "Uploaded",
+    "queued": "Waiting",
+    "processing": "Compressing",
+    "completed": "Done",
+    "failed": "Failed",
+    "cancelled": "Cancelled",
+    "expired": "Expired"
+  },
+  "result": {
+    "noSavings": "Already optimal — the original is smaller, so we kept it",
+    "sanitizedLarger": "Metadata removed; the cleaned file is slightly larger, so we kept the original"
+  },
+  "totals": {
+    "title": "Total space saved",
+    "session": "This session",
+    "average": "{{percent}}% average reduction",
+    "before": "Before: {{value}}",
+    "after": "After: {{value}}"
+  },
+  "rejected": {
+    "title": "Not added",
+    "UNSUPPORTED_TYPE": "{{name}} — only JPEG, PNG, WebP and AVIF are supported",
+    "TOO_LARGE": "{{name}} — larger than the {{limit}} your plan allows",
+    "OVER_BATCH_LIMIT": "{{name}} — over the {{limit}} files allowed in one batch",
+    "OVER_DAILY_LIMIT": "{{name}} — over what is left of your daily allowance"
+  },
+  "errors": {
+    "BATCH_SIZE_INVALID": "That is more files than your plan allows in one batch.",
+    "FILE_TOO_LARGE": "One of the files is larger than your plan allows.",
+    "DAILY_QUOTA_EXCEEDED": "Your daily allowance is spent, so this batch could not be started. Nothing was compressed — try again tomorrow with a smaller batch.",
+    "IDEMPOTENCY_CONFLICT": "This batch was already started with a different set of files.",
+    "BATCH_NOT_ADMITTABLE": "This batch can no longer accept files.",
+    "FILE_NOT_MEASURED": "One of the uploads did not finish. Start a new batch.",
+    "ENTITLEMENTS_UNAVAILABLE": "Plan limits are temporarily unavailable. Try again in a moment.",
+    "NOT_FOUND": "This batch is gone — results are not kept after you leave the page. Start a new one.",
+    "STORAGE_REJECTED": "The upload was refused. Start a new batch.",
+    "STORAGE_UNREACHABLE": "Could not reach storage. Check your connection and try again.",
+    "generic": "Something went wrong. Try again."
+  },
+  "notice": {
+    "leaving": "Results are held in this tab only. If you leave, you lose access to them.",
+    "retention": "Results stay available for {{hours}} hours."
+  }
+}
