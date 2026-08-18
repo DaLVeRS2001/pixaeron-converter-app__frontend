@@ -38,6 +38,8 @@ enum PasswordResetStatus {
 
 type Query {
   me: User!
+  conversionBatch(id: ID!, batchToken: String): ConversionBatch!
+  conversionEntitlement: ConversionEntitlement!
 }
 
 type Mutation {
@@ -51,6 +53,8 @@ type Mutation {
   refreshSession: Boolean!
   logout: Boolean!
   logoutAll: Boolean!
+  createConversionBatch(input: CreateConversionBatchInput!): ConversionBatch!
+  completeConversionUploads(input: CompleteConversionUploadsInput!): CompleteConversionUploadsPayload!
 }
 
 input LoginInput {
@@ -89,4 +93,104 @@ input GoogleLoginInput {
   captchaToken: String
   legalConsentAccepted: Boolean
   legalConsentVersion: String
+}
+
+type ConversionUploadField {
+  name: String!
+  value: String!
+}
+
+type ConversionUploadTarget {
+  url: String!
+  fields: [ConversionUploadField!]!
+}
+
+type ConversionFile {
+  id: ID!
+  status: ConversionFileStatus!
+  inputBytes: Int
+  resultKind: ConversionResultKind
+  outputBytes: Int
+  outputFormat: String
+  width: Int
+  height: Int
+  failureCode: String
+  downloadUrl: String
+  upload: ConversionUploadTarget
+}
+
+enum ConversionFileStatus {
+  UPLOADING
+  READY
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+  EXPIRED
+}
+
+enum ConversionResultKind {
+  SAVED
+  NO_SAVINGS
+  SANITIZED_LARGER
+}
+
+type ConversionBatch {
+  id: ID!
+  status: ConversionBatchStatus!
+  fileCount: Int!
+  expiresAt: DateTime!
+  batchToken: String
+  files: [ConversionFile!]!
+}
+
+enum ConversionBatchStatus {
+  UPLOADING
+  QUEUED
+  PROCESSING
+  COMPLETED
+  PARTIAL
+  FAILED
+  CANCELLED
+  EXPIRED
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type CompleteConversionUploadsPayload {
+  batch: ConversionBatch!
+  admittedFiles: Int!
+  verifiedFiles: Int!
+  missingFiles: Int!
+}
+
+type ConversionEntitlement {
+  planCode: ConversionPlanCode!
+  maxBatchFiles: Int!
+  maxFileBytes: Int!
+  dailyFiles: Int
+  remainingToday: Int
+  maxConcurrentFiles: Int!
+}
+
+enum ConversionPlanCode {
+  ANONYMOUS
+  FREE
+  LIGHT
+  PRO
+}
+
+input CreateConversionBatchInput {
+  fileCount: Int!
+  idempotencyKey: String!
+  batchToken: String
+}
+
+input CompleteConversionUploadsInput {
+  batchId: ID!
+  batchToken: String
 }
