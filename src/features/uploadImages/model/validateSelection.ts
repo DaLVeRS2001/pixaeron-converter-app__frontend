@@ -25,9 +25,6 @@ type SelectionResult = {
   rejected: RejectedSelection[];
 };
 
-const isAcceptedType = (file: File): boolean =>
-  (ACCEPTED_MIME_TYPES as readonly string[]).includes(file.type);
-
 const validateSelection = (
   files: readonly File[],
   limits: SelectionLimits
@@ -40,7 +37,7 @@ const validateSelection = (
     limits.remainingToday === null ? Infinity : Math.max(0, limits.remainingToday);
 
   for (const file of files) {
-    if (!isAcceptedType(file)) {
+    if (!(ACCEPTED_MIME_TYPES as readonly string[]).includes(file.type)) {
       rejected.push({ file, reason: SELECTION_REJECTION.unsupportedType });
       continue;
     }

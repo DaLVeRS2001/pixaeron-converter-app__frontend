@@ -1,5 +1,5 @@
 import block from 'bem-cn';
-import { useCallback, useId, useRef, useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { formatBytes, totalSavings } from 'entities/conversion';
@@ -7,8 +7,10 @@ import { formatBytes, totalSavings } from 'entities/conversion';
 import { compressedName, saveResult } from 'features/trackConversion';
 import { ACCEPTED_MIME_TYPES } from 'features/uploadImages';
 
+import { Alert } from 'shared/ui/Alert';
 import { Button } from 'shared/ui/Button';
 
+import { errorKeyFor } from '../model/errorCopy';
 import { useCompressorModel } from '../model/useCompressorModel';
 import { ConversionRow } from './ConversionRow';
 
@@ -19,14 +21,11 @@ const cn = block('compressor-widget');
 const CompressorWidget = () => {
   const { t } = useTranslation('conversion');
   const inputId = useId();
-  const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
-  const [downloadFailed, setDownloadFailed] = useState(false);
 
   const model = useCompressorModel();
   const { entitlement, batch, names, rejected, errorCode, uploading, submit, reset } = model;
 
-  const accept = ACCEPTED_MIME_TYPES.join(',');
   const files = batch?.files ?? [];
   const totals = totalSavings(files);
 
@@ -39,29 +38,22 @@ const CompressorWidget = () => {
 
   const onDownload = useCallback(
     async (fileId: string, name: string) => {
-      setDownloadFailed(false);
-      const { data } = await model.refetchBatch();
-      const fresh = data?.conversionBatch.files.find((file) => file.id === fileId);
-      if (!fresh?.downloadUrl) {
-        setDownloadFailed(true);
-        return;
-      }
-
       try {
+        const { data } = await model.refetchBatch();
+        const fresh = data?.conversionBatch?.files.find((file) => file.id === fileId);
+        if (!fresh?.downloadUrl) {
+          model.reportFailure('NOT_FOUND');
+
+          return;
+        }
+
         await saveResult(fresh.downloadUrl, compressedName(name, fresh.outputFormat));
       } catch {
-        setDownloadFailed(true);
+        model.reportFailure('STORAGE_UNREACHABLE');
       }
     },
     [model]
   );
-
-  const limitsHint = entitlement
-    ? t('dropzone.limits', {
-        files: entitlement.maxBatchFiles,
-        size: formatBytes(entitlement.maxFileBytes),
-      })
-    : '';
 
   return (
     <section className={cn()}>
@@ -83,12 +75,11 @@ const CompressorWidget = () => {
 
         <label className={cn('picker')} htmlFor={inputId}>
           <input
-            ref={inputRef}
             id={inputId}
             className={cn('input')}
             type="file"
             multiple
-            accept={accept}
+            accept={ACCEPTED_MIME_TYPES.join(',')}
             disabled={uploading || !entitlement}
             onChange={(event) => {
               onFiles(event.target.files);
@@ -100,7 +91,10 @@ const CompressorWidget = () => {
 
         {entitlement && (
           <p className={cn('limits')}>
-            {limitsHint}
+            {t('dropzone.limits', {
+              files: entitlement.maxBatchFiles,
+              size: formatBytes(entitlement.maxFileBytes),
+            })}
             {entitlement.remainingToday !== null && (
               <span className={cn('remaining')}>
                 {t('dropzone.remaining', { count: entitlement.remainingToday })}
@@ -111,9 +105,8 @@ const CompressorWidget = () => {
       </div>
 
       {rejected.length > 0 && (
-        <div className={cn('rejected')}>
-          <p className={cn('rejected-title')}>{t('rejected.title')}</p>
-          <ul>
+        <Alert variant="warning" title={t('rejected.title')}>
+          <ul className={cn('rejected')}>
             {rejected.map((entry) => (
               <li key={`${entry.file.name}-${entry.reason}`}>
                 {t(`rejected.${entry.reason}`, {
@@ -126,14 +119,10 @@ const CompressorWidget = () => {
               </li>
             ))}
           </ul>
-        </div>
+        </Alert>
       )}
 
-      {errorCode && (
-        <p className={cn('error')}>{t(`errors.${errorCode}`, t('errors.generic'))}</p>
-      )}
-
-      {downloadFailed && <p className={cn('error')}>{t('errors.NOT_FOUND')}</p>}
+      {errorCode && <Alert variant="error">{t(errorKeyFor(errorCode))}</Alert>}
 
       {files.length > 0 && (
         <div className={cn('queue')}>

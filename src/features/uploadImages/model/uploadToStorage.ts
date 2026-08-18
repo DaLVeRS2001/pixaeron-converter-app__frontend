@@ -20,26 +20,22 @@ class UploadFailedError extends Error {
   }
 }
 
-const buildUploadForm = (target: UploadTarget, file: File): FormData => {
+const uploadToStorage = async (
+  target: UploadTarget,
+  file: File,
+  signal?: AbortSignal
+): Promise<void> => {
   const form = new FormData();
   for (const field of target.fields) {
     form.append(field.name, field.value);
   }
   form.append('file', file);
 
-  return form;
-};
-
-const uploadToStorage = async (
-  target: UploadTarget,
-  file: File,
-  signal?: AbortSignal
-): Promise<void> => {
   let response: Response;
   try {
     response = await fetch(target.url, {
       method: 'POST',
-      body: buildUploadForm(target, file),
+      body: form,
       signal,
     });
   } catch (error) {
@@ -52,5 +48,5 @@ const uploadToStorage = async (
   }
 };
 
-export { UPLOAD_FAILURE, UploadFailedError, buildUploadForm, uploadToStorage };
+export { UPLOAD_FAILURE, UploadFailedError, uploadToStorage };
 export type { UploadFailureReason, UploadTarget };

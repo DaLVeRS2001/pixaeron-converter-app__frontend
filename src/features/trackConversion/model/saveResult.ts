@@ -21,8 +21,11 @@ const compressedName = (
   return `${stem}-compressed.${extensionFor(outputFormat)}`;
 };
 
-const saveBlobAs = (blob: Blob, fileName: string) => {
-  const href = URL.createObjectURL(blob);
+const saveResult = async (downloadUrl: string, fileName: string): Promise<void> => {
+  const response = await fetch(downloadUrl);
+  if (!response.ok) throw new Error(`download responded ${response.status}`);
+
+  const href = URL.createObjectURL(await response.blob());
   const anchor = document.createElement('a');
   anchor.href = href;
   anchor.download = fileName;
@@ -30,13 +33,6 @@ const saveBlobAs = (blob: Blob, fileName: string) => {
   anchor.click();
   anchor.remove();
   URL.revokeObjectURL(href);
-};
-
-const saveResult = async (downloadUrl: string, fileName: string): Promise<void> => {
-  const response = await fetch(downloadUrl);
-  if (!response.ok) throw new Error(`download responded ${response.status}`);
-
-  saveBlobAs(await response.blob(), fileName);
 };
 
 export { compressedName, saveResult };

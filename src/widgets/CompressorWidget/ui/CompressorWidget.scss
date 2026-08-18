@@ -61,28 +61,8 @@
     color: var(--color-slate-600);
   }
   &__rejected {
-    padding: 1rem 1.25rem;
-    border-radius: 0.75rem;
-    background: var(--color-warning-100);
-    color: var(--color-warning-700);
-    font-size: 0.875rem;
-
-    ul {
-      padding-left: 1.25rem;
-      margin: 0.5rem 0 0;
-    }
-  }
-  &__rejected-title {
+    padding-left: 1.25rem;
     margin: 0;
-    font-weight: 600;
-  }
-  &__error {
-    padding: 1rem 1.25rem;
-    border-radius: 0.75rem;
-    margin: 0;
-    background: var(--color-error-100);
-    color: var(--color-error-700);
-    font-size: 0.875rem;
   }
   &__queue {
     display: grid;

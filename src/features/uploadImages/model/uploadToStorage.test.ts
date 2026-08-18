@@ -1,9 +1,4 @@
-import {
-  UPLOAD_FAILURE,
-  UploadFailedError,
-  buildUploadForm,
-  uploadToStorage,
-} from './uploadToStorage';
+import { UPLOAD_FAILURE, UploadFailedError, uploadToStorage } from './uploadToStorage';
 
 const target = {
   url: 'https://bucket.s3.eu-central-1.amazonaws.com/',
@@ -15,22 +10,6 @@ const target = {
 };
 
 const file = new File(['bytes'], 'photo.png', { type: 'image/png' });
-
-describe('buildUploadForm', () => {
-  it('sends every presigned field before the file, which S3 requires', () => {
-    const form = buildUploadForm(target, file);
-    const keys = [...form.keys()];
-
-    expect(keys).toEqual(['bucket', 'key', 'policy', 'file']);
-    expect(form.get('key')).toBe('inputs/batch/file');
-  });
-
-  it('does not rename or reorder the fields the backend signed', () => {
-    const form = buildUploadForm(target, file);
-
-    expect(form.get('policy')).toBe('base64-policy');
-  });
-});
 
 describe('uploadToStorage', () => {
   const fetchMock = jest.fn();
@@ -48,6 +27,16 @@ describe('uploadToStorage', () => {
       target.url,
       expect.objectContaining({ method: 'POST' })
     );
+  });
+
+  it('sends every presigned field before the file, which S3 requires', async () => {
+    fetchMock.mockResolvedValue({ ok: true, status: 204 });
+
+    await uploadToStorage(target, file);
+
+    const sent = fetchMock.mock.calls[0][1].body as FormData;
+    expect([...sent.keys()]).toEqual(['bucket', 'key', 'policy', 'file']);
+    expect(sent.get('policy')).toBe('base64-policy');
   });
 
   it('reports a storage rejection with its status, so an expired policy is diagnosable', async () => {

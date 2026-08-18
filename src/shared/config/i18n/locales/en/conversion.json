@@ -4,15 +4,12 @@
     "hint": "or click to browse your files",
     "action": "Select files",
     "limits": "Up to {{files}} files per batch, {{size}} each",
-    "remaining": "{{count}} left today",
-    "unlimited": "No daily limit on your plan"
+    "remaining": "{{count}} left today"
   },
   "queue": {
     "title": "Compression queue",
     "count_one": "{{count}} file",
     "count_other": "{{count}} files",
-    "original": "Original",
-    "compressed": "Compressed",
     "saved": "{{percent}}% saved",
     "download": "Download",
     "clear": "Start over"
@@ -33,7 +30,6 @@
   },
   "totals": {
     "title": "Total space saved",
-    "session": "This session",
     "average": "{{percent}}% average reduction",
     "before": "Before: {{value}}",
     "after": "After: {{value}}"
@@ -56,10 +52,13 @@
     "NOT_FOUND": "This batch is gone — results are not kept after you leave the page. Start a new one.",
     "STORAGE_REJECTED": "The upload was refused. Start a new batch.",
     "STORAGE_UNREACHABLE": "Could not reach storage. Check your connection and try again.",
-    "generic": "Something went wrong. Try again."
+    "generic": "Something went wrong. Try again.",
+    "BATCH_TOKEN_MISMATCH": "This batch belongs to a different visitor.",
+    "TOO_MANY_REQUESTS": "Too many requests in a row. Wait a moment and try again.",
+    "SERVICE_UNAVAILABLE": "The service is temporarily unavailable. Try again shortly.",
+    "NETWORK_ERROR": "Could not reach Pixaeron. Check your connection and try again."
   },
   "notice": {
-    "leaving": "Results are held in this tab only. If you leave, you lose access to them.",
-    "retention": "Results stay available for {{hours}} hours."
+    "leaving": "Results are held in this tab only. If you leave, you lose access to them."
   }
 }

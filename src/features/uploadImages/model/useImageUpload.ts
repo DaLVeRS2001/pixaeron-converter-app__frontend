@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client/react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { CompleteConversionUploadsDocument, CreateConversionBatchDocument } from 'shared/api';
 
@@ -10,8 +10,6 @@ type StartedBatch = {
   batchToken: string | null;
   fileNames: Map<string, string>;
 };
-
-const newIdempotencyKey = () => crypto.randomUUID();
 
 const useImageUpload = () => {
   const [createBatch] = useMutation(CreateConversionBatchDocument);
@@ -24,6 +22,8 @@ const useImageUpload = () => {
     abortRef.current = null;
   }, []);
 
+  useEffect(() => cancel, [cancel]);
+
   const start = useCallback(
     async (files: readonly File[]): Promise<StartedBatch> => {
       const controller = new AbortController();
@@ -33,23 +33,31 @@ const useImageUpload = () => {
       try {
         const { data } = await createBatch({
           variables: {
-            input: { fileCount: files.length, idempotencyKey: newIdempotencyKey() },
+            input: { fileCount: files.length, idempotencyKey: crypto.randomUUID() },
           },
         });
 
         const batch = data?.createConversionBatch;
-        if (!batch) throw new Error('createConversionBatch returned no batch');
+        if (!batch || batch.files.length !== files.length) {
+          throw new Error('createConversionBatch returned an unusable batch');
+        }
 
-        const fileNames = new Map<string, string>();
-        const uploads = batch.files.map((slot, index) => {
-          const file = files[index];
-          fileNames.set(slot.id, file.name);
-          if (!slot.upload) throw new Error(`file ${slot.id} carries no upload target`);
+        const fileNames = new Map(
+          batch.files.map((slot, index) => [slot.id, files[index].name])
+        );
 
-          return uploadToStorage(slot.upload, file, controller.signal);
-        });
+        try {
+          await Promise.all(
+            batch.files.map((slot, index) => {
+              if (!slot.upload) throw new Error(`file ${slot.id} carries no upload target`);
 
-        await Promise.all(uploads);
+              return uploadToStorage(slot.upload, files[index], controller.signal);
+            })
+          );
+        } catch (error) {
+          controller.abort();
+          throw error;
+        }
 
         await completeUploads({
           variables: { input: { batchId: batch.id, batchToken: batch.batchToken } },

@@ -1,7 +1,4 @@
-import enCommon from './locales/en/common.json';
-import enConversion from './locales/en/conversion.json';
-import ruCommon from './locales/ru/common.json';
-import ruConversion from './locales/ru/conversion.json';
+import { resources } from './resources';
 
 const BANNED_CLAIMS = [
   'in your browser',
@@ -35,30 +32,24 @@ const flatten = (value: unknown, path = ''): [string, string][] => {
   );
 };
 
-const LOCALES = {
-  'en/common': enCommon,
-  'en/conversion': enConversion,
-  'ru/common': ruCommon,
-  'ru/conversion': ruConversion,
-};
+const locales = Object.entries(resources);
 
 describe('user-facing copy', () => {
-  it.each(Object.entries(LOCALES))(
-    '%s makes no claim the product cannot honour',
-    (_name, resource) => {
-      const offenders = flatten(resource)
-        .filter(([, text]) =>
-          BANNED_CLAIMS.some((claim) => text.toLowerCase().includes(claim))
-        )
-        .map(([path, text]) => `${path}: ${text}`);
+  it.each(locales)('%s makes no claim the product cannot honour', (_language, bundle) => {
+    const offenders = flatten(bundle)
+      .filter(([, text]) => BANNED_CLAIMS.some((claim) => text.toLowerCase().includes(claim)))
+      .map(([path, text]) => `${path}: ${text}`);
 
-      expect(offenders).toEqual([]);
-    }
-  );
+    expect(offenders).toEqual([]);
+  });
 
-  it('covers every locale, so a stale translation cannot outlive the cleanup', () => {
-    const locales = new Set(Object.keys(LOCALES).map((name) => name.split('/')[0]));
+  it('reads every locale and namespace the app registers, not a hand-written list', () => {
+    const scanned = locales.flatMap(([language, bundle]) =>
+      Object.keys(bundle).map((namespace) => `${language}/${namespace}`)
+    );
 
-    expect([...locales].sort()).toEqual(['en', 'ru']);
+    expect(scanned).toContain('en/conversion');
+    expect(scanned).toContain('ru/conversion');
+    expect(scanned.length).toBe(locales.length * Object.keys(resources.en).length);
   });
 });
