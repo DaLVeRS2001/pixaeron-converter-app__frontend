@@ -82,14 +82,11 @@ const SignInForm = () => {
         />
       </div>
       <p className={cn('footer')}>
-        {t('signIn.noAccount')}
+        {t('signIn.noAccount')}{' '}
         <Link className={cn('link')} to="/sign-up">
           {t('signIn.createAccount')}
         </Link>
       </p>
-      <Link className={cn('back')} to="/">
-        {t('signIn.back')}
-      </Link>
     </div>
   );
 };

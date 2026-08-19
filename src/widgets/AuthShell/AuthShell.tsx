@@ -1,11 +1,13 @@
 import block from 'bem-cn';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 import { LanguageSwitcher } from 'features/changeLanguage';
 
-import authHero from 'shared/assets/auth-hero.webp';
+import CompressionArt from 'shared/assets/auth-compression.svg';
 import { BrandLogo } from 'shared/ui/BrandLogo';
+import { SVG } from 'shared/ui/SVG';
 
 import './AuthShell.scss';
 
@@ -19,13 +21,19 @@ const cn = block('auth-shell');
 const AuthShell = ({ variant, children }: AuthShellProps) => {
   const { t } = useTranslation('auth');
 
+  const logoLink = (
+    <Link to="/" className={cn('logo')} aria-label={t('shell.home')}>
+      <BrandLogo light={variant !== 'centered'} />
+    </Link>
+  );
+
   if (variant === 'centered') {
     return (
       <main className={cn({ variant })}>
         <div className={cn('language')}>
           <LanguageSwitcher />
         </div>
-        <BrandLogo />
+        {logoLink}
         <section className={cn('card')}>{children}</section>
       </main>
     );
@@ -37,23 +45,23 @@ const AuthShell = ({ variant, children }: AuthShellProps) => {
         <LanguageSwitcher />
       </div>
       <section className={cn('visual')}>
-        <BrandLogo light={variant === 'signup'} large={variant === 'signup'} />
+        {logoLink}
         <div className={cn('visual-copy')}>
           <h1>{variant === 'signin' ? t('shell.signInTitle') : t('shell.signUpTitle')}</h1>
+          <p>
+            {variant === 'signin'
+              ? t('shell.signInDescription')
+              : t('shell.signUpDescription')}
+          </p>
           {variant === 'signup' && (
-            <>
-              <p>{t('shell.signUpDescription')}</p>
-              <ul className={cn('benefits')}>
-                <li>{t('shell.benefitCompression')}</li>
-                <li>{t('shell.benefitStorage')}</li>
-                <li>{t('shell.benefitFreeTier')}</li>
-              </ul>
-            </>
+            <ul className={cn('benefits')}>
+              <li>{t('shell.benefitCompression')}</li>
+              <li>{t('shell.benefitStorage')}</li>
+              <li>{t('shell.benefitFreeTier')}</li>
+            </ul>
           )}
         </div>
-        {variant === 'signin' && (
-          <img className={cn('hero')} src={authHero} alt={t('shell.heroAlt')} />
-        )}
+        <SVG Svg={CompressionArt} className={cn('art').toString()} aria-hidden="true" />
       </section>
       <section className={cn('content')}>{children}</section>
     </main>

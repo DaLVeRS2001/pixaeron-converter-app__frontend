@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 300" fill="none">
+  <defs>
+    <linearGradient id="auth-compression-sheet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef2ff" />
+      <stop offset="1" stop-color="#e0e7ff" />
+    </linearGradient>
+    <linearGradient id="auth-compression-photo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366f1" />
+      <stop offset="0.55" stop-color="#8b5cf6" />
+      <stop offset="1" stop-color="#f59e0b" />
+    </linearGradient>
+  </defs>
+
+  <rect x="20" y="26" width="186" height="248" rx="20" fill="url(#auth-compression-sheet)" />
+  <rect x="38" y="46" width="150" height="112" rx="14" fill="url(#auth-compression-photo)" />
+  <circle cx="72" cy="80" r="11" fill="#ffffff" opacity="0.85" />
+  <path d="M38 134l36-32 27 23 23-19 64 47v5H38z" fill="#ffffff" opacity="0.35" />
+  <rect x="38" y="180" width="118" height="12" rx="6" fill="#c7d2fe" />
+  <rect x="38" y="204" width="84" height="12" rx="6" fill="#c7d2fe" />
+  <rect x="38" y="228" width="56" height="12" rx="6" fill="#c7d2fe" />
+
+  <path d="M224 150h30" stroke="#a5b4fc" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 9" />
+  <path d="M256 150l-10-7v14z" fill="#6366f1" />
+
+  <rect x="278" y="86" width="150" height="128" rx="16" fill="#ffffff" stroke="#c7d2fe" stroke-width="2" />
+  <rect x="292" y="100" width="122" height="72" rx="10" fill="url(#auth-compression-photo)" />
+  <circle cx="316" cy="122" r="8" fill="#ffffff" opacity="0.85" />
+  <path d="M292 158l26-22 20 16 18-13 58 34v3H292z" fill="#ffffff" opacity="0.35" />
+  <rect x="292" y="186" width="80" height="8" rx="4" fill="#e0e7ff" />
+  <rect x="292" y="200" width="52" height="8" rx="4" fill="#e0e7ff" />
+</svg>

@@ -11,20 +11,14 @@
   line-height: 1.0625rem;
 
   &__icon {
-    display: inline-flex;
     flex: 0 0 1.125rem;
     width: 1.125rem;
     height: 1.125rem;
-    align-items: center;
-    justify-content: center;
     margin-top: 0.0625rem;
-    border: 0.0625rem solid currentcolor;
-    border-radius: 50%;
-    font-size: 0.625rem;
-    font-weight: 700;
   }
   &__body {
     min-width: 0;
+    text-align: left;
   }
   &__title {
     display: block;

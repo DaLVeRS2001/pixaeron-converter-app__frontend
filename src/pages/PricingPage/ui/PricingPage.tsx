@@ -21,6 +21,7 @@ const PLANS = [
     dailyFiles: 50,
     batchFiles: 5,
     fileSize: '10 MB',
+    processing: 'serial',
     queue: 'standard',
   },
   {
@@ -33,6 +34,7 @@ const PLANS = [
     dailyFiles: null,
     batchFiles: 10,
     fileSize: '50 MB',
+    processing: 'serial',
     queue: 'priority',
   },
   {
@@ -45,7 +47,8 @@ const PLANS = [
     dailyFiles: null,
     batchFiles: 20,
     fileSize: '150 MB',
-    queue: 'fastest',
+    processing: 'parallel',
+    queue: 'top',
   },
 ] as const;
 
@@ -74,8 +77,8 @@ const PricingPage = () => {
                 <li>{t('pricing.feature.storage', { size: plan.storage })}</li>
                 <li>
                   {plan.retentionDays
-                    ? t('pricing.feature.retentionDays', { days: plan.retentionDays })
-                    : t('pricing.feature.retentionHours', { hours: plan.retentionHours })}
+                    ? t('pricing.feature.retentionDays', { count: plan.retentionDays })
+                    : t('pricing.feature.retentionHours', { count: plan.retentionHours })}
                 </li>
                 <li>
                   {plan.dailyFiles
@@ -84,6 +87,7 @@ const PricingPage = () => {
                 </li>
                 <li>{t('pricing.feature.batch', { files: plan.batchFiles })}</li>
                 <li>{t('pricing.feature.fileSize', { size: plan.fileSize })}</li>
+                <li>{t(`pricing.feature.processing.${plan.processing}`)}</li>
                 <li>{t(`pricing.feature.queue.${plan.queue}`)}</li>
               </ul>
 
