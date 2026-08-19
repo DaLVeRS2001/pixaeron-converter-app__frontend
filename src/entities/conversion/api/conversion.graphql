@@ -1,8 +1,11 @@
 query ConversionEntitlement {
   conversionEntitlement {
+    planCode
     maxBatchFiles
     maxFileBytes
     remainingToday
+    storageBytes
+    storageBytesUsed
   }
 }
 
@@ -44,5 +47,26 @@ mutation CompleteConversionUploads($input: CompleteConversionUploadsInput!) {
   completeConversionUploads(input: $input) {
     admittedFiles
     missingFiles
+  }
+}
+
+query MyConversionBatches($limit: Int, $offset: Int) {
+  myConversionBatches(limit: $limit, offset: $offset) {
+    total
+    items {
+      id
+      status
+      expiresAt
+      files {
+        id
+        status
+        inputBytes
+        outputBytes
+        outputFormat
+        resultKind
+        failureCode
+        downloadUrl
+      }
+    }
   }
 }

@@ -11,7 +11,7 @@ import { UPLOAD_FAILURE, UploadFailedError, uploadToStorage } from './uploadToSt
 type StartedBatch = {
   batchId: string;
   batchToken: string | null;
-  fileNames: Map<string, string>;
+  sourceFiles: Map<string, File>;
   missingFiles: number;
 };
 
@@ -46,9 +46,7 @@ const useImageUpload = () => {
           throw new UploadFailedError(UPLOAD_FAILURE.malformedBatch);
         }
 
-        const fileNames = new Map(
-          batch.files.map((slot, index) => [slot.id, files[index].name])
-        );
+        const sourceFiles = new Map(batch.files.map((slot, index) => [slot.id, files[index]]));
 
         try {
           await Promise.all(
@@ -74,7 +72,7 @@ const useImageUpload = () => {
         return {
           batchId: batch.id,
           batchToken: batch.batchToken ?? null,
-          fileNames,
+          sourceFiles,
           missingFiles: admitted.missingFiles,
         };
       } finally {

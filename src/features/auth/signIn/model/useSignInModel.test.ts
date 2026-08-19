@@ -17,7 +17,10 @@ const setTurnstileSiteKey = (value: string) =>
   Object.assign(globalThis, { __TURNSTILE_SITE_KEY__: value });
 
 jest.mock('@apollo/client/react', () => ({
-  useApolloClient: () => ({ writeQuery: mockWriteQuery }),
+  useApolloClient: () => ({
+    writeQuery: mockWriteQuery,
+    cache: { evict: jest.fn(), gc: jest.fn() },
+  }),
   useMutation: (...args: unknown[]) => mockUseMutation(...args),
 }));
 

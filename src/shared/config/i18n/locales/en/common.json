@@ -2,22 +2,10 @@
   "language": {
     "label": "Language"
   },
-  "notifications": {
-    "close": "Close notification"
-  },
-  "errorBoundary": {
-    "title": "Something went wrong",
-    "goBack": "Go back",
-    "reload": "Reload page"
-  },
   "session": {
     "unavailableTitle": "Service unavailable",
     "unavailable": "We could not check your session. Please try again.",
     "retry": "Try again"
-  },
-  "header": {
-    "signOut": "Sign out",
-    "signingOut": "Signing out…"
   },
   "routeError": {
     "title": "Something went wrong",
@@ -25,41 +13,162 @@
     "home": "Go home",
     "reload": "Reload page"
   },
-  "main": {
-    "accountReady": "Account ready",
-    "welcome": "Welcome, {{username}}",
-    "description": "Authentication is connected to the Pixaeron backend. The converter workspace will be implemented as the next product area.",
-    "email": "Email",
-    "verification": "Verification",
-    "verified": "Verified",
-    "pending": "Pending"
-  },
   "notFound": {
     "title": "Page not found",
     "home": "Go home",
     "signIn": "Sign in"
   },
   "landing": {
-    "eyebrow": "Secure access for image workflows",
-    "title": "Pixaeron — convert, compress, and prepare images without losing control",
-    "description": "Pixaeron is an image-processing web application. Compress JPEG, PNG, WebP and AVIF images right here without an account, or create one for secure sign-in, email verification and password recovery.",
+    "eyebrow": "Server-side image compression",
+    "title": "Compress images without losing control",
+    "description": "Pixaeron shrinks JPEG, PNG, WebP and AVIF on our servers — right here, no account required. Sign up when you want higher limits, stored results and a dashboard.",
     "googleData": "Use email and password or Google Sign-In. With Google Sign-In, Pixaeron receives your name, email address, and Google account identifier only to create and authenticate your account. Pixaeron does not access Gmail, Google Drive, Google Contacts, or other Google services.",
     "start": "Create account",
-    "signIn": "Sign in",
-    "security": "Secure account access",
-    "securityDescription": "Create and access your account with email and password or Google Sign-In, email verification, protected sessions, and password recovery.",
-    "formats": "Practical image workflows",
-    "formatsDescription": "The compressor is live: drop JPEG, PNG, WebP or AVIF images and get smaller files back, no account needed.",
-    "speed": "Designed to scale",
-    "speedDescription": "The platform is structured so processing services can scale independently as image workloads are introduced.",
     "compressorTitle": "Compress images now",
     "compressorDescription": "Files are uploaded to our servers, compressed there, and deleted automatically. Camera and location metadata are stripped from every result.",
-    "compressorFormats": "JPEG · PNG · WebP · AVIF"
+    "compressorFormats": "JPEG · PNG · WebP · AVIF",
+    "compressNow": "Compress images",
+    "advantagesTitle": "Why Pixaeron",
+    "ctaTitle": "Create a free account",
+    "advantages": {
+      "engine": {
+        "title": "Serious compression engine",
+        "description": "The same tuned encoders the big services use — mozjpeg for JPEG and palette quantization for PNG — running on our servers, not a stripped-down browser build."
+      },
+      "metadata": {
+        "title": "Metadata gone by default",
+        "description": "Camera model, GPS position and editing traces are stripped from every result. There is no switch to forget."
+      },
+      "noSignup": {
+        "title": "No account needed",
+        "description": "Drop files and download results straight away. An account only raises your limits — it is never a gate."
+      },
+      "formats": {
+        "title": "JPEG, PNG, WebP and AVIF",
+        "description": "Each format is re-encoded by an encoder tuned for it. The format you upload is the format you get back."
+      },
+      "honest": {
+        "title": "Honest results",
+        "description": "If re-encoding cannot make your file smaller, we say so and return the original — never a padded file or an inflated percentage."
+      },
+      "access": {
+        "title": "Your files, briefly",
+        "description": "Uploads live on our servers only as long as your plan keeps them, then they are deleted. Nothing is collected for training or resale."
+      }
+    }
   },
   "footer": {
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "signIn": "Sign in",
-    "copyright": "© {{year}} Pixaeron"
+    "copyright": "© {{year}} Pixaeron",
+    "tagline": "Server-side image compression with honest limits.",
+    "product": "Product",
+    "account": "Account",
+    "legal": "Legal",
+    "signUp": "Create account",
+    "compressor": "Compressor",
+    "pricing": "Pricing"
+  },
+  "publicHeader": {
+    "home": "Pixaeron home",
+    "navLabel": "Primary",
+    "compressor": "Compressor",
+    "pricing": "Pricing",
+    "signIn": "Sign in",
+    "getStarted": "Get started free",
+    "dashboard": "Dashboard"
+  },
+  "pricing": {
+    "title": "Plans and pricing",
+    "lead": "Every plan compresses with the same engine. Bigger plans keep results longer, allow larger files and skip ahead in the queue.",
+    "perMonth": "/mo",
+    "popular": "Popular",
+    "note": "Paid plans are not on sale yet — pricing is published so there are no surprises.",
+    "free": {
+      "name": "Free",
+      "summary": "For everyday compression with an account.",
+      "storage": "1 GB of stored results",
+      "retention": "Results kept for 48 hours",
+      "daily": "50 files per day",
+      "fileSize": "Files up to 10 MB",
+      "action": "Free plan"
+    },
+    "light": {
+      "name": "Light",
+      "summary": "More room and a faster queue.",
+      "storage": "2 GB of stored results",
+      "retention": "Results kept for 7 days",
+      "fileSize": "Files up to 75 MB",
+      "queue": "Priority queue",
+      "action": "Coming soon"
+    },
+    "pro": {
+      "name": "Pro",
+      "summary": "For teams and heavy pipelines.",
+      "storage": "10 GB of stored results",
+      "retention": "Results kept for 7 days",
+      "fileSize": "Files up to 150 MB",
+      "queue": "Fastest queue",
+      "action": "Coming soon"
+    }
+  },
+  "app": {
+    "sidebar": {
+      "label": "Workspace",
+      "dashboard": "Dashboard",
+      "compress": "Compress images",
+      "convert": "Convert images",
+      "files": "My files",
+      "soon": "Soon",
+      "storage": "Storage {{percent}}% used",
+      "storageDetail": "{{used}} of {{limit}}",
+      "signOut": "Sign out",
+      "signingOut": "Signing out…"
+    },
+    "dashboard": {
+      "welcome": "Welcome back, {{username}}",
+      "lead": "Here is your workspace at a glance.",
+      "storageTile": "Stored results",
+      "storageOf": "of {{limit}}",
+      "remainingTile": "Left today",
+      "remainingNote": "files in your daily allowance",
+      "planTile": "Plan",
+      "planNote": "Compare plans",
+      "compressTitle": "Compress images",
+      "compressDescription": "Shrink JPEG, PNG, WebP and AVIF on our servers.",
+      "compressAction": "Start compressing",
+      "convertTitle": "Convert images",
+      "convertDescription": "Format conversion is on the way.",
+      "recentsTitle": "Recent results",
+      "viewAll": "View all",
+      "empty": "Nothing here yet — compress your first images."
+    },
+    "compress": {
+      "title": "Compress images",
+      "lead": "Your plan limits apply automatically."
+    },
+    "files": {
+      "title": "My files",
+      "lead": "Recent results, kept for as long as your plan stores them. Oldest results make room for new ones automatically.",
+      "empty": "No stored results yet.",
+      "download": "Download",
+      "pagerLabel": "Pages",
+      "previous": "Back",
+      "next": "Next",
+      "page": "{{page}} of {{pages}}",
+      "status": {
+        "waiting": "Waiting",
+        "working": "Working",
+        "done": "Done",
+        "failed": "Failed",
+        "expired": "Expired"
+      },
+      "loading": "Loading your results…"
+    },
+    "results": {
+      "saved": "{{percent}}% smaller",
+      "until": "until {{date}}"
+    }
   }
 }

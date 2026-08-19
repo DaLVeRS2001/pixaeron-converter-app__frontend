@@ -56,6 +56,9 @@ const useCompleteLogin = () => {
   return useCallback(
     (user: MeQuery['me']) => {
       apolloClient.writeQuery({ query: MeDocument, data: { me: user } });
+      apolloClient.cache.evict({ fieldName: 'conversionEntitlement' });
+      apolloClient.cache.evict({ fieldName: 'myConversionBatches' });
+      apolloClient.cache.gc();
       sessionStorage.removeItem('pendingVerificationEmail');
       navigate(postLoginPath, { replace: true });
     },

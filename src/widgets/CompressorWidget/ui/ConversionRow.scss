@@ -14,10 +14,37 @@
     }
   }
   &__name {
-    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-width: 0;
     grid-column: 1;
     color: var(--color-slate-900);
     font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &__thumb {
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    object-fit: cover;
+
+    &_placeholder {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-slate-100);
+      color: var(--color-slate-400);
+    }
+  }
+  &__thumb-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  &__name-text {
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }

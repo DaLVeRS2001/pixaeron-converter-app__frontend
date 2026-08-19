@@ -65,7 +65,8 @@
   "notice": {
     "leaving": "Results are held in this tab only. If you leave, you lose access to them.",
     "missingUploads_one": "One upload never reached our storage and was not compressed.",
-    "missingUploads_other": "{{count}} uploads never reached our storage and were not compressed."
+    "missingUploads_other": "{{count}} uploads never reached our storage and were not compressed.",
+    "stored": "Results are saved to My files for as long as your plan keeps them."
   },
   "failure": {
     "ANIMATED_UNSUPPORTED": "Animated images are not supported yet",

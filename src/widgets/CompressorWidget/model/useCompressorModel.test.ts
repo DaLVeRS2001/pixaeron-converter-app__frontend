@@ -132,7 +132,7 @@ describe('useCompressorModel', () => {
     });
 
     expect(result.current.startedAt).toBeNull();
-    expect(result.current.names.size).toBe(0);
+    expect(result.current.sourceFiles.size).toBe(0);
   });
 
   it('keeps a healthy batch when only the quota counter failed to refresh', async () => {

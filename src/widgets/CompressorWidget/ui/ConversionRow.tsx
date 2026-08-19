@@ -1,14 +1,19 @@
 import block from 'bem-cn';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { formatBytes, isFileMoving, savedPercent } from 'entities/conversion';
 import type { ConversionFileStatus, ConversionFileView } from 'entities/conversion';
+
+import ImageIcon from 'shared/assets/icons/image.svg';
+import { SVG } from 'shared/ui/SVG';
 
 import './ConversionRow.scss';
 
 type ConversionRowProps = {
   file: ConversionFileView;
   name: string;
+  sourceFile: File | null;
   failedDownload: string | null;
   onDownload: (fileId: string, name: string) => void;
 };
@@ -41,7 +46,26 @@ const DOWNLOAD_KEY = {
   STORAGE_UNREACHABLE: 'download.STORAGE_UNREACHABLE',
 } as const;
 
-const ConversionRow = ({ file, name, failedDownload, onDownload }: ConversionRowProps) => {
+const SourceThumb = ({ sourceFile }: { sourceFile: File }) => {
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const url = URL.createObjectURL(sourceFile);
+    if (imageRef.current) imageRef.current.src = url;
+
+    return () => URL.revokeObjectURL(url);
+  }, [sourceFile]);
+
+  return <img ref={imageRef} className={cn('thumb').toString()} alt="" />;
+};
+
+const ConversionRow = ({
+  file,
+  name,
+  sourceFile,
+  failedDownload,
+  onDownload,
+}: ConversionRowProps) => {
   const { t } = useTranslation('conversion');
 
   const percent =
@@ -64,7 +88,14 @@ const ConversionRow = ({ file, name, failedDownload, onDownload }: ConversionRow
   return (
     <li className={cn({ status: file.status.toLowerCase() })}>
       <span className={cn('name')} title={name}>
-        {name}
+        {sourceFile ? (
+          <SourceThumb sourceFile={sourceFile} />
+        ) : (
+          <span className={cn('thumb', { placeholder: true })} aria-hidden="true">
+            <SVG Svg={ImageIcon} className={cn('thumb-icon').toString()} />
+          </span>
+        )}
+        <span className={cn('name-text')}>{name}</span>
       </span>
 
       <span className={cn('sizes')}>

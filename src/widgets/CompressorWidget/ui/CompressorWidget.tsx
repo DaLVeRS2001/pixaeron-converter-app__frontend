@@ -28,7 +28,7 @@ const CompressorWidget = () => {
     pollingStopped,
     startedAt,
     missingUploads,
-    names,
+    sourceFiles,
     downloadFailure,
     rejected,
     errorCode,
@@ -166,7 +166,8 @@ const CompressorWidget = () => {
               <ConversionRow
                 key={file.id}
                 file={file}
-                name={names.get(file.id) ?? file.id}
+                name={sourceFiles.get(file.id)?.name ?? file.id}
+                sourceFile={sourceFiles.get(file.id) ?? null}
                 failedDownload={
                   downloadFailure?.fileId === file.id ? downloadFailure.reason : null
                 }
@@ -190,7 +191,9 @@ const CompressorWidget = () => {
             </footer>
           )}
 
-          <p className={cn('notice')}>{t('notice.leaving')}</p>
+          <p className={cn('notice')}>
+            {entitlement?.planCode === 'ANONYMOUS' ? t('notice.leaving') : t('notice.stored')}
+          </p>
         </div>
       )}
 

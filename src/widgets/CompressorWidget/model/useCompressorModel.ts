@@ -13,7 +13,7 @@ type ActiveBatch = StartedBatch & { startedAt: number };
 
 type DownloadFailure = { fileId: string; reason: string };
 
-const NO_NAMES: ReadonlyMap<string, string> = new Map();
+const NO_FILES: ReadonlyMap<string, File> = new Map();
 
 const useCompressorModel = () => {
   const entitlementQuery = useQuery(ConversionEntitlementDocument);
@@ -113,7 +113,7 @@ const useCompressorModel = () => {
     pollingStopped,
     startedAt: active?.startedAt ?? null,
     missingUploads: active?.missingFiles ?? 0,
-    names: active?.fileNames ?? NO_NAMES,
+    sourceFiles: active?.sourceFiles ?? NO_FILES,
     downloadFailure,
     rejected,
     errorCode,

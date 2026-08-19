@@ -58,5 +58,8 @@ const totalSavings = (files: readonly MeasuredFile[]): ConversionTotals => {
   };
 };
 
-export { formatBytes, savedPercent, totalSavings };
+const storagePercent = (usedBytes: number, limitBytes: number): number =>
+  Math.min(100, Math.round((usedBytes / limitBytes) * 100));
+
+export { formatBytes, savedPercent, storagePercent, totalSavings };
 export type { ConversionTotals };

@@ -1,45 +1,30 @@
-import { useApolloClient, useMutation } from '@apollo/client/react';
 import block from 'bem-cn';
-import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
+import { useCurrentUser } from 'entities/user';
 
 import { LanguageSwitcher } from 'features/changeLanguage';
 
-import { LogoutDocument } from 'shared/api';
 import { BrandLogo } from 'shared/ui/BrandLogo';
-import { Button } from 'shared/ui/Button';
 
 import './Header.scss';
 
 const cn = block('header');
 
 const Header = () => {
-  const { t } = useTranslation();
-  const apolloClient = useApolloClient();
-  const [logout, { loading }] = useMutation(LogoutDocument);
-
-  const onLogout = async () => {
-    try {
-      await logout();
-    } finally {
-      try {
-        await apolloClient.cache.reset({ discardWatches: false });
-      } finally {
-        window.location.replace('/sign-in');
-      }
-    }
-  };
+  const session = useCurrentUser();
 
   return (
     <header className={cn()}>
       <div className={cn('inner')}>
-        <BrandLogo />
+        <Link to="/app" className={cn('logo')}>
+          <BrandLogo />
+        </Link>
         <div className={cn('actions')}>
           <LanguageSwitcher />
-          <div className={cn('logout')}>
-            <Button variant="secondary" onClick={onLogout} disabled={loading}>
-              {loading ? t('header.signingOut') : t('header.signOut')}
-            </Button>
-          </div>
+          {session.status === 'authenticated' && (
+            <span className={cn('user')}>{session.user.username}</span>
+          )}
         </div>
       </div>
     </header>

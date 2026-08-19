@@ -1,10 +1,22 @@
 .main-layout {
+  display: flex;
   min-height: 100vh;
   background: var(--color-slate-50);
 
+  &__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
   &__container {
+    flex: 1;
     width: min(100% - 2rem, 75rem);
     margin: 0 auto;
-    padding: 3rem 0;
+    padding: 2rem 0 3rem;
+  }
+
+  @media (width <= 48rem) {
+    flex-direction: column;
   }
 }
