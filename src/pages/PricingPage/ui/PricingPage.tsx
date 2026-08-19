@@ -29,10 +29,10 @@ const PLANS = [
     featured: true,
     storage: '2 GB',
     retentionHours: null,
-    retentionDays: 7,
+    retentionDays: 4,
     dailyFiles: null,
     batchFiles: 10,
-    fileSize: '75 MB',
+    fileSize: '50 MB',
     queue: 'priority',
   },
   {
