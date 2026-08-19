@@ -1,0 +1,89 @@
+{
+  "dropzone": {
+    "title": "Drag & drop images here to compress",
+    "hint": "or click to browse your files",
+    "action": "Select files",
+    "limits": "Up to {{files}} files per batch, {{size}} each",
+    "remaining": "{{count}} left today"
+  },
+  "queue": {
+    "title": "Compression queue",
+    "count_one": "{{count}} file",
+    "count_other": "{{count}} files",
+    "saved": "{{percent}}% saved",
+    "download": "Download",
+    "clear": "Start over",
+    "elapsed": "running {{time}}"
+  },
+  "status": {
+    "uploading": "Uploading",
+    "ready": "Uploaded",
+    "queued": "Waiting",
+    "processing": "Compressing",
+    "completed": "Done",
+    "failed": "Failed",
+    "cancelled": "Cancelled",
+    "expired": "Expired"
+  },
+  "result": {
+    "noSavings": "Already optimal — the original is smaller, so we kept it",
+    "sanitizedLarger": "Metadata stripped. The cleaned copy is slightly larger than your original — you are downloading the cleaned one"
+  },
+  "totals": {
+    "title": "Total space saved",
+    "average": "{{percent}}% average reduction",
+    "before": "Before: {{value}}",
+    "after": "After: {{value}}"
+  },
+  "rejected": {
+    "title": "Not added",
+    "UNSUPPORTED_TYPE": "{{name}} — only JPEG, PNG, WebP and AVIF are supported",
+    "TOO_LARGE": "{{name}} — larger than the {{size}} your plan allows",
+    "OVER_BATCH_LIMIT": "{{name}} — over the {{files}} files allowed in one batch",
+    "OVER_DAILY_LIMIT": "{{name}} — over what is left of your daily allowance",
+    "EMPTY_FILE": "{{name}} — the file is empty"
+  },
+  "errors": {
+    "BATCH_SIZE_INVALID": "That is more files than your plan allows in one batch.",
+    "FILE_TOO_LARGE": "One of the files is larger than your plan allows.",
+    "DAILY_QUOTA_EXCEEDED": "Your daily allowance is spent, so this batch could not be started. Nothing was compressed — try again tomorrow with a smaller batch.",
+    "IDEMPOTENCY_CONFLICT": "This batch was already started with a different set of files.",
+    "BATCH_NOT_ADMITTABLE": "This batch can no longer accept files.",
+    "FILE_NOT_MEASURED": "One of the uploads did not finish. Start a new batch.",
+    "ENTITLEMENTS_UNAVAILABLE": "Plan limits are temporarily unavailable. Try again in a moment.",
+    "NOT_FOUND": "This batch is gone — results are not kept after you leave the page. Start a new one.",
+    "STORAGE_REJECTED": "The upload was refused. Start a new batch.",
+    "STORAGE_UNREACHABLE": "Could not reach storage. Check your connection and try again.",
+    "generic": "Something went wrong. Try again.",
+    "BATCH_TOKEN_MISMATCH": "This batch belongs to a different visitor.",
+    "TOO_MANY_REQUESTS": "Too many requests in a row. Wait a moment and try again.",
+    "SERVICE_UNAVAILABLE": "The service is temporarily unavailable. Try again shortly.",
+    "NETWORK_ERROR": "Could not reach Pixaeron. Check your connection and try again.",
+    "NO_FILES_ADMITTED": "None of your uploads reached our storage, so nothing was compressed.",
+    "BATCH_MALFORMED": "Pixaeron answered with a batch we cannot use. Please try again."
+  },
+  "notice": {
+    "leaving": "Results are held in this tab only. If you leave, you lose access to them.",
+    "missingUploads_one": "One upload never reached our storage and was not compressed.",
+    "missingUploads_other": "{{count}} uploads never reached our storage and were not compressed.",
+    "stored": "Results are saved to My files for as long as your plan keeps them."
+  },
+  "failure": {
+    "ANIMATED_UNSUPPORTED": "Animated images are not supported yet",
+    "PIXELS_EXCEEDED": "Too many pixels for the compressor",
+    "UNSUPPORTED_FORMAT": "This file is not one of the supported still-image formats",
+    "DECODE_FAILED": "The file could not be read as an image",
+    "INPUT_TOO_LARGE": "Larger than the compressor accepts",
+    "INPUT_CHANGED": "The upload changed while it was being read",
+    "INPUT_MISSING": "The upload was no longer there",
+    "generic": "Compression failed"
+  },
+  "announce": {
+    "busy": "Uploading your files…",
+    "finished": "Compression finished."
+  },
+  "download": {
+    "RESULT_EXPIRED": "This result is no longer stored. Compress the file again.",
+    "STORAGE_UNREACHABLE": "The file could not be fetched. Try the download again."
+  }
+}

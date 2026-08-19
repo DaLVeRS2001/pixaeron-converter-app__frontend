@@ -17,7 +17,12 @@
     justify-content: flex-end;
     gap: 1rem;
   }
-  &__logout {
-    width: 7.5rem;
+  &__logo {
+    display: inline-flex;
+    text-decoration: none;
+  }
+  &__user {
+    color: var(--color-slate-700);
+    font-weight: 600;
   }
 }

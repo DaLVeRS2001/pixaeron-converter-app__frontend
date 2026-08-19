@@ -5,11 +5,16 @@ import { MeDocument } from 'shared/api';
 import { useCompleteLogin } from './useCompleteLogin';
 
 const mockWriteQuery = jest.fn();
+const mockEvict = jest.fn();
+const mockGc = jest.fn();
 const mockNavigate = jest.fn();
 let mockLocationState: unknown;
 
 jest.mock('@apollo/client/react', () => ({
-  useApolloClient: () => ({ writeQuery: mockWriteQuery }),
+  useApolloClient: () => ({
+    writeQuery: mockWriteQuery,
+    cache: { evict: mockEvict, gc: mockGc },
+  }),
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -48,6 +53,9 @@ describe('useCompleteLogin', () => {
       query: MeDocument,
       data: { me: user },
     });
+    expect(mockEvict).toHaveBeenCalledWith({ fieldName: 'conversionEntitlement' });
+    expect(mockEvict).toHaveBeenCalledWith({ fieldName: 'myConversionBatches' });
+    expect(mockGc).toHaveBeenCalled();
     expect(sessionStorage.getItem('pendingVerificationEmail')).toBeNull();
     expect(mockNavigate).toHaveBeenCalledWith('/convert?preset=web#queue', { replace: true });
   });

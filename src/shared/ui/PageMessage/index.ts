@@ -1,0 +1,1 @@
+export { PageMessage } from './PageMessage';

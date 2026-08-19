@@ -1,0 +1,72 @@
+query ConversionEntitlement {
+  conversionEntitlement {
+    planCode
+    maxBatchFiles
+    maxFileBytes
+    remainingToday
+    storageBytes
+    storageBytesUsed
+  }
+}
+
+query ConversionBatch($id: ID!, $batchToken: String) {
+  conversionBatch(id: $id, batchToken: $batchToken) {
+    id
+    status
+    files {
+      id
+      status
+      inputBytes
+      outputBytes
+      outputFormat
+      resultKind
+      failureCode
+      downloadUrl
+    }
+  }
+}
+
+mutation CreateConversionBatch($input: CreateConversionBatchInput!) {
+  createConversionBatch(input: $input) {
+    id
+    batchToken
+    files {
+      id
+      upload {
+        url
+        fields {
+          name
+          value
+        }
+      }
+    }
+  }
+}
+
+mutation CompleteConversionUploads($input: CompleteConversionUploadsInput!) {
+  completeConversionUploads(input: $input) {
+    admittedFiles
+    missingFiles
+  }
+}
+
+query MyConversionBatches($limit: Int, $offset: Int) {
+  myConversionBatches(limit: $limit, offset: $offset) {
+    total
+    items {
+      id
+      status
+      expiresAt
+      files {
+        id
+        status
+        inputBytes
+        outputBytes
+        outputFormat
+        resultKind
+        failureCode
+        downloadUrl
+      }
+    }
+  }
+}

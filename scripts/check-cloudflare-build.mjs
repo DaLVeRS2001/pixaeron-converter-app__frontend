@@ -106,11 +106,17 @@ const requiredDirectives = {
     'https://accounts.google.com',
     'https://challenges.cloudflare.com',
   ],
-  'img-src': ["'self'", 'data:'],
+  'img-src': [
+    "'self'",
+    'data:',
+    'blob:',
+    'https://pixaeron-conversion-production.s3.eu-central-1.amazonaws.com',
+  ],
   'font-src': ["'self'"],
   'connect-src': [
     "'self'",
     'https://api.pixaeron.com',
+    'https://pixaeron-conversion-production.s3.eu-central-1.amazonaws.com',
     'https://accounts.google.com',
     'https://challenges.cloudflare.com',
   ],

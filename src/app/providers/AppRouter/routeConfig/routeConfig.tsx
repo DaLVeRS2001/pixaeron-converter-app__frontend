@@ -6,16 +6,22 @@ import { PageLoader } from 'shared/ui/PageLoader';
 import { RequireAuth } from '../guards/RequireAuth';
 import { RequireGuest } from '../guards/RequireGuest';
 import { Layout } from '../ui/Layout/Layout';
+import { RootLayout } from '../ui/RootLayout';
 import { RouteErrorBoundary } from '../ui/RouteErrorBoundary';
 
 const routes: RouteObject[] = [
   {
+    element: <RootLayout />,
     hydrateFallbackElement: <PageLoader />,
     errorElement: <RouteErrorBoundary />,
     children: [
       {
         path: '/',
         lazy: { Component: async () => (await import('pages/LandingPage')).LandingPage },
+      },
+      {
+        path: '/pricing',
+        lazy: { Component: async () => (await import('pages/PricingPage')).PricingPage },
       },
       {
         path: '/privacy',
@@ -70,7 +76,21 @@ const routes: RouteObject[] = [
             children: [
               {
                 index: true,
-                lazy: { Component: async () => (await import('pages/MainPage')).MainPage },
+                lazy: {
+                  Component: async () => (await import('pages/DashboardPage')).DashboardPage,
+                },
+              },
+              {
+                path: 'compress',
+                lazy: {
+                  Component: async () => (await import('pages/CompressPage')).CompressPage,
+                },
+              },
+              {
+                path: 'files',
+                lazy: {
+                  Component: async () => (await import('pages/MyFilesPage')).MyFilesPage,
+                },
               },
             ],
           },

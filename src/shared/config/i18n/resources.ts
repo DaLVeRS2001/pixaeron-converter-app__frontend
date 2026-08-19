@@ -1,8 +1,10 @@
 import enAuth from './locales/en/auth.json';
 import enTranslation from './locales/en/common.json';
+import enConversion from './locales/en/conversion.json';
 import enErrorMessages from './locales/en/errorMessages.json';
 import ruAuth from './locales/ru/auth.json';
 import ruTranslation from './locales/ru/common.json';
+import ruConversion from './locales/ru/conversion.json';
 import ruErrorMessages from './locales/ru/errorMessages.json';
 
 type TTranslationSchema<TData> = {
@@ -16,6 +18,7 @@ const defaultNS = 'translation';
 const defaultLanguageResources = {
   translation: enTranslation,
   auth: enAuth,
+  conversion: enConversion,
   errorMessages: enErrorMessages,
 };
 
@@ -29,6 +32,7 @@ const resources = {
   ru: {
     translation: ruTranslation,
     auth: ruAuth,
+    conversion: ruConversion,
     errorMessages: ruErrorMessages,
   } satisfies TLanguageResourcesSchema,
 };
