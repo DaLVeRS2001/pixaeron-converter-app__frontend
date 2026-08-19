@@ -180,16 +180,16 @@ type ConversionEntitlement {
   storageBytesUsed: Float
 }
 
-type ConversionBatchPage {
-  items: [ConversionBatch!]!
-  total: Int!
-}
-
 enum ConversionPlanCode {
   ANONYMOUS
   FREE
   LIGHT
   PRO
+}
+
+type ConversionBatchPage {
+  items: [ConversionBatch!]!
+  total: Int!
 }
 
 input CreateConversionBatchInput {
