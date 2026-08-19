@@ -14,35 +14,41 @@ const PLANS = [
   {
     code: 'free',
     price: '$0',
-    highlights: [
-      'pricing.free.storage',
-      'pricing.free.retention',
-      'pricing.free.daily',
-      'pricing.free.fileSize',
-    ],
     featured: false,
+    storage: '1 GB',
+    retentionHours: 48,
+    retentionDays: null,
+    dailyFiles: 50,
+    batchFiles: 5,
+    fileSize: '10 MB',
+    queue: 'standard',
+    concurrent: 1,
   },
   {
     code: 'light',
     price: '$2.25',
-    highlights: [
-      'pricing.light.storage',
-      'pricing.light.retention',
-      'pricing.light.fileSize',
-      'pricing.light.queue',
-    ],
     featured: true,
+    storage: '2 GB',
+    retentionHours: null,
+    retentionDays: 7,
+    dailyFiles: null,
+    batchFiles: 10,
+    fileSize: '75 MB',
+    queue: 'priority',
+    concurrent: 3,
   },
   {
     code: 'pro',
     price: '$10',
-    highlights: [
-      'pricing.pro.storage',
-      'pricing.pro.retention',
-      'pricing.pro.fileSize',
-      'pricing.pro.queue',
-    ],
     featured: false,
+    storage: '10 GB',
+    retentionHours: null,
+    retentionDays: 7,
+    dailyFiles: null,
+    batchFiles: 20,
+    fileSize: '150 MB',
+    queue: 'fastest',
+    concurrent: 8,
   },
 ] as const;
 
@@ -66,11 +72,25 @@ const PricingPage = () => {
                 <span>{t('pricing.perMonth')}</span>
               </p>
               <p className={cn('summary')}>{t(`pricing.${plan.code}.summary`)}</p>
+
               <ul>
-                {plan.highlights.map((highlight) => (
-                  <li key={highlight}>{t(highlight)}</li>
-                ))}
+                <li>{t('pricing.feature.storage', { size: plan.storage })}</li>
+                <li>
+                  {plan.retentionDays
+                    ? t('pricing.feature.retentionDays', { days: plan.retentionDays })
+                    : t('pricing.feature.retentionHours', { hours: plan.retentionHours })}
+                </li>
+                <li>
+                  {plan.dailyFiles
+                    ? t('pricing.feature.daily', { files: plan.dailyFiles })
+                    : t('pricing.feature.dailyUnlimited')}
+                </li>
+                <li>{t('pricing.feature.batch', { files: plan.batchFiles })}</li>
+                <li>{t('pricing.feature.fileSize', { size: plan.fileSize })}</li>
+                <li>{t(`pricing.feature.queue.${plan.queue}`)}</li>
+                <li>{t('pricing.feature.concurrent', { count: plan.concurrent })}</li>
               </ul>
+
               <Button variant={plan.featured ? 'primary' : 'secondary'} disabled>
                 {t(`pricing.${plan.code}.action`)}
               </Button>

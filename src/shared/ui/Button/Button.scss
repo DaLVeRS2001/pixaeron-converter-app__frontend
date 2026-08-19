@@ -4,7 +4,6 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  width: 100%;
   padding: 0.625rem 1.25rem;
   border: 0.0625rem solid transparent;
   border-radius: var(--radius-sm);
@@ -49,7 +48,6 @@
     }
     &_text {
       min-height: auto;
-      width: auto;
       padding: 0;
       color: var(--color-brand-600);
       background: transparent;

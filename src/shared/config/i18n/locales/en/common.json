@@ -16,7 +16,8 @@
   "notFound": {
     "title": "Page not found",
     "home": "Go home",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "description": "The page you followed does not exist or has moved."
   },
   "landing": {
     "eyebrow": "Server-side image compression",
@@ -88,29 +89,33 @@
     "free": {
       "name": "Free",
       "summary": "For everyday compression with an account.",
-      "storage": "1 GB of stored results",
-      "retention": "Results kept for 48 hours",
-      "daily": "50 files per day",
-      "fileSize": "Files up to 10 MB",
       "action": "Free plan"
     },
     "light": {
       "name": "Light",
       "summary": "More room and a faster queue.",
-      "storage": "2 GB of stored results",
-      "retention": "Results kept for 7 days",
-      "fileSize": "Files up to 75 MB",
-      "queue": "Priority queue",
       "action": "Coming soon"
     },
     "pro": {
       "name": "Pro",
       "summary": "For teams and heavy pipelines.",
-      "storage": "10 GB of stored results",
-      "retention": "Results kept for 7 days",
-      "fileSize": "Files up to 150 MB",
-      "queue": "Fastest queue",
       "action": "Coming soon"
+    },
+    "feature": {
+      "storage": "{{size}} of stored results",
+      "retentionHours": "Results kept for {{hours}} hours",
+      "retentionDays": "Results kept for {{days}} days",
+      "daily": "{{files}} files per day",
+      "dailyUnlimited": "No daily file limit",
+      "batch": "Up to {{files}} files per batch",
+      "fileSize": "Files up to {{size}}",
+      "concurrent_one": "{{count}} file compressed at a time",
+      "concurrent_other": "{{count}} files compressed at once",
+      "queue": {
+        "standard": "Standard queue",
+        "priority": "Priority queue",
+        "fastest": "Fastest queue"
+      }
     }
   },
   "app": {
