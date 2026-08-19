@@ -109,8 +109,6 @@
       "dailyUnlimited": "No daily file limit",
       "batch": "Up to {{files}} files per batch",
       "fileSize": "Files up to {{size}}",
-      "concurrent_one": "{{count}} file compressed at a time",
-      "concurrent_other": "{{count}} files compressed at once",
       "queue": {
         "standard": "Standard queue",
         "priority": "Priority queue",

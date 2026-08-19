@@ -109,15 +109,11 @@
       "dailyUnlimited": "Без дневного лимита",
       "batch": "До {{files}} файлов за один раз",
       "fileSize": "Файлы до {{size}}",
-      "concurrent_one": "{{count}} файл сжимается одновременно",
-      "concurrent_few": "{{count}} файла сжимаются одновременно",
-      "concurrent_many": "{{count}} файлов сжимаются одновременно",
       "queue": {
         "standard": "Обычная очередь",
         "priority": "Приоритетная очередь",
         "fastest": "Самая быстрая очередь"
-      },
-      "concurrent_other": "{{count}} файлов сжимаются одновременно"
+      }
     }
   },
   "app": {

@@ -22,7 +22,6 @@ const PLANS = [
     batchFiles: 5,
     fileSize: '10 MB',
     queue: 'standard',
-    concurrent: 1,
   },
   {
     code: 'light',
@@ -35,7 +34,6 @@ const PLANS = [
     batchFiles: 10,
     fileSize: '75 MB',
     queue: 'priority',
-    concurrent: 3,
   },
   {
     code: 'pro',
@@ -48,7 +46,6 @@ const PLANS = [
     batchFiles: 20,
     fileSize: '150 MB',
     queue: 'fastest',
-    concurrent: 8,
   },
 ] as const;
 
@@ -88,7 +85,6 @@ const PricingPage = () => {
                 <li>{t('pricing.feature.batch', { files: plan.batchFiles })}</li>
                 <li>{t('pricing.feature.fileSize', { size: plan.fileSize })}</li>
                 <li>{t(`pricing.feature.queue.${plan.queue}`)}</li>
-                <li>{t('pricing.feature.concurrent', { count: plan.concurrent })}</li>
               </ul>
 
               <Button variant={plan.featured ? 'primary' : 'secondary'} disabled>
