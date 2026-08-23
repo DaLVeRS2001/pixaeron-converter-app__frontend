@@ -47,6 +47,7 @@ const CompressorWidget = () => {
 
   const files = batch?.files ?? [];
   const totals = totalSavings(files);
+  const savedNothing = totals.savedBytes === 0;
   const running = batch !== null && startedAt !== null && !pollingStopped;
   const errorKey =
     errorCode && Object.hasOwn(ERROR_KEY, errorCode)
@@ -191,13 +192,19 @@ const CompressorWidget = () => {
             ))}
           </ul>
 
-          {totals.files > 0 && (
-            <footer className={cn('totals')}>
-              <p className={cn('totals-title')}>{t('totals.title')}</p>
-              <p className={cn('totals-value')}>{formatBytes(totals.savedBytes)}</p>
-              <p className={cn('totals-average')}>
-                {t('totals.average', { percent: totals.savedPercent })}
+          {batch && isBatchSettled(batch.status) && totals.files > 0 && (
+            <footer className={cn('totals', { none: savedNothing })}>
+              <p className={cn('totals-title')}>
+                {savedNothing ? t('totals.none') : t('totals.title')}
               </p>
+              {!savedNothing && (
+                <>
+                  <p className={cn('totals-value')}>{formatBytes(totals.savedBytes)}</p>
+                  <p className={cn('totals-average')}>
+                    {t('totals.average', { percent: totals.savedPercent })}
+                  </p>
+                </>
+              )}
               <p className={cn('totals-compare')}>
                 {t('totals.before', { value: formatBytes(totals.inputBytes) })}
                 {' · '}

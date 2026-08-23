@@ -42,6 +42,7 @@
   },
   "totals": {
     "title": "Total space saved",
+    "none": "Nothing was saved on this batch",
     "average": "{{percent}}% average reduction",
     "before": "Before: {{value}}",
     "after": "After: {{value}}"
