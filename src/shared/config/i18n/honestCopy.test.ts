@@ -15,12 +15,16 @@ const BANNED_CLAIMS = [
   'lossless',
   'up to 80%',
   'gdpr compliant',
+  'faster',
+  'fastest',
   'в браузере',
   'на стороне клиента',
   'не покидают',
   'ничего не хранится',
   'без потерь',
   'до 80%',
+  'быстрее',
+  'самая быстрая',
 ];
 
 const flatten = (value: unknown, path = ''): [string, string][] => {
@@ -33,11 +37,20 @@ const flatten = (value: unknown, path = ''): [string, string][] => {
 };
 
 const locales = Object.entries(resources);
+const englishOnly = locales.filter(([language]) => language === 'en');
 
 describe('user-facing copy', () => {
   it.each(locales)('%s makes no claim the product cannot honour', (_language, bundle) => {
     const offenders = flatten(bundle)
       .filter(([, text]) => BANNED_CLAIMS.some((claim) => text.toLowerCase().includes(claim)))
+      .map(([path, text]) => `${path}: ${text}`);
+
+    expect(offenders).toEqual([]);
+  });
+
+  it.each(englishOnly)('%s writes without em dashes', (_language, bundle) => {
+    const offenders = flatten(bundle)
+      .filter(([, text]) => text.includes('—'))
       .map(([path, text]) => `${path}: ${text}`);
 
     expect(offenders).toEqual([]);

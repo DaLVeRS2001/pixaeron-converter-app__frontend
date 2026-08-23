@@ -4,7 +4,7 @@
   },
   "session": {
     "unavailableTitle": "Service unavailable",
-    "unavailable": "We could not check your session. Please try again.",
+    "unavailable": "We could not check your session. Please try again",
     "retry": "Try again"
   },
   "routeError": {
@@ -17,12 +17,12 @@
     "title": "Page not found",
     "home": "Go home",
     "signIn": "Sign in",
-    "description": "The page you followed does not exist or has moved."
+    "description": "The page you followed does not exist or has moved"
   },
   "landing": {
     "eyebrow": "Server-side image compression",
     "title": "Compress images without losing control",
-    "description": "Pixaeron shrinks JPEG, PNG, WebP and AVIF on our servers — right here, no account required. Sign up when you want higher limits, stored results and a dashboard.",
+    "description": "Pixaeron shrinks JPEG, PNG, WebP and AVIF on our servers, right here and without an account. Sign up when you want higher limits, stored results and a dashboard.",
     "googleData": "Use email and password or Google Sign-In. With Google Sign-In, Pixaeron receives your name, email address, and Google account identifier only to create and authenticate your account. Pixaeron does not access Gmail, Google Drive, Google Contacts, or other Google services.",
     "start": "Create account",
     "compressorTitle": "Compress images now",
@@ -34,7 +34,7 @@
     "advantages": {
       "engine": {
         "title": "Serious compression engine",
-        "description": "The same tuned encoders the big services use — mozjpeg for JPEG and palette quantization for PNG — running on our servers, not a stripped-down browser build."
+        "description": "The same tuned encoders the big services use: mozjpeg for JPEG, palette quantization for PNG. They run on our servers, not in a stripped-down browser build."
       },
       "metadata": {
         "title": "Metadata gone by default",
@@ -42,7 +42,7 @@
       },
       "noSignup": {
         "title": "No account needed",
-        "description": "Drop files and download results straight away. An account only raises your limits — it is never a gate."
+        "description": "Drop files and download results straight away. An account only raises your limits; it never gates you."
       },
       "formats": {
         "title": "JPEG, PNG, WebP and AVIF",
@@ -50,11 +50,11 @@
       },
       "honest": {
         "title": "Honest results",
-        "description": "If re-encoding cannot make your file smaller, we say so and return the original — never a padded file or an inflated percentage."
+        "description": "If re-encoding cannot make your file smaller, we say so and return the original, never a padded file or an inflated percentage."
       },
       "access": {
         "title": "Your files, briefly",
-        "description": "Uploads live on our servers only as long as your plan keeps them, then they are deleted. Nothing is collected for training or resale."
+        "description": "Without an account results live in your tab only, until you leave. With an account they live as long as your plan keeps them, and nothing is collected for training or resale."
       }
     }
   },
@@ -63,7 +63,7 @@
     "terms": "Terms of Service",
     "signIn": "Sign in",
     "copyright": "© {{year}} Pixaeron",
-    "tagline": "Server-side image compression with honest limits.",
+    "tagline": "Server-side image compression with honest limits",
     "product": "Product",
     "account": "Account",
     "legal": "Legal",
@@ -82,37 +82,43 @@
   },
   "pricing": {
     "title": "Plans and pricing",
-    "lead": "Every plan compresses with the same engine. Bigger plans keep results longer, allow larger files and skip ahead in the queue.",
+    "lead": "Every plan compresses with the same engine. Bigger plans keep results longer, allow larger files and are picked up before free plans when there is a queue.",
     "perMonth": "/mo",
     "popular": "Popular",
-    "note": "Paid plans are not on sale yet — pricing is published so there are no surprises.",
+    "note": "Paid plans are not on sale yet. Pricing is published so there are no surprises.",
     "free": {
       "name": "Free",
-      "summary": "For everyday compression with an account.",
+      "summary": "For everyday compression with an account",
       "action": "Free plan"
     },
     "light": {
       "name": "Light",
-      "summary": "More room and a faster queue.",
+      "summary": "More room and higher queue priority",
       "action": "Coming soon"
     },
     "pro": {
       "name": "Pro",
-      "summary": "For teams and heavy pipelines.",
+      "summary": "For teams and heavy pipelines",
       "action": "Coming soon"
     },
     "feature": {
       "storage": "{{size}} of stored results",
-      "retentionHours": "Results kept for {{hours}} hours",
-      "retentionDays": "Results kept for {{days}} days",
+      "retentionHours_one": "Results kept for {{count}} hour",
+      "retentionHours_other": "Results kept for {{count}} hours",
+      "retentionDays_one": "Results kept for {{count}} day",
+      "retentionDays_other": "Results kept for {{count}} days",
       "daily": "{{files}} files per day",
       "dailyUnlimited": "No daily file limit",
       "batch": "Up to {{files}} files per batch",
       "fileSize": "Files up to {{size}}",
+      "processing": {
+        "serial": "One file at a time",
+        "parallel": "Files processed in parallel"
+      },
       "queue": {
         "standard": "Standard queue",
-        "priority": "Priority queue",
-        "fastest": "Fastest queue"
+        "priority": "Priority queue, ahead of Free",
+        "top": "Top priority in the queue"
       }
     }
   },
@@ -131,7 +137,7 @@
     },
     "dashboard": {
       "welcome": "Welcome back, {{username}}",
-      "lead": "Here is your workspace at a glance.",
+      "lead": "Here is your workspace at a glance",
       "storageTile": "Stored results",
       "storageOf": "of {{limit}}",
       "remainingTile": "Left today",
@@ -139,22 +145,22 @@
       "planTile": "Plan",
       "planNote": "Compare plans",
       "compressTitle": "Compress images",
-      "compressDescription": "Shrink JPEG, PNG, WebP and AVIF on our servers.",
+      "compressDescription": "Shrink JPEG, PNG, WebP and AVIF on our servers",
       "compressAction": "Start compressing",
       "convertTitle": "Convert images",
-      "convertDescription": "Format conversion is on the way.",
+      "convertDescription": "Format conversion is on the way",
       "recentsTitle": "Recent results",
       "viewAll": "View all",
-      "empty": "Nothing here yet — compress your first images."
+      "empty": "Nothing here yet. Compress your first images"
     },
     "compress": {
       "title": "Compress images",
-      "lead": "Your plan limits apply automatically."
+      "lead": "Your plan limits apply automatically"
     },
     "files": {
       "title": "My files",
       "lead": "Recent results, kept for as long as your plan stores them. Oldest results make room for new ones automatically.",
-      "empty": "No stored results yet.",
+      "empty": "No stored results yet",
       "download": "Download",
       "pagerLabel": "Pages",
       "previous": "Back",

@@ -89,6 +89,18 @@ const MyFilesPage = () => {
             <li key={file.id} className={cn('row')}>
               <span className={cn('thumb')} aria-hidden="true">
                 <SVG Svg={ImageIcon} className={cn('thumb-icon').toString()} />
+                {file.status === 'COMPLETED' && file.downloadUrl && (
+                  <img
+                    key={file.downloadUrl}
+                    className={cn('thumb-image').toString()}
+                    src={file.downloadUrl}
+                    alt=""
+                    loading="lazy"
+                    onError={(event) => {
+                      event.currentTarget.style.display = 'none';
+                    }}
+                  />
+                )}
               </span>
               <span className={cn('format')}>{file.outputFormat?.toUpperCase() ?? '—'}</span>
               <span className={cn('sizes')}>
