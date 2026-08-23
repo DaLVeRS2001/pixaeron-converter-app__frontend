@@ -33,6 +33,10 @@ export type ConversionFileStatus =
   | 'READY'
   | 'UPLOADING';
 
+export type ConversionMode =
+  | 'LOSSLESS'
+  | 'LOSSY';
+
 export type ConversionPlanCode =
   | 'ANONYMOUS'
   | 'FREE'
@@ -48,6 +52,7 @@ export type CreateConversionBatchInput = {
   batchToken?: string | null | undefined;
   fileCount: number;
   idempotencyKey: string;
+  mode?: ConversionMode | null | undefined;
 };
 
 export type EmailActionInput = {

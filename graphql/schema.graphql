@@ -140,6 +140,7 @@ enum ConversionResultKind {
 type ConversionBatch {
   id: ID!
   status: ConversionBatchStatus!
+  mode: ConversionMode!
   fileCount: Int!
   expiresAt: DateTime!
   batchToken: String
@@ -155,6 +156,11 @@ enum ConversionBatchStatus {
   FAILED
   CANCELLED
   EXPIRED
+}
+
+enum ConversionMode {
+  LOSSLESS
+  LOSSY
 }
 
 """
@@ -194,6 +200,7 @@ type ConversionBatchPage {
 
 input CreateConversionBatchInput {
   fileCount: Int!
+  mode: ConversionMode
   idempotencyKey: String!
   batchToken: String
 }

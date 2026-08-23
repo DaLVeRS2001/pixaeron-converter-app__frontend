@@ -1,4 +1,15 @@
 {
+  "mode": {
+    "label": "Compression mode",
+    "LOSSLESS": {
+      "name": "Lossless",
+      "hint": "Pixels stay untouched, only wasted bytes and metadata go"
+    },
+    "LOSSY": {
+      "name": "Lossy",
+      "hint": "Smallest files at a slight quality cost, no need to compress the result again"
+    }
+  },
   "dropzone": {
     "title": "Drag & drop images here to compress",
     "hint": "or click to browse your files",

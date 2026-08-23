@@ -6,8 +6,10 @@ import { formatBytes, isBatchSettled, totalSavings } from 'entities/conversion';
 
 import { ACCEPTED_MIME_TYPES } from 'features/uploadImages';
 
+import type { ConversionMode } from 'shared/api';
 import { Alert } from 'shared/ui/Alert';
 import { Button } from 'shared/ui/Button';
+import { Switcher } from 'shared/ui/Switcher';
 
 import { ERROR_KEY, GENERIC_ERROR_KEY } from '../model/errorCopy';
 import { useCompressorModel } from '../model/useCompressorModel';
@@ -17,6 +19,8 @@ import './CompressorWidget.scss';
 
 const cn = block('compressor-widget');
 
+const MODES: readonly ConversionMode[] = ['LOSSLESS', 'LOSSY'];
+
 const CompressorWidget = () => {
   const { t } = useTranslation('conversion');
   const inputId = useId();
@@ -24,6 +28,8 @@ const CompressorWidget = () => {
 
   const {
     entitlement,
+    mode,
+    setMode,
     batch,
     pollingStopped,
     startedAt,
@@ -75,6 +81,15 @@ const CompressorWidget = () => {
 
   return (
     <section className={cn()}>
+      <Switcher
+        label={t('mode.label')}
+        options={MODES.map((value) => ({ value, label: t(`mode.${value}.name`) }))}
+        value={mode}
+        onChange={setMode}
+        hint={t(`mode.${mode}.hint`)}
+        disabled={uploading}
+      />
+
       <div
         className={cn('dropzone', { dragging })}
         onDragOver={(event) => {

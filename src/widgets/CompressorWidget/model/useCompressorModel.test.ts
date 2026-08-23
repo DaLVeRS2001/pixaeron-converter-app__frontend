@@ -84,6 +84,21 @@ describe('useCompressorModel', () => {
     expect(result.current.errorCode).toBeNull();
   });
 
+  it('hands the chosen mode to the upload', async () => {
+    mockStart.mockResolvedValue({
+      batchId: 'batch-1',
+      batchToken: 'token',
+      fileNames: new Map(),
+      missingFiles: 0,
+    });
+    const { result } = renderHook(() => useCompressorModel());
+
+    act(() => result.current.setMode('LOSSLESS'));
+    await act(async () => result.current.submit([image('a.png')]));
+
+    expect(mockStart).toHaveBeenCalledWith(expect.any(Array), 'LOSSLESS');
+  });
+
   it('clears the batch and cancels the transfer when the visitor starts over', async () => {
     mockStart.mockResolvedValue({
       batchId: 'batch-1',
