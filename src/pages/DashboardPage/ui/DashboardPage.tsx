@@ -8,6 +8,7 @@ import {
   MyConversionBatchesDocument,
   flattenBatchFiles,
   formatBytes,
+  resultNoteKey,
   savedPercent,
 } from 'entities/conversion';
 import { useCurrentUser } from 'entities/user';
@@ -27,6 +28,7 @@ const RECENT_FILES = 5;
 
 const DashboardPage = () => {
   const { t, i18n } = useTranslation();
+  const { t: tConversion } = useTranslation('conversion');
   const session = useCurrentUser();
   const entitlement = useQuery(ConversionEntitlementDocument).data?.conversionEntitlement;
   const recents = useQuery(MyConversionBatchesDocument, {
@@ -102,33 +104,43 @@ const DashboardPage = () => {
           <p className={cn('empty')}>{t('app.dashboard.empty')}</p>
         ) : (
           <ul>
-            {recentFiles.slice(0, RECENT_FILES).map((file) => (
-              <li key={file.id}>
-                <span className={cn('recent-format')}>
-                  {file.outputFormat?.toUpperCase() ?? '—'}
-                </span>
-                <span className={cn('recent-sizes')}>
-                  {typeof file.inputBytes === 'number' && formatBytes(file.inputBytes)}
-                  {typeof file.outputBytes === 'number' &&
-                    ` → ${formatBytes(file.outputBytes)}`}
-                </span>
-                {typeof file.inputBytes === 'number' &&
-                  typeof file.outputBytes === 'number' && (
-                    <span className={cn('recent-saved')}>
-                      {t('app.results.saved', {
-                        percent: savedPercent(file.inputBytes, file.outputBytes),
-                      })}
-                    </span>
+            {recentFiles.slice(0, RECENT_FILES).map((file) => {
+              const note = resultNoteKey(file.resultKind);
+              const percent =
+                typeof file.inputBytes === 'number' && typeof file.outputBytes === 'number'
+                  ? savedPercent(file.inputBytes, file.outputBytes)
+                  : null;
+
+              return (
+                <li key={file.id}>
+                  <span className={cn('recent-format')}>
+                    {file.outputFormat?.toUpperCase() ?? '—'}
+                  </span>
+                  <span className={cn('recent-sizes')}>
+                    {typeof file.inputBytes === 'number' && formatBytes(file.inputBytes)}
+                    {typeof file.outputBytes === 'number' &&
+                      ` → ${formatBytes(file.outputBytes)}`}
+                  </span>
+                  {note ? (
+                    <span className={cn('recent-note')}>{tConversion(note)}</span>
+                  ) : (
+                    percent !== null &&
+                    percent > 0 && (
+                      <span className={cn('recent-saved')}>
+                        {t('app.results.saved', { percent })}
+                      </span>
+                    )
                   )}
-                <span className={cn('recent-until')}>
-                  {file.status === 'COMPLETED'
-                    ? t('app.results.until', {
-                        date: new Date(file.expiresAt).toLocaleString(i18n.resolvedLanguage),
-                      })
-                    : ''}
-                </span>
-              </li>
-            ))}
+                  <span className={cn('recent-until')}>
+                    {file.status === 'COMPLETED'
+                      ? t('app.results.until', {
+                          date: new Date(file.expiresAt).toLocaleString(i18n.resolvedLanguage),
+                        })
+                      : ''}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

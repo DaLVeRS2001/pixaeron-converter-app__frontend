@@ -138,6 +138,10 @@
     font-size: 0.85rem;
     font-weight: 600;
   }
+  &__recent-note {
+    color: var(--color-slate-500);
+    font-size: 0.8125rem;
+  }
   &__recent-until {
     margin-left: auto;
     color: var(--color-slate-500);
