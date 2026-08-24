@@ -6,8 +6,11 @@ import { formatBytes, isBatchSettled, totalSavings } from 'entities/conversion';
 
 import { ACCEPTED_MIME_TYPES } from 'features/uploadImages';
 
+import type { ConversionMode, ConversionStrength } from 'shared/api';
 import { Alert } from 'shared/ui/Alert';
 import { Button } from 'shared/ui/Button';
+import { Slider } from 'shared/ui/Slider';
+import { Switcher } from 'shared/ui/Switcher';
 
 import { ERROR_KEY, GENERIC_ERROR_KEY } from '../model/errorCopy';
 import { useCompressorModel } from '../model/useCompressorModel';
@@ -17,6 +20,9 @@ import './CompressorWidget.scss';
 
 const cn = block('compressor-widget');
 
+const MODES: readonly ConversionMode[] = ['LOSSLESS', 'LOSSY'];
+const STRENGTHS: readonly ConversionStrength[] = ['LOW', 'MEDIUM', 'HIGH'];
+
 const CompressorWidget = () => {
   const { t } = useTranslation('conversion');
   const inputId = useId();
@@ -24,6 +30,10 @@ const CompressorWidget = () => {
 
   const {
     entitlement,
+    mode,
+    setMode,
+    strength,
+    setStrength,
     batch,
     pollingStopped,
     startedAt,
@@ -41,6 +51,7 @@ const CompressorWidget = () => {
 
   const files = batch?.files ?? [];
   const totals = totalSavings(files);
+  const savedNothing = totals.savedBytes === 0;
   const running = batch !== null && startedAt !== null && !pollingStopped;
   const errorKey =
     errorCode && Object.hasOwn(ERROR_KEY, errorCode)
@@ -75,6 +86,29 @@ const CompressorWidget = () => {
 
   return (
     <section className={cn()}>
+      <Switcher
+        label={t('mode.label')}
+        options={MODES.map((value) => ({ value, label: t(`mode.${value}.name`) }))}
+        value={mode}
+        onChange={setMode}
+        hint={t(`mode.${mode}.hint`)}
+        disabled={uploading}
+      />
+
+      {mode === 'LOSSY' && (
+        <Slider
+          label={t('strength.label')}
+          stops={STRENGTHS.map((value) => ({
+            value,
+            label: t(`strength.${value}.name`),
+          }))}
+          value={strength}
+          onChange={setStrength}
+          hint={t(`strength.${strength}.hint`)}
+          disabled={uploading}
+        />
+      )}
+
       <div
         className={cn('dropzone', { dragging })}
         onDragOver={(event) => {
@@ -176,13 +210,19 @@ const CompressorWidget = () => {
             ))}
           </ul>
 
-          {totals.files > 0 && (
-            <footer className={cn('totals')}>
-              <p className={cn('totals-title')}>{t('totals.title')}</p>
-              <p className={cn('totals-value')}>{formatBytes(totals.savedBytes)}</p>
-              <p className={cn('totals-average')}>
-                {t('totals.average', { percent: totals.savedPercent })}
+          {batch && isBatchSettled(batch.status) && totals.files > 0 && (
+            <footer className={cn('totals', { none: savedNothing })}>
+              <p className={cn('totals-title')}>
+                {savedNothing ? t('totals.none') : t('totals.title')}
               </p>
+              {!savedNothing && (
+                <>
+                  <p className={cn('totals-value')}>{formatBytes(totals.savedBytes)}</p>
+                  <p className={cn('totals-average')}>
+                    {t('totals.average', { percent: totals.savedPercent })}
+                  </p>
+                </>
+              )}
               <p className={cn('totals-compare')}>
                 {t('totals.before', { value: formatBytes(totals.inputBytes) })}
                 {' · '}

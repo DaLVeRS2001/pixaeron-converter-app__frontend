@@ -65,6 +65,11 @@
     font-size: 0.85rem;
     font-weight: 600;
   }
+  &__note {
+    grid-column: 4;
+    color: var(--color-slate-500);
+    font-size: 0.8125rem;
+  }
   &__status {
     grid-column: 5;
     font-size: 0.85rem;
@@ -105,7 +110,8 @@
     &__until {
       display: none;
     }
-    &__saved {
+    &__saved,
+    &__note {
       grid-column: 3;
     }
     &__status {

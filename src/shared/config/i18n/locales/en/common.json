@@ -26,7 +26,7 @@
     "googleData": "Use email and password or Google Sign-In. With Google Sign-In, Pixaeron receives your name, email address, and Google account identifier only to create and authenticate your account. Pixaeron does not access Gmail, Google Drive, Google Contacts, or other Google services.",
     "start": "Create account",
     "compressorTitle": "Compress images now",
-    "compressorDescription": "Files are uploaded to our servers, compressed there, and deleted automatically. Camera and location metadata are stripped from every result.",
+    "compressorDescription": "Files are uploaded to our servers, compressed there, and deleted automatically. Camera and location metadata go out with the compression.",
     "compressorFormats": "JPEG · PNG · WebP · AVIF",
     "compressNow": "Compress images",
     "advantagesTitle": "Why Pixaeron",
@@ -38,7 +38,7 @@
       },
       "metadata": {
         "title": "Metadata gone by default",
-        "description": "Camera model, GPS position and editing traces are stripped from every result. There is no switch to forget."
+        "description": "Camera model, GPS position and editing traces go out with the compression, in every format. Only a file we hand back untouched keeps them."
       },
       "noSignup": {
         "title": "No account needed",
@@ -50,7 +50,7 @@
       },
       "honest": {
         "title": "Honest results",
-        "description": "If re-encoding cannot make your file smaller, we say so and return the original, never a padded file or an inflated percentage."
+        "description": "If re-encoding cannot make your file smaller, we say so instead of padding the file or inflating the percentage."
       },
       "access": {
         "title": "Your files, briefly",
@@ -159,7 +159,7 @@
     },
     "files": {
       "title": "My files",
-      "lead": "Recent results, kept for as long as your plan stores them. Oldest results make room for new ones automatically.",
+      "lead": "Recent results, kept for as long as your plan stores them. Oldest results make room for new ones automatically",
       "empty": "No stored results yet",
       "download": "Download",
       "pagerLabel": "Pages",

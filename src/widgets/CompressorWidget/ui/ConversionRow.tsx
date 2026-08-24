@@ -2,7 +2,7 @@ import block from 'bem-cn';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { formatBytes, isFileMoving, savedPercent } from 'entities/conversion';
+import { formatBytes, isFileMoving, resultNoteKey, savedPercent } from 'entities/conversion';
 import type { ConversionFileStatus, ConversionFileView } from 'entities/conversion';
 
 import ImageIcon from 'shared/assets/icons/image.svg';
@@ -73,12 +73,7 @@ const ConversionRow = ({
       ? savedPercent(file.inputBytes, file.outputBytes)
       : null;
 
-  const noteKey =
-    file.resultKind === 'NO_SAVINGS'
-      ? 'result.noSavings'
-      : file.resultKind === 'SANITIZED_LARGER'
-        ? 'result.sanitizedLarger'
-        : null;
+  const noteKey = resultNoteKey(file.resultKind);
 
   const failureCode = file.failureCode ?? '';
   const failureKey = Object.hasOwn(FAILURE_KEY, failureCode)

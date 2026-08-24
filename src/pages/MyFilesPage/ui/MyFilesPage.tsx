@@ -8,6 +8,7 @@ import {
   MyConversionBatchesDocument,
   flattenBatchFiles,
   formatBytes,
+  resultNoteKey,
   savedPercent,
 } from 'entities/conversion';
 
@@ -85,59 +86,69 @@ const MyFilesPage = () => {
         <p className={cn('empty')}>{t('app.files.empty')}</p>
       ) : (
         <ul className={cn('rows')}>
-          {rows.map((file) => (
-            <li key={file.id} className={cn('row')}>
-              <span className={cn('thumb')} aria-hidden="true">
-                <SVG Svg={ImageIcon} className={cn('thumb-icon').toString()} />
-                {file.status === 'COMPLETED' && file.downloadUrl && (
-                  <img
-                    key={file.downloadUrl}
-                    className={cn('thumb-image').toString()}
-                    src={file.downloadUrl}
-                    alt=""
-                    loading="lazy"
-                    onError={(event) => {
-                      event.currentTarget.style.display = 'none';
-                    }}
-                  />
+          {rows.map((file) => {
+            const note = resultNoteKey(file.resultKind);
+            const percent =
+              typeof file.inputBytes === 'number' && typeof file.outputBytes === 'number'
+                ? savedPercent(file.inputBytes, file.outputBytes)
+                : null;
+
+            return (
+              <li key={file.id} className={cn('row')}>
+                <span className={cn('thumb')} aria-hidden="true">
+                  <SVG Svg={ImageIcon} className={cn('thumb-icon').toString()} />
+                  {file.status === 'COMPLETED' && file.downloadUrl && (
+                    <img
+                      key={file.downloadUrl}
+                      className={cn('thumb-image').toString()}
+                      src={file.downloadUrl}
+                      alt=""
+                      loading="lazy"
+                      onError={(event) => {
+                        event.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  )}
+                </span>
+                <span className={cn('format')}>{file.outputFormat?.toUpperCase() ?? '—'}</span>
+                <span className={cn('sizes')}>
+                  {typeof file.inputBytes === 'number' && formatBytes(file.inputBytes)}
+                  {typeof file.outputBytes === 'number' &&
+                    ` → ${formatBytes(file.outputBytes)}`}
+                </span>
+                {note ? (
+                  <span className={cn('note')}>{tConversion(note)}</span>
+                ) : (
+                  percent !== null &&
+                  percent > 0 && (
+                    <span className={cn('saved')}>{t('app.results.saved', { percent })}</span>
+                  )
                 )}
-              </span>
-              <span className={cn('format')}>{file.outputFormat?.toUpperCase() ?? '—'}</span>
-              <span className={cn('sizes')}>
-                {typeof file.inputBytes === 'number' && formatBytes(file.inputBytes)}
-                {typeof file.outputBytes === 'number' && ` → ${formatBytes(file.outputBytes)}`}
-              </span>
-              {typeof file.inputBytes === 'number' && typeof file.outputBytes === 'number' && (
-                <span className={cn('saved')}>
-                  {t('app.results.saved', {
-                    percent: savedPercent(file.inputBytes, file.outputBytes),
-                  })}
+                <span className={cn('status', { failed: file.status === 'FAILED' })}>
+                  {t(`app.files.status.${FILE_STATUS_GROUP[file.status]}`)}
                 </span>
-              )}
-              <span className={cn('status', { failed: file.status === 'FAILED' })}>
-                {t(`app.files.status.${FILE_STATUS_GROUP[file.status]}`)}
-              </span>
-              <span className={cn('until')}>
-                {file.status === 'COMPLETED'
-                  ? t('app.results.until', {
-                      date: new Date(String(file.expiresAt)).toLocaleString(
-                        i18n.resolvedLanguage
-                      ),
-                    })
-                  : ''}
-              </span>
-              {file.status === 'COMPLETED' && file.downloadUrl && (
-                <Button variant="secondary" onClick={() => onDownload(file.id)}>
-                  {t('app.files.download')}
-                </Button>
-              )}
-              {downloadFailure?.fileId === file.id && (
-                <span className={cn('download-failure')} role="status">
-                  {tConversion(DOWNLOAD_KEY[downloadFailure.reason])}
+                <span className={cn('until')}>
+                  {file.status === 'COMPLETED'
+                    ? t('app.results.until', {
+                        date: new Date(String(file.expiresAt)).toLocaleString(
+                          i18n.resolvedLanguage
+                        ),
+                      })
+                    : ''}
                 </span>
-              )}
-            </li>
-          ))}
+                {file.status === 'COMPLETED' && file.downloadUrl && (
+                  <Button variant="secondary" onClick={() => onDownload(file.id)}>
+                    {t('app.files.download')}
+                  </Button>
+                )}
+                {downloadFailure?.fileId === file.id && (
+                  <span className={cn('download-failure')} role="status">
+                    {tConversion(DOWNLOAD_KEY[downloadFailure.reason])}
+                  </span>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
 

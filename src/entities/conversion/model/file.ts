@@ -1,4 +1,8 @@
-import type { ConversionBatchQuery, ConversionFileStatus } from 'shared/api';
+import type {
+  ConversionBatchQuery,
+  ConversionFileStatus,
+  ConversionResultKind,
+} from 'shared/api';
 
 type ConversionFileView = NonNullable<
   ConversionBatchQuery['conversionBatch']
@@ -26,5 +30,19 @@ const flattenBatchFiles = <TFile>(
     batch.files.map((file) => ({ ...file, expiresAt: String(batch.expiresAt) }))
   );
 
-export { FILE_STATUS_GROUP, flattenBatchFiles };
+const RESULT_NOTE_KEY = {
+  NO_SAVINGS: 'result.noSavings',
+  SANITIZED_LARGER: 'result.sanitizedLarger',
+} as const satisfies Partial<Record<ConversionResultKind, string>>;
+
+type ResultNoteKey = (typeof RESULT_NOTE_KEY)[keyof typeof RESULT_NOTE_KEY];
+
+const resultNoteKey = (
+  resultKind: ConversionResultKind | null | undefined
+): ResultNoteKey | null =>
+  resultKind && resultKind in RESULT_NOTE_KEY
+    ? RESULT_NOTE_KEY[resultKind as keyof typeof RESULT_NOTE_KEY]
+    : null;
+
+export { FILE_STATUS_GROUP, flattenBatchFiles, resultNoteKey };
 export type { StoredFile };

@@ -1,4 +1,30 @@
 {
+  "mode": {
+    "label": "Compression mode",
+    "LOSSLESS": {
+      "name": "Lossless",
+      "hint": "Pixels stay untouched, wasted bytes and metadata go wherever they can be cut without re-encoding"
+    },
+    "LOSSY": {
+      "name": "Lossy",
+      "hint": "Smaller files at a quality cost, no need to compress the result again"
+    }
+  },
+  "strength": {
+    "label": "Compression strength",
+    "LOW": {
+      "name": "Low",
+      "hint": "The safe setting: the difference is there, but not something you can spot"
+    },
+    "MEDIUM": {
+      "name": "Medium",
+      "hint": "Smaller than Low, the loss shows only if you go looking for it"
+    },
+    "HIGH": {
+      "name": "High",
+      "hint": "Maximum pressure: edges and gradients start to show the cost"
+    }
+  },
   "dropzone": {
     "title": "Drag & drop images here to compress",
     "hint": "or click to browse your files",
@@ -26,11 +52,12 @@
     "expired": "Expired"
   },
   "result": {
-    "noSavings": "Already optimal: the original is smaller, so we kept it",
-    "sanitizedLarger": "Metadata stripped. The cleaned copy is slightly larger than your original, and that cleaned copy is what you download"
+    "noSavings": "Nothing worth saving here: the file comes back unchanged",
+    "sanitizedLarger": "Metadata stripped. The cleaned copy is larger than your original, and that cleaned copy is what you download"
   },
   "totals": {
     "title": "Total space saved",
+    "none": "Nothing was saved on this batch",
     "average": "{{percent}}% average reduction",
     "before": "Before: {{value}}",
     "after": "After: {{value}}"

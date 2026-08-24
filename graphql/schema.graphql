@@ -157,6 +157,17 @@ enum ConversionBatchStatus {
   EXPIRED
 }
 
+enum ConversionMode {
+  LOSSLESS
+  LOSSY
+}
+
+enum ConversionStrength {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -194,6 +205,8 @@ type ConversionBatchPage {
 
 input CreateConversionBatchInput {
   fileCount: Int!
+  mode: ConversionMode
+  strength: ConversionStrength
   idempotencyKey: String!
   batchToken: String
 }

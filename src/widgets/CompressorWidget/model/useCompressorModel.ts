@@ -8,6 +8,7 @@ import { UploadFailedError, useImageUpload, validateSelection } from 'features/u
 import type { RejectedSelection, StartedBatch } from 'features/uploadImages';
 
 import { getGraphQLErrorDetails } from 'shared/api';
+import type { ConversionMode, ConversionStrength } from 'shared/api';
 
 type ActiveBatch = StartedBatch & { startedAt: number };
 
@@ -20,6 +21,8 @@ const useCompressorModel = () => {
   const { refetch: refetchEntitlement } = entitlementQuery;
   const { start, cancel, uploading } = useImageUpload();
 
+  const [mode, setMode] = useState<ConversionMode>('LOSSY');
+  const [strength, setStrength] = useState<ConversionStrength>('LOW');
   const [active, setActive] = useState<ActiveBatch | null>(null);
   const [rejected, setRejected] = useState<RejectedSelection[]>([]);
   const [failure, setFailure] = useState<string | null>(null);
@@ -61,7 +64,7 @@ const useCompressorModel = () => {
       if (selection.accepted.length === 0) return;
 
       try {
-        const started = await start(selection.accepted);
+        const started = await start(selection.accepted, mode, strength);
         if (run !== attempt.current) return;
 
         setActive({ ...started, startedAt: Date.now() });
@@ -78,7 +81,7 @@ const useCompressorModel = () => {
 
       await refetchEntitlement().catch(() => undefined);
     },
-    [entitlement, refetchEntitlement, start, uploading]
+    [entitlement, mode, refetchEntitlement, start, strength, uploading]
   );
 
   const download = useCallback(
@@ -109,6 +112,10 @@ const useCompressorModel = () => {
 
   return {
     entitlement,
+    mode,
+    setMode,
+    strength,
+    setStrength,
     batch,
     pollingStopped,
     startedAt: active?.startedAt ?? null,

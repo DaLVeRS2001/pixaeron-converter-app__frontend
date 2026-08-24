@@ -6,6 +6,8 @@ import {
   CreateConversionBatchDocument,
 } from 'entities/conversion';
 
+import type { ConversionMode, ConversionStrength } from 'shared/api';
+
 import { UPLOAD_FAILURE, UploadFailedError, uploadToStorage } from './uploadToStorage';
 
 type StartedBatch = {
@@ -29,7 +31,11 @@ const useImageUpload = () => {
   useEffect(() => cancel, [cancel]);
 
   const start = useCallback(
-    async (files: readonly File[]): Promise<StartedBatch> => {
+    async (
+      files: readonly File[],
+      mode: ConversionMode,
+      strength: ConversionStrength
+    ): Promise<StartedBatch> => {
       const controller = new AbortController();
       abortRef.current = controller;
       setUploading(true);
@@ -37,7 +43,12 @@ const useImageUpload = () => {
       try {
         const { data } = await createBatch({
           variables: {
-            input: { fileCount: files.length, idempotencyKey: crypto.randomUUID() },
+            input: {
+              fileCount: files.length,
+              idempotencyKey: crypto.randomUUID(),
+              mode,
+              strength,
+            },
           },
         });
 
