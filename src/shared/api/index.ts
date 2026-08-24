@@ -25,6 +25,7 @@ export type {
   ConversionEntitlementQuery,
   ConversionFileStatus,
   ConversionMode,
+  ConversionStrength,
   ConversionResultKind,
   CreateConversionBatchMutation,
   EmailVerificationStatus,

@@ -55,13 +55,19 @@ describe('useImageUpload', () => {
     await act(async () => {
       started = await result.current.start(
         [image('a.png'), image('b.png'), image('c.png')],
-        'LOSSLESS'
+        'LOSSLESS',
+        'LOW'
       );
     });
 
     expect(mockMutations.get(CreateConversionBatchDocument)).toHaveBeenCalledWith({
       variables: {
-        input: { fileCount: 3, idempotencyKey: 'idempotency-key', mode: 'LOSSLESS' },
+        input: {
+          fileCount: 3,
+          idempotencyKey: 'idempotency-key',
+          mode: 'LOSSLESS',
+          strength: 'LOW',
+        },
       },
     });
     expect(started).toMatchObject({
@@ -76,7 +82,9 @@ describe('useImageUpload', () => {
     const { result } = renderHook(() => useImageUpload());
 
     await act(async () => {
-      await expect(result.current.start([image('a.png')], 'LOSSY')).rejects.toMatchObject({
+      await expect(
+        result.current.start([image('a.png')], 'LOSSY', 'LOW')
+      ).rejects.toMatchObject({
         reason: 'NO_FILES_ADMITTED',
       });
     });

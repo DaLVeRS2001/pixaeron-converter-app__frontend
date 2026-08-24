@@ -96,7 +96,22 @@ describe('useCompressorModel', () => {
     act(() => result.current.setMode('LOSSLESS'));
     await act(async () => result.current.submit([image('a.png')]));
 
-    expect(mockStart).toHaveBeenCalledWith(expect.any(Array), 'LOSSLESS');
+    expect(mockStart).toHaveBeenCalledWith(expect.any(Array), 'LOSSLESS', 'LOW');
+  });
+
+  it('hands the chosen strength to the upload', async () => {
+    mockStart.mockResolvedValue({
+      batchId: 'batch-1',
+      batchToken: 'token',
+      fileNames: new Map(),
+      missingFiles: 0,
+    });
+    const { result } = renderHook(() => useCompressorModel());
+
+    act(() => result.current.setStrength('HIGH'));
+    await act(async () => result.current.submit([image('a.png')]));
+
+    expect(mockStart).toHaveBeenCalledWith(expect.any(Array), 'LOSSY', 'HIGH');
   });
 
   it('clears the batch and cancels the transfer when the visitor starts over', async () => {

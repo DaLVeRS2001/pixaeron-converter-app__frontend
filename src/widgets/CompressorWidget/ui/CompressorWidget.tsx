@@ -6,9 +6,10 @@ import { formatBytes, isBatchSettled, totalSavings } from 'entities/conversion';
 
 import { ACCEPTED_MIME_TYPES } from 'features/uploadImages';
 
-import type { ConversionMode } from 'shared/api';
+import type { ConversionMode, ConversionStrength } from 'shared/api';
 import { Alert } from 'shared/ui/Alert';
 import { Button } from 'shared/ui/Button';
+import { Slider } from 'shared/ui/Slider';
 import { Switcher } from 'shared/ui/Switcher';
 
 import { ERROR_KEY, GENERIC_ERROR_KEY } from '../model/errorCopy';
@@ -20,6 +21,7 @@ import './CompressorWidget.scss';
 const cn = block('compressor-widget');
 
 const MODES: readonly ConversionMode[] = ['LOSSLESS', 'LOSSY'];
+const STRENGTHS: readonly ConversionStrength[] = ['LOW', 'MEDIUM', 'HIGH'];
 
 const CompressorWidget = () => {
   const { t } = useTranslation('conversion');
@@ -30,6 +32,8 @@ const CompressorWidget = () => {
     entitlement,
     mode,
     setMode,
+    strength,
+    setStrength,
     batch,
     pollingStopped,
     startedAt,
@@ -90,6 +94,20 @@ const CompressorWidget = () => {
         hint={t(`mode.${mode}.hint`)}
         disabled={uploading}
       />
+
+      {mode === 'LOSSY' && (
+        <Slider
+          label={t('strength.label')}
+          stops={STRENGTHS.map((value) => ({
+            value,
+            label: t(`strength.${value}.name`),
+          }))}
+          value={strength}
+          onChange={setStrength}
+          hint={t(`strength.${strength}.hint`)}
+          disabled={uploading}
+        />
+      )}
 
       <div
         className={cn('dropzone', { dragging })}

@@ -140,7 +140,6 @@ enum ConversionResultKind {
 type ConversionBatch {
   id: ID!
   status: ConversionBatchStatus!
-  mode: ConversionMode!
   fileCount: Int!
   expiresAt: DateTime!
   batchToken: String
@@ -161,6 +160,12 @@ enum ConversionBatchStatus {
 enum ConversionMode {
   LOSSLESS
   LOSSY
+}
+
+enum ConversionStrength {
+  LOW
+  MEDIUM
+  HIGH
 }
 
 """
@@ -201,6 +206,7 @@ type ConversionBatchPage {
 input CreateConversionBatchInput {
   fileCount: Int!
   mode: ConversionMode
+  strength: ConversionStrength
   idempotencyKey: String!
   batchToken: String
 }

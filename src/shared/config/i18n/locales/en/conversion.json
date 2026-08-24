@@ -7,7 +7,22 @@
     },
     "LOSSY": {
       "name": "Lossy",
-      "hint": "Smallest files at a slight quality cost, no need to compress the result again"
+      "hint": "Smaller files at a quality cost, no need to compress the result again"
+    }
+  },
+  "strength": {
+    "label": "Compression strength",
+    "LOW": {
+      "name": "Low",
+      "hint": "The safe setting: the difference is there, but not something you can spot"
+    },
+    "MEDIUM": {
+      "name": "Medium",
+      "hint": "Smaller than Low, the loss shows only if you go looking for it"
+    },
+    "HIGH": {
+      "name": "High",
+      "hint": "Maximum pressure: edges and gradients start to show the cost"
     }
   },
   "dropzone": {
