@@ -3,7 +3,7 @@
     "label": "Compression mode",
     "LOSSLESS": {
       "name": "Lossless",
-      "hint": "Pixels stay untouched, only wasted bytes and metadata go"
+      "hint": "Pixels stay untouched, wasted bytes and metadata go wherever they can be cut without re-encoding"
     },
     "LOSSY": {
       "name": "Lossy",
@@ -37,8 +37,8 @@
     "expired": "Expired"
   },
   "result": {
-    "noSavings": "Already optimal: the original is smaller, so we kept it",
-    "sanitizedLarger": "Metadata stripped. The cleaned copy is slightly larger than your original, and that cleaned copy is what you download"
+    "noSavings": "Nothing worth saving here: the file comes back unchanged",
+    "sanitizedLarger": "Metadata stripped. The cleaned copy is larger than your original, and that cleaned copy is what you download"
   },
   "totals": {
     "title": "Total space saved",

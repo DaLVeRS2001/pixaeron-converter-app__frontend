@@ -89,8 +89,7 @@ const MyFilesPage = () => {
           {rows.map((file) => {
             const note = resultNoteKey(file.resultKind);
             const percent =
-              typeof file.inputBytes === 'number' &&
-              typeof file.outputBytes === 'number'
+              typeof file.inputBytes === 'number' && typeof file.outputBytes === 'number'
                 ? savedPercent(file.inputBytes, file.outputBytes)
                 : null;
 
@@ -122,9 +121,7 @@ const MyFilesPage = () => {
                 ) : (
                   percent !== null &&
                   percent > 0 && (
-                    <span className={cn('saved')}>
-                      {t('app.results.saved', { percent })}
-                    </span>
+                    <span className={cn('saved')}>{t('app.results.saved', { percent })}</span>
                   )
                 )}
                 <span className={cn('status', { failed: file.status === 'FAILED' })}>
