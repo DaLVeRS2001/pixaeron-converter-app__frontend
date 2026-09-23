@@ -12,6 +12,7 @@ const mockStart = jest.fn();
 const mockCancel = jest.fn();
 const mockRefetchEntitlement = jest.fn();
 const mockRefetchBatch = jest.fn();
+let mockPollingStopped = false;
 
 jest.mock('@apollo/client/react', () => ({
   useQuery: () => ({
@@ -26,7 +27,7 @@ jest.mock('features/trackConversion', () => ({
   saveResult: jest.fn(),
   useConversionProgress: () => ({
     batch: null,
-    pollingStopped: false,
+    pollingStopped: mockPollingStopped,
     refetch: mockRefetchBatch,
     error: undefined,
   }),
@@ -54,6 +55,7 @@ describe('useCompressorModel', () => {
     mockRefetchEntitlement.mockReset().mockResolvedValue({});
     mockRefetchBatch.mockReset();
     mockRefetchBatch.mockResolvedValue({ data: { conversionBatch: { files: [] } } });
+    mockPollingStopped = false;
   });
 
   it('names every rejected file and uploads nothing when none survive validation', async () => {
@@ -163,6 +165,18 @@ describe('useCompressorModel', () => {
 
     expect(result.current.startedAt).toBeNull();
     expect(result.current.sourceFiles.size).toBe(0);
+  });
+
+  it('refreshes the storage figure once the batch has settled', () => {
+    const { result, rerender } = renderHook(() => useCompressorModel());
+    expect(mockRefetchEntitlement).not.toHaveBeenCalled();
+
+    mockPollingStopped = true;
+    rerender();
+    rerender();
+
+    expect(mockRefetchEntitlement).toHaveBeenCalledTimes(1);
+    expect(result.current.pollingStopped).toBe(true);
   });
 
   it('keeps a healthy batch when only the quota counter failed to refresh', async () => {
