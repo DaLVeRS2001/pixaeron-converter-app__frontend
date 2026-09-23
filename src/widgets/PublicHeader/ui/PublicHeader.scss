@@ -6,8 +6,8 @@
   align-items: center;
   gap: 2rem;
   padding: 0.875rem clamp(1rem, 4vw, 3rem);
-  background: var(--color-white);
-  border-bottom: 0.0625rem solid var(--color-slate-200);
+  background: var(--color-surface);
+  border-bottom: 0.0625rem solid var(--color-border);
 
   &__logo {
     display: inline-flex;
@@ -19,12 +19,12 @@
     margin-inline: auto;
 
     a {
-      color: var(--color-slate-600);
+      color: var(--color-text-muted);
       font-weight: 500;
       text-decoration: none;
 
       &:hover {
-        color: var(--color-slate-900);
+        color: var(--color-text);
       }
     }
   }
@@ -34,12 +34,12 @@
     gap: 1rem;
   }
   &__sign-in {
-    color: var(--color-slate-700);
+    color: var(--color-text-secondary);
     font-weight: 500;
     text-decoration: none;
 
     &:hover {
-      color: var(--color-slate-900);
+      color: var(--color-text);
     }
   }
 

@@ -2,10 +2,10 @@
   width: 100%;
   min-height: 2.75rem;
   padding: 0.625rem 0.75rem;
-  border: 0.0625rem solid var(--color-slate-200);
+  border: 0.0625rem solid var(--color-border);
   border-radius: var(--radius-sm);
-  color: var(--color-slate-900);
-  background: var(--color-white);
+  color: var(--color-text);
+  background: var(--color-surface);
   font-size: 0.875rem;
   line-height: 1.25rem;
   outline: none;
@@ -14,18 +14,18 @@
     box-shadow 160ms ease;
 
   &::placeholder {
-    color: var(--color-slate-400);
+    color: var(--color-text-faint);
   }
   &:focus {
-    border-color: var(--color-brand-500);
-    box-shadow: 0 0 0 0.1875rem rgb(99 102 241 / 12%);
+    border-color: var(--color-brand-border);
+    box-shadow: 0 0 0 0.1875rem var(--color-focus-ring);
   }
   &_invalid {
-    border-color: var(--color-error-500);
+    border-color: var(--color-error-accent);
 
     &:focus {
-      border-color: var(--color-error-500);
-      box-shadow: 0 0 0 0.1875rem rgb(239 68 68 / 12%);
+      border-color: var(--color-error-accent);
+      box-shadow: 0 0 0 0.1875rem var(--color-error-ring);
     }
   }
 }

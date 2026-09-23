@@ -10,6 +10,10 @@ jest.mock('shared/lib', () => ({
   loadExternalScript: (...args: unknown[]) => mockLoadExternalScript(...args),
 }));
 
+jest.mock('shared/config/theme', () => ({
+  useTheme: () => ({ theme: 'light', setTheme: jest.fn() }),
+}));
+
 describe('GoogleButton', () => {
   beforeEach(() => {
     Object.assign(globalThis, { __GOOGLE_CLIENT_ID__: 'google-client-id' });

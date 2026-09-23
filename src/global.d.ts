@@ -38,7 +38,7 @@ interface Window {
         renderButton: (
           element: HTMLElement,
           options: {
-            theme: 'outline';
+            theme: 'outline' | 'filled_black';
             size: 'large';
             width: number;
             text: 'signin_with' | 'signup_with';

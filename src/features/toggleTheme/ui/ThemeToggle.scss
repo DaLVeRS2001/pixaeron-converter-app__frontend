@@ -1,0 +1,67 @@
+.theme-toggle {
+  $root: &;
+
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  width: 3.75rem;
+  height: 2rem;
+  padding: 0.1875rem;
+  background: var(--color-surface-muted);
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 999rem;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+
+  &:hover {
+    border-color: var(--color-border-strong);
+  }
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 0.1875rem var(--color-focus-ring);
+  }
+  &__icon {
+    position: relative;
+    z-index: 1;
+    width: 1rem;
+    height: 1rem;
+    justify-self: center;
+    color: var(--color-text-faint);
+    transition: color 160ms ease;
+
+    &_sun {
+      color: var(--color-on-brand);
+    }
+  }
+  &__knob {
+    position: absolute;
+    top: 0.1875rem;
+    left: 0.1875rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: var(--color-brand-bg);
+    border-radius: 50%;
+    box-shadow: var(--shadow-raised);
+    transition: transform 200ms ease;
+  }
+  &_dark {
+    #{$root}__icon_sun {
+      color: var(--color-text-faint);
+    }
+    #{$root}__icon_moon {
+      color: var(--color-on-brand);
+    }
+    #{$root}__knob {
+      transform: translateX(1.75rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__knob {
+      transition: none;
+    }
+  }
+}

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useCurrentUser } from 'entities/user';
 
 import { LanguageSwitcher } from 'features/changeLanguage';
+import { ThemeToggle } from 'features/toggleTheme';
 
 import { BrandLogo } from 'shared/ui/BrandLogo';
 import { Button } from 'shared/ui/Button';
@@ -34,6 +35,7 @@ const PublicHeader = () => {
       </nav>
 
       <div className={cn('actions')}>
+        <ThemeToggle />
         <LanguageSwitcher />
         {signedIn ? (
           <Button to="/app" variant="secondary">

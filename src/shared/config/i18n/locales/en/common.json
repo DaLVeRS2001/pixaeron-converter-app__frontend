@@ -2,6 +2,9 @@
   "language": {
     "label": "Language"
   },
+  "theme": {
+    "dark": "Dark theme"
+  },
   "session": {
     "unavailableTitle": "Service unavailable",
     "unavailable": "We could not check your session. Please try again",
@@ -27,6 +30,18 @@
     "start": "Create account",
     "compressorTitle": "Compress images now",
     "compressorDescription": "Files are uploaded to our servers, compressed there, and deleted automatically. Camera and location metadata go out with the compression.",
+    "comparison": {
+      "title": "See the difference",
+      "lead": "One real photo, compressed on our servers at the highest strength. The sizes below are the actual files; open either one and judge for yourself.",
+      "originalTitle": "Original",
+      "compressedTitle": "Compressed",
+      "unoptimized": "Unoptimized",
+      "smaller": "{{percent}}% smaller",
+      "open": "Open full file",
+      "originalAlt": "A wave breaking on a sandy beach, original photo",
+      "compressedAlt": "The same wave after compression",
+      "credit": "Photo: Misquamicut Beach, Wikimedia Commons, public domain"
+    },
     "compressorFormats": "JPEG · PNG · WebP · AVIF",
     "compressNow": "Compress images",
     "advantagesTitle": "Why Pixaeron",
@@ -165,7 +180,7 @@
       "pagerLabel": "Pages",
       "previous": "Back",
       "next": "Next",
-      "page": "{{page}} of {{pages}}",
+      "showing": "Showing {{shown}} of {{total}} files",
       "status": {
         "waiting": "Waiting",
         "working": "Working",

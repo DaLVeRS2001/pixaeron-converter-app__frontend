@@ -23,6 +23,12 @@ Environment responsibilities:
 
 Webpack validates these build variables before compilation. Production builds require an HTTPS GraphQL URL plus valid Google and Turnstile public identifiers.
 
+## Theming
+
+Colours are semantic CSS custom properties declared once in `src/app/styles/variables/global.scss`: the `:root` block is the light theme and `:root[data-theme='dark']` overrides the same names for the dark theme. Components use only these names (`--color-surface`, `--color-text-muted`, `--color-brand-bg`, `--color-inverse-surface`, the status families with their `text`, `bg` and `border` members plus an `accent` for success, error and warning, and the shadows); Stylelint rejects the raw palette, hex and `rgb()` values anywhere else, so a new colour is added to both blocks in that one file. The one deliberate exception is the pre-bundle loader in `public/index.html`, which hard-codes its two backgrounds because it paints before any stylesheet exists.
+
+The active theme is the `data-theme` attribute on `<html>`. `public/theme-init.js` sets it before the bundle loads from the stored choice or `prefers-color-scheme`, which is why the file is a separate script rather than inline (the content security policy forbids inline scripts); `src/shared/config/theme` owns the storage key and attribute name and a unit test keeps the script on the same values. `app/providers/ThemeProvider` holds the choice at runtime and `features/toggleTheme` renders the switch used by the public header, the workspace header and the auth shell.
+
 ## Updating the GraphQL contract
 
 The committed `graphql/schema.graphql` file is the composed API schema from GraphOS; it is not a copied Auth subgraph schema. Do not edit it manually. GraphQL operation documents under `src/**/*.graphql` are intentionally handwritten product queries and mutations. Codegen validates those operations against the composed schema and generates the typed Apollo documents and TypeScript types under `src/shared/api/generated/`; only that generated directory is machine-written.

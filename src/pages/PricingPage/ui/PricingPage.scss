@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--color-slate-50);
+  background: var(--color-bg);
 
   &__main {
     flex: 1;
@@ -19,7 +19,7 @@
   &__lead {
     max-width: 34rem;
     margin: 1rem auto 3rem;
-    color: var(--color-slate-600);
+    color: var(--color-text-muted);
     line-height: 1.6;
   }
   &__grid {
@@ -34,13 +34,13 @@
     flex-direction: column;
     gap: 1rem;
     padding: 2rem 1.75rem;
-    background: var(--color-white);
-    border: 0.0625rem solid var(--color-slate-200);
+    background: var(--color-surface);
+    border: 0.0625rem solid var(--color-border);
     border-radius: 1rem;
 
     &_featured {
-      border-color: var(--color-brand-500);
-      box-shadow: 0 1rem 2.5rem rgb(79 70 229 / 12%);
+      border-color: var(--color-brand-border);
+      box-shadow: var(--shadow-featured);
     }
     h2 {
       margin: 0;
@@ -53,12 +53,12 @@
       gap: 0.625rem;
       margin: 0;
       padding: 0;
-      color: var(--color-slate-600);
+      color: var(--color-text-muted);
       list-style: none;
 
       li::before {
         margin-right: 0.5rem;
-        color: var(--color-brand-600);
+        color: var(--color-brand-text);
         content: '✓';
       }
     }
@@ -68,9 +68,9 @@
     top: -0.75rem;
     right: 1.5rem;
     padding: 0.25rem 0.75rem;
-    background: var(--color-brand-600);
+    background: var(--color-brand-bg);
     border-radius: 1rem;
-    color: var(--color-white);
+    color: var(--color-on-brand);
     font-size: 0.75rem;
     font-weight: 600;
   }
@@ -81,19 +81,19 @@
 
     span {
       margin-left: 0.375rem;
-      color: var(--color-slate-500);
+      color: var(--color-text-subtle);
       font-size: 0.95rem;
       font-weight: 400;
     }
   }
   &__summary {
     margin: 0;
-    color: var(--color-slate-600);
+    color: var(--color-text-muted);
     line-height: 1.5;
   }
   &__note {
     margin: 2.5rem auto 0;
-    color: var(--color-slate-500);
+    color: var(--color-text-subtle);
     font-size: 0.875rem;
   }
 }

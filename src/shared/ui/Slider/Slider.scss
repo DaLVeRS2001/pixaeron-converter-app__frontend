@@ -6,7 +6,7 @@
   gap: 0.375rem;
 
   &__label {
-    color: var(--color-slate-600);
+    color: var(--color-text-muted);
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -34,40 +34,40 @@
 
     &::-webkit-slider-runnable-track {
       height: 0.25rem;
-      background: var(--color-slate-200);
+      background: var(--color-border);
       border-radius: 999rem;
     }
     &::-moz-range-track {
       height: 0.25rem;
-      background: var(--color-slate-200);
+      background: var(--color-border);
       border-radius: 999rem;
     }
     &::-webkit-slider-thumb {
       width: 1rem;
       height: 1rem;
       margin-top: -0.375rem;
-      background: var(--color-brand-600);
-      border: 0.125rem solid var(--color-white);
+      background: var(--color-brand-bg);
+      border: 0.125rem solid var(--color-surface);
       border-radius: 999rem;
-      box-shadow: 0 0.0625rem 0.1875rem rgb(15 23 42 / 24%);
+      box-shadow: var(--shadow-thumb);
       appearance: none;
     }
     &::-moz-range-thumb {
       width: 1rem;
       height: 1rem;
-      background: var(--color-brand-600);
-      border: 0.125rem solid var(--color-white);
+      background: var(--color-brand-bg);
+      border: 0.125rem solid var(--color-surface);
       border-radius: 999rem;
-      box-shadow: 0 0.0625rem 0.1875rem rgb(15 23 42 / 24%);
+      box-shadow: var(--shadow-thumb);
     }
     &:focus-visible {
       outline: none;
 
       &::-webkit-slider-thumb {
-        box-shadow: 0 0 0 0.1875rem rgb(99 102 241 / 32%);
+        box-shadow: 0 0 0 0.1875rem var(--color-focus-ring);
       }
       &::-moz-range-thumb {
-        box-shadow: 0 0 0 0.1875rem rgb(99 102 241 / 32%);
+        box-shadow: 0 0 0 0.1875rem var(--color-focus-ring);
       }
     }
   }
@@ -76,7 +76,7 @@
     justify-content: space-between;
   }
   &__stop {
-    color: var(--color-slate-500);
+    color: var(--color-text-subtle);
     font-size: 0.75rem;
     line-height: 1rem;
 
@@ -87,14 +87,14 @@
       text-align: right;
     }
     &_active {
-      color: var(--color-brand-600);
+      color: var(--color-brand-text);
       font-weight: 600;
     }
   }
   &__hint {
     flex: 1 1 16rem;
     margin: 0;
-    color: var(--color-slate-600);
+    color: var(--color-text-muted);
     font-size: 0.8125rem;
     line-height: 1.25rem;
   }

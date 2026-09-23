@@ -10,6 +10,10 @@ jest.mock('shared/lib', () => ({
   loadExternalScript: (...args: unknown[]) => mockLoadExternalScript(...args),
 }));
 
+jest.mock('shared/config/theme', () => ({
+  useTheme: () => ({ theme: 'light', setTheme: jest.fn() }),
+}));
+
 type TurnstileOptions = Parameters<NonNullable<Window['turnstile']>['render']>[1];
 
 describe('Captcha', () => {
