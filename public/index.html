@@ -1,15 +1,18 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <link rel="icon" href="/favicon.webp" type="image/webp" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
       content="Pixaeron is an image-processing web application with secure account creation, Google Sign-In, email verification, and password recovery"
     />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta property="og:image" content="favicon.webp" />
+    <meta property="og:image" content="/icon-512.png" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>Pixaeron — secure image-processing web application</title>
+    <script src="/theme-init.js"></script>
     <style type="text/css">
       body {
         margin: 0;
@@ -24,6 +27,10 @@
         width: 100vw;
         text-align: center;
         background: #f8fafc;
+      }
+
+      [data-theme='dark'] .load-app {
+        background: #0b1220;
       }
 
       .load-app__img {

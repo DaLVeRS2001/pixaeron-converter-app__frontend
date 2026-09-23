@@ -14,10 +14,9 @@ export function plugins(options: IBuildOptions): webpack.WebpackPluginInstance[]
     new HTMLWebpackPlugin({
       title: 'Pixaeron',
       template: paths.html,
-      favicon: paths.favicon,
     }),
     new CopyWebpackPlugin({
-      patterns: [{ from: paths.headers, to: '[name][ext]' }],
+      patterns: [{ from: paths.public, to: '.', globOptions: { ignore: ['**/index.html'] } }],
     }),
     new webpack.ProgressPlugin(),
     ...(analyze
