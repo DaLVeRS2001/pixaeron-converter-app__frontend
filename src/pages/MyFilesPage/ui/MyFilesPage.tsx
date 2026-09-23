@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import {
   FILE_STATUS_GROUP,
-  MyConversionBatchesDocument,
-  flattenBatchFiles,
+  MyConversionFilesDocument,
   formatBytes,
   resultNoteKey,
   savedPercent,
@@ -16,13 +15,14 @@ import { DOWNLOAD_FAILURE, saveResult } from 'features/trackConversion';
 
 import ImageIcon from 'shared/assets/icons/image.svg';
 import { Button } from 'shared/ui/Button';
+import { Pagination } from 'shared/ui/Pagination';
 import { SVG } from 'shared/ui/SVG';
 
 import './MyFilesPage.scss';
 
 const cn = block('my-files-page');
 
-const BATCH_PAGE_SIZE = 10;
+const FILE_PAGE_SIZE = 20;
 
 const DOWNLOAD_KEY = {
   RESULT_EXPIRED: 'download.RESULT_EXPIRED',
@@ -39,26 +39,23 @@ const MyFilesPage = () => {
   const { t: tConversion } = useTranslation('conversion');
   const [page, setPage] = useState(0);
   const [downloadFailure, setDownloadFailure] = useState<DownloadFailure | null>(null);
-  const query = useQuery(MyConversionBatchesDocument, {
-    variables: { limit: BATCH_PAGE_SIZE, offset: page * BATCH_PAGE_SIZE },
+  const query = useQuery(MyConversionFilesDocument, {
+    variables: { limit: FILE_PAGE_SIZE, offset: page * FILE_PAGE_SIZE },
     fetchPolicy: 'cache-and-network',
   });
-  const result = query.data?.myConversionBatches;
-  const pages = Math.max(1, Math.ceil((result?.total ?? 0) / BATCH_PAGE_SIZE));
+  const result = query.data?.myConversionFiles;
+  const pages = Math.max(1, Math.ceil((result?.total ?? 0) / FILE_PAGE_SIZE));
   const currentPage = Math.min(page, pages - 1);
-
-  const rows = flattenBatchFiles(result?.items ?? []);
+  const rows = result?.items ?? [];
 
   const onDownload = async (fileId: string) => {
     setDownloadFailure(null);
     try {
       const { data } = await query.refetch();
-      const freshTotal = data?.myConversionBatches.total ?? 0;
-      const freshPages = Math.max(1, Math.ceil(freshTotal / BATCH_PAGE_SIZE));
+      const freshTotal = data?.myConversionFiles.total ?? 0;
+      const freshPages = Math.max(1, Math.ceil(freshTotal / FILE_PAGE_SIZE));
       if (page >= freshPages) setPage(freshPages - 1);
-      const fresh = data?.myConversionBatches.items
-        .flatMap((batch) => batch.files)
-        .find((file) => file.id === fileId);
+      const fresh = data?.myConversionFiles.items.find((file) => file.id === fileId);
       if (!fresh?.downloadUrl) {
         setDownloadFailure({ fileId, reason: DOWNLOAD_FAILURE.expired });
 
@@ -97,11 +94,10 @@ const MyFilesPage = () => {
               <li key={file.id} className={cn('row')}>
                 <span className={cn('thumb')} aria-hidden="true">
                   <SVG Svg={ImageIcon} className={cn('thumb-icon').toString()} />
-                  {file.status === 'COMPLETED' && file.downloadUrl && (
+                  {file.status === 'COMPLETED' && file.previewUrl && (
                     <img
-                      key={file.downloadUrl}
                       className={cn('thumb-image').toString()}
-                      src={file.downloadUrl}
+                      src={file.previewUrl}
                       alt=""
                       loading="lazy"
                       onError={(event) => {
@@ -130,9 +126,7 @@ const MyFilesPage = () => {
                 <span className={cn('until')}>
                   {file.status === 'COMPLETED'
                     ? t('app.results.until', {
-                        date: new Date(String(file.expiresAt)).toLocaleString(
-                          i18n.resolvedLanguage
-                        ),
+                        date: new Date(file.expiresAt).toLocaleString(i18n.resolvedLanguage),
                       })
                     : ''}
                 </span>
@@ -152,24 +146,17 @@ const MyFilesPage = () => {
         </ul>
       )}
 
-      {pages > 1 && (
-        <nav className={cn('pager')} aria-label={t('app.files.pagerLabel')}>
-          <Button
-            variant="secondary"
-            disabled={currentPage === 0}
-            onClick={() => setPage(currentPage - 1)}
-          >
-            {t('app.files.previous')}
-          </Button>
-          <span>{t('app.files.page', { page: currentPage + 1, pages })}</span>
-          <Button
-            variant="secondary"
-            disabled={currentPage + 1 >= pages}
-            onClick={() => setPage(currentPage + 1)}
-          >
-            {t('app.files.next')}
-          </Button>
-        </nav>
+      {result && result.total > 0 && (
+        <Pagination
+          className={cn('pager').toString()}
+          page={currentPage}
+          pages={pages}
+          onChange={setPage}
+          label={t('app.files.pagerLabel')}
+          previousLabel={t('app.files.previous')}
+          nextLabel={t('app.files.next')}
+          summary={t('app.files.showing', { shown: rows.length, total: result.total })}
+        />
       )}
     </section>
   );

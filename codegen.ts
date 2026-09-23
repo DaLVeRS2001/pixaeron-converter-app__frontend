@@ -9,6 +9,9 @@ const config: CodegenConfig = {
       presetConfig: {
         fragmentMasking: false,
       },
+      config: {
+        scalars: { DateTime: 'string' },
+      },
     },
   },
   ignoreNoDocuments: false,

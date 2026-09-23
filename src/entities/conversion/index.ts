@@ -3,7 +3,7 @@ export {
   ConversionBatchDocument,
   ConversionEntitlementDocument,
   CreateConversionBatchDocument,
-  MyConversionBatchesDocument,
+  MyConversionFilesDocument,
 } from 'shared/api';
 export type {
   ConversionBatchStatus,
@@ -12,5 +12,5 @@ export type {
 } from 'shared/api';
 export { isBatchSettled, isFileMoving } from './model/status';
 export { formatBytes, savedPercent, storagePercent, totalSavings } from './model/savings';
-export { FILE_STATUS_GROUP, flattenBatchFiles, resultNoteKey } from './model/file';
-export type { ConversionFileView, StoredFile } from './model/file';
+export { FILE_STATUS_GROUP, resultNoteKey } from './model/file';
+export type { ConversionFileView } from './model/file';

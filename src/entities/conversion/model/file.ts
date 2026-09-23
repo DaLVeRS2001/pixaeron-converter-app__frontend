@@ -21,15 +21,6 @@ const FILE_STATUS_GROUP = {
   EXPIRED: 'expired',
 } as const satisfies Record<ConversionFileStatus, string>;
 
-type StoredFile = ConversionFileView & { expiresAt: string };
-
-const flattenBatchFiles = <TFile>(
-  batches: ReadonlyArray<{ expiresAt: unknown; files: ReadonlyArray<TFile> }>
-): Array<TFile & { expiresAt: string }> =>
-  batches.flatMap((batch) =>
-    batch.files.map((file) => ({ ...file, expiresAt: String(batch.expiresAt) }))
-  );
-
 const RESULT_NOTE_KEY = {
   NO_SAVINGS: 'result.noSavings',
   SANITIZED_LARGER: 'result.sanitizedLarger',
@@ -44,5 +35,4 @@ const resultNoteKey = (
     ? RESULT_NOTE_KEY[resultKind as keyof typeof RESULT_NOTE_KEY]
     : null;
 
-export { FILE_STATUS_GROUP, flattenBatchFiles, resultNoteKey };
-export type { StoredFile };
+export { FILE_STATUS_GROUP, resultNoteKey };

@@ -10,7 +10,7 @@ export {
   LoginDocument,
   LogoutDocument,
   MeDocument,
-  MyConversionBatchesDocument,
+  MyConversionFilesDocument,
   RefreshSessionDocument,
   RegisterDocument,
   RequestPasswordResetDocument,
@@ -30,6 +30,6 @@ export type {
   CreateConversionBatchMutation,
   EmailVerificationStatus,
   MeQuery,
-  MyConversionBatchesQuery,
+  MyConversionFilesQuery,
   PasswordResetStatus,
 } from './generated/graphql';

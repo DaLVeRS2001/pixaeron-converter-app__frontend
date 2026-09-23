@@ -41,6 +41,7 @@ type Query {
   conversionBatch(id: ID!, batchToken: String): ConversionBatch!
   conversionEntitlement: ConversionEntitlement!
   myConversionBatches(limit: Int, offset: Int): ConversionBatchPage!
+  myConversionFiles(limit: Int, offset: Int): ConversionFilePage!
 }
 
 type Mutation {
@@ -117,6 +118,8 @@ type ConversionFile {
   height: Int
   failureCode: String
   downloadUrl: String
+  previewUrl: String
+  expiresAt: DateTime!
   upload: ConversionUploadTarget
 }
 
@@ -189,6 +192,11 @@ enum ConversionPlanCode {
 
 type ConversionBatchPage {
   items: [ConversionBatch!]!
+  total: Int!
+}
+
+type ConversionFilePage {
+  items: [ConversionFile!]!
   total: Int!
 }
 
