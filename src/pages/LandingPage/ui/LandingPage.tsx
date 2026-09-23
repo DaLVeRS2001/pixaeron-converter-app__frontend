@@ -1,6 +1,8 @@
 import block from 'bem-cn';
 import { useTranslation } from 'react-i18next';
 
+import { formatBytes, savedPercent } from 'entities/conversion';
+
 import { CompressorWidget } from 'widgets/CompressorWidget';
 import { PublicFooter } from 'widgets/PublicFooter';
 import { PublicHeader } from 'widgets/PublicHeader';
@@ -11,6 +13,8 @@ import LayersIcon from 'shared/assets/icons/layers.svg';
 import LightningIcon from 'shared/assets/icons/lightning.svg';
 import ShieldIcon from 'shared/assets/icons/shield-check.svg';
 import SwapIcon from 'shared/assets/icons/swap.svg';
+import seaCompressed from 'shared/assets/images/sea-compressed.webp';
+import seaOriginal from 'shared/assets/images/sea-original.webp';
 import { Button } from 'shared/ui/Button';
 import { SVG } from 'shared/ui/SVG';
 
@@ -25,6 +29,24 @@ const ADVANTAGES = [
   { key: 'formats', Icon: LayersIcon },
   { key: 'honest', Icon: SwapIcon },
   { key: 'access', Icon: ShieldIcon },
+] as const;
+
+const SAMPLE = {
+  width: 3872,
+  height: 2592,
+  format: 'JPEG',
+  preview: { width: 1600, height: 1071 },
+  original: { bytes: 3370083, preview: seaOriginal, file: '/samples/sea-original.jpg' },
+  compressed: { bytes: 297852, preview: seaCompressed, file: '/samples/sea-compressed.jpg' },
+};
+
+const SAMPLE_RENDITIONS = [
+  { kind: 'original', ...SAMPLE.original, badge: null },
+  {
+    kind: 'compressed',
+    ...SAMPLE.compressed,
+    badge: savedPercent(SAMPLE.original.bytes, SAMPLE.compressed.bytes),
+  },
 ] as const;
 
 const LandingPage = () => {
@@ -55,6 +77,46 @@ const LandingPage = () => {
           <p className={cn('compressor-formats')}>{t('landing.compressorFormats')}</p>
           <CompressorWidget />
           <p className={cn('compressor-note')}>{t('landing.compressorDescription')}</p>
+        </section>
+
+        <section className={cn('comparison')} aria-labelledby="comparison-heading">
+          <h2 id="comparison-heading">{t('landing.comparison.title')}</h2>
+          <p className={cn('comparison-lead')}>{t('landing.comparison.lead')}</p>
+          <div className={cn('comparison-grid')}>
+            {SAMPLE_RENDITIONS.map((rendition) => (
+              <figure key={rendition.kind} className={cn('sample')}>
+                <figcaption className={cn('sample-header')}>
+                  <span className={cn('sample-title')}>
+                    {t(`landing.comparison.${rendition.kind}Title`)}
+                  </span>
+                  <span className={cn('sample-badge', { [rendition.kind]: true })}>
+                    {rendition.badge === null
+                      ? t('landing.comparison.unoptimized')
+                      : t('landing.comparison.smaller', { percent: rendition.badge })}
+                  </span>
+                </figcaption>
+                <img
+                  className={cn('sample-image')}
+                  src={rendition.preview}
+                  alt={t(`landing.comparison.${rendition.kind}Alt`)}
+                  loading="lazy"
+                  width={SAMPLE.preview.width}
+                  height={SAMPLE.preview.height}
+                />
+                <p className={cn('sample-meta')}>
+                  <span>{formatBytes(rendition.bytes)}</span>
+                  <span>
+                    {SAMPLE.width}×{SAMPLE.height}
+                  </span>
+                  <span>{SAMPLE.format}</span>
+                  <a href={rendition.file} target="_blank" rel="noreferrer">
+                    {t('landing.comparison.open')}
+                  </a>
+                </p>
+              </figure>
+            ))}
+          </div>
+          <p className={cn('comparison-credit')}>{t('landing.comparison.credit')}</p>
         </section>
 
         <section className={cn('advantages')} aria-labelledby="advantages-heading">

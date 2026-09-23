@@ -1,6 +1,6 @@
 .landing-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, var(--color-white), var(--color-slate-50));
+  background: linear-gradient(180deg, var(--color-bg-top), var(--color-bg));
 
   &__hero {
     width: min(58rem, calc(100% - 3rem));
@@ -9,7 +9,7 @@
     text-align: center;
   }
   &__eyebrow {
-    color: var(--color-brand-600);
+    color: var(--color-brand-text);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -17,7 +17,7 @@
   &__hero h1 {
     margin: 1rem auto;
     max-width: 52rem;
-    color: var(--color-slate-950);
+    color: var(--color-text-strong);
     font-size: clamp(2.5rem, 7vw, 4.5rem);
     line-height: 1.05;
     letter-spacing: -0.04em;
@@ -25,7 +25,7 @@
   &__lead {
     max-width: 44rem;
     margin: 0 auto;
-    color: var(--color-slate-600);
+    color: var(--color-text-muted);
     font-size: 1.125rem;
   }
   &__actions {
@@ -45,20 +45,109 @@
 
     h2 {
       margin: 0;
-      color: var(--color-slate-900);
+      color: var(--color-text);
       font-size: 1.75rem;
     }
   }
   &__compressor-formats {
     margin: 0;
-    color: var(--color-brand-600);
+    color: var(--color-brand-text);
     font-weight: 600;
     letter-spacing: 0.05em;
   }
   &__compressor-note {
     margin: 0;
-    color: var(--color-slate-500);
+    color: var(--color-text-subtle);
     font-size: 0.875rem;
+  }
+  &__comparison {
+    width: min(70rem, calc(100% - 3rem));
+    margin: 0 auto;
+    padding: 3rem 0 1rem;
+    text-align: center;
+
+    h2 {
+      margin: 0;
+      color: var(--color-text);
+      font-size: 1.75rem;
+    }
+  }
+  &__comparison-lead {
+    max-width: 40rem;
+    margin: 0.75rem auto 2rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+  &__comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    text-align: left;
+  }
+  &__sample {
+    display: grid;
+    gap: 0.875rem;
+    margin: 0;
+    padding: 1.25rem;
+    background: var(--color-surface);
+    border: 0.0625rem solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+  }
+  &__sample-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  &__sample-title {
+    color: var(--color-text);
+    font-weight: 700;
+  }
+  &__sample-badge {
+    padding: 0.25rem 0.625rem;
+    border-radius: 999rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+
+    &_original {
+      color: var(--color-error-text);
+      background: var(--color-error-bg);
+    }
+    &_compressed {
+      color: var(--color-success-text);
+      background: var(--color-success-bg);
+    }
+  }
+  &__sample-image {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+  }
+  &__sample-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.25rem;
+    margin: 0;
+    color: var(--color-text-subtle);
+    font-size: 0.875rem;
+
+    a {
+      margin-left: auto;
+      color: var(--color-brand-text);
+      font-weight: 500;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  &__comparison-credit {
+    margin: 1.25rem 0 0;
+    color: var(--color-text-faint);
+    font-size: 0.8125rem;
   }
   &__advantages {
     width: min(70rem, calc(100% - 3rem));
@@ -67,7 +156,7 @@
 
     h2 {
       margin: 0 0 2rem;
-      color: var(--color-slate-900);
+      color: var(--color-text);
       font-size: 1.75rem;
       text-align: center;
     }
@@ -79,19 +168,19 @@
   }
   &__advantage {
     padding: 2rem;
-    background: var(--color-white);
-    border: 0.0625rem solid var(--color-slate-200);
+    background: var(--color-surface);
+    border: 0.0625rem solid var(--color-border);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-card);
 
     h3 {
       margin: 1rem 0 0.5rem;
-      color: var(--color-slate-900);
+      color: var(--color-text);
       font-size: 1.05rem;
     }
     p {
       margin: 0;
-      color: var(--color-slate-600);
+      color: var(--color-text-muted);
       line-height: 1.6;
     }
   }
@@ -99,17 +188,17 @@
     width: 2rem;
     height: 2rem;
     padding: 0.4rem;
-    background: rgb(79 70 229 / 10%);
+    background: var(--color-brand-soft);
     border-radius: 0.625rem;
-    color: var(--color-brand-600);
+    color: var(--color-brand-text);
   }
   &__cta {
     width: min(58rem, calc(100% - 3rem));
     margin: 0 auto 5rem;
     padding: 3rem 2rem;
-    background: var(--color-slate-950);
+    background: var(--color-inverse-surface);
     border-radius: var(--radius-xl);
-    color: var(--color-white);
+    color: var(--color-inverse-text);
     text-align: center;
 
     h2 {
@@ -119,7 +208,7 @@
     p {
       max-width: 44rem;
       margin: 0 auto 1.75rem;
-      color: var(--color-slate-400);
+      color: var(--color-inverse-text-muted);
       font-size: 0.9375rem;
       line-height: 1.6;
     }
@@ -129,7 +218,8 @@
     &__hero {
       padding-top: 4rem;
     }
-    &__advantages-grid {
+    &__advantages-grid,
+    &__comparison-grid {
       grid-template-columns: 1fr;
     }
   }
