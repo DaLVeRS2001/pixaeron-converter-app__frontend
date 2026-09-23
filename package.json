@@ -31,6 +31,7 @@
   "dependencies": {
     "@apollo/client": "^4.2.8",
     "@fontsource/inter": "^5.3.0",
+    "@headlessui/react": "^2.2.10",
     "@hookform/resolvers": "^5.2.2",
     "@reduxjs/toolkit": "^2.12.0",
     "bem-cn": "^3.0.1",
