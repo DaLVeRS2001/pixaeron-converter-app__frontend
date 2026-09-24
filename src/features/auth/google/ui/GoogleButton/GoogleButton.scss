@@ -1,5 +1,8 @@
 .google-button {
+  display: flex;
+  justify-content: center;
   width: 100%;
   min-height: 2.75rem;
   overflow: hidden;
+  color-scheme: light;
 }
