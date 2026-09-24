@@ -93,7 +93,9 @@
     "pricing": "Тарифы",
     "signIn": "Войти",
     "getStarted": "Начать бесплатно",
-    "dashboard": "В кабинет"
+    "dashboard": "В кабинет",
+    "menu": "Меню",
+    "closeMenu": "Закрыть меню"
   },
   "pricing": {
     "title": "Тарифы и цены",

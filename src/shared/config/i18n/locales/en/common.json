@@ -93,7 +93,9 @@
     "pricing": "Pricing",
     "signIn": "Sign in",
     "getStarted": "Get started free",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "menu": "Menu",
+    "closeMenu": "Close menu"
   },
   "pricing": {
     "title": "Plans and pricing",

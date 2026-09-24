@@ -12,6 +12,7 @@ const LanguageSwitcher = () => {
       options={languageOptions}
       value={currentLanguage}
       onChange={changeLanguage}
+      labelHidden
     />
   );
 };

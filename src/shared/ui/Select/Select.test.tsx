@@ -40,6 +40,15 @@ describe('Select', () => {
     expect(onChange).toHaveBeenCalledWith('ru');
   });
 
+  it('keeps the label for assistive technology when it is visually hidden', () => {
+    render(
+      <Select label="Language" options={OPTIONS} value="en" onChange={jest.fn()} labelHidden />
+    );
+
+    expect(screen.getByRole('button', { name: /Language/ })).toBeInTheDocument();
+    expect(screen.getByText('Language')).toHaveClass('select__label_hidden');
+  });
+
   it('marks the current option as selected while the list is open', () => {
     render(<Select label="Language" options={OPTIONS} value="ru" onChange={jest.fn()} />);
 

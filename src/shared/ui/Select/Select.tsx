@@ -25,6 +25,7 @@ type SelectProps<Value extends string> = {
   value: Value;
   onChange: (value: Value) => void;
   className?: string;
+  labelHidden?: boolean;
 };
 
 const cn = block('select');
@@ -35,19 +36,20 @@ const Select = <Value extends string>({
   value,
   onChange,
   className,
+  labelHidden = false,
 }: SelectProps<Value>) => {
   const selected = options.find((option) => option.value === value);
 
   return (
     <Field className={cn.mix(className).toString()}>
-      <Label className={cn('label').toString()}>{label}</Label>
+      <Label className={cn('label', { hidden: labelHidden }).toString()}>{label}</Label>
       <Listbox value={value} onChange={onChange}>
         <ListboxButton className={cn('button').toString()}>
           <span className={cn('value')}>{selected?.label ?? value}</span>
           <SVG Svg={ChevronIcon} className={cn('chevron').toString()} />
         </ListboxButton>
         <ListboxOptions
-          anchor={{ to: 'bottom end', gap: 6 }}
+          anchor={{ to: 'bottom start', gap: 6 }}
           modal={false}
           className={cn('options').toString()}
         >

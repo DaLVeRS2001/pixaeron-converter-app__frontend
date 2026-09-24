@@ -3,9 +3,9 @@
 
   position: relative;
   display: inline-grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.5rem 1.5rem;
   align-items: center;
-  width: 3.75rem;
+  width: 3.5rem;
   height: 2rem;
   padding: 0.1875rem;
   background: var(--color-surface-muted);
@@ -55,7 +55,7 @@
       color: var(--color-on-brand);
     }
     #{$root}__knob {
-      transform: translateX(1.75rem);
+      transform: translateX(1.5rem);
     }
   }
 
