@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useTheme } from 'shared/config/theme';
 import { invalidateExternalScript, loadExternalScript } from 'shared/lib';
 
 import './Captcha.scss';
@@ -17,6 +18,7 @@ const scriptId = 'cloudflare-turnstile-script';
 
 const Captcha = ({ action, onToken, onUnavailable }: CaptchaProps) => {
   const { t } = useTranslation('auth');
+  const { theme } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const onTokenRef = useRef(onToken);
   const onUnavailableRef = useRef(onUnavailable);
@@ -69,7 +71,7 @@ const Captcha = ({ action, onToken, onUnavailable }: CaptchaProps) => {
             onTokenRef.current('');
             notifyUnavailable();
           },
-          theme: 'light',
+          theme,
         });
       } catch {
         if (cancelled) return;
@@ -87,7 +89,7 @@ const Captcha = ({ action, onToken, onUnavailable }: CaptchaProps) => {
       if (widgetId && window.turnstile) window.turnstile.remove(widgetId);
       container.replaceChildren();
     };
-  }, [action]);
+  }, [action, theme]);
 
   if (!__TURNSTILE_SITE_KEY__) {
     return (

@@ -50,23 +50,20 @@ mutation CompleteConversionUploads($input: CompleteConversionUploadsInput!) {
   }
 }
 
-query MyConversionBatches($limit: Int, $offset: Int) {
-  myConversionBatches(limit: $limit, offset: $offset) {
+query MyConversionFiles($limit: Int, $offset: Int) {
+  myConversionFiles(limit: $limit, offset: $offset) {
     total
     items {
       id
       status
+      inputBytes
+      outputBytes
+      outputFormat
+      resultKind
+      failureCode
+      downloadUrl
+      previewUrl
       expiresAt
-      files {
-        id
-        status
-        inputBytes
-        outputBytes
-        outputFormat
-        resultKind
-        failureCode
-        downloadUrl
-      }
     }
   }
 }

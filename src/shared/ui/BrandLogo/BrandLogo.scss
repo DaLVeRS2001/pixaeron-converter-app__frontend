@@ -4,13 +4,13 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--color-slate-900);
+  color: var(--color-text);
   text-decoration: none;
 
   &__mark {
     width: 1.5rem;
     height: 1.5rem;
-    fill: var(--color-brand-500);
+    color: var(--color-brand-accent);
   }
   &__name {
     font-size: 1.25rem;
@@ -18,6 +18,6 @@
     letter-spacing: -0.025rem;
   }
   &_light {
-    color: var(--color-white);
+    color: var(--color-inverse-text);
   }
 }

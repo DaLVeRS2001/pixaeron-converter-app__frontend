@@ -54,7 +54,7 @@ describe('useCompleteLogin', () => {
       data: { me: user },
     });
     expect(mockEvict).toHaveBeenCalledWith({ fieldName: 'conversionEntitlement' });
-    expect(mockEvict).toHaveBeenCalledWith({ fieldName: 'myConversionBatches' });
+    expect(mockEvict).toHaveBeenCalledWith({ fieldName: 'myConversionFiles' });
     expect(mockGc).toHaveBeenCalled();
     expect(sessionStorage.getItem('pendingVerificationEmail')).toBeNull();
     expect(mockNavigate).toHaveBeenCalledWith('/convert?preset=web#queue', { replace: true });

@@ -1,6 +1,7 @@
 ﻿import block from 'bem-cn';
 import { useEffect, useRef } from 'react';
 
+import { useTheme } from 'shared/config/theme';
 import { invalidateExternalScript, loadExternalScript } from 'shared/lib';
 
 import './GoogleButton.scss';
@@ -20,6 +21,7 @@ let initializedGoogleIdentity: GoogleIdentityClient | undefined;
 let activeCredentialHandler: ((credential: string) => void) | undefined;
 
 const GoogleButton = ({ mode, onCredential, onUnavailable }: GoogleButtonProps) => {
+  const { theme } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const onCredentialRef = useRef(onCredential);
   const onUnavailableRef = useRef(onUnavailable);
@@ -66,7 +68,7 @@ const GoogleButton = ({ mode, onCredential, onUnavailable }: GoogleButtonProps) 
           initializedGoogleIdentity = googleIdentity;
         }
         googleIdentity.renderButton(container, {
-          theme: 'outline',
+          theme: theme === 'dark' ? 'filled_black' : 'outline',
           size: 'large',
           width: Math.min(container.clientWidth, 400),
           text: mode,
@@ -86,7 +88,7 @@ const GoogleButton = ({ mode, onCredential, onUnavailable }: GoogleButtonProps) 
       if (activeCredentialHandler === handleCredential) activeCredentialHandler = undefined;
       container.replaceChildren();
     };
-  }, [mode]);
+  }, [mode, theme]);
 
   if (!__GOOGLE_CLIENT_ID__) return null;
 

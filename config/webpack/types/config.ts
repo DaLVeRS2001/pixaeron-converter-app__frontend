@@ -5,8 +5,7 @@ interface IBuildPaths {
   html: string;
   build: string;
   src: string;
-  favicon: string;
-  headers: string;
+  public: string;
 }
 
 interface BuildEnvironment {

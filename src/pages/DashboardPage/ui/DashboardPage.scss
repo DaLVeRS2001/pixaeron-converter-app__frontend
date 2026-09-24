@@ -5,7 +5,7 @@
   }
   &__lead {
     margin: 0.5rem 0 2rem;
-    color: var(--color-slate-600);
+    color: var(--color-text-muted);
   }
   &__tiles {
     display: grid;
@@ -15,13 +15,13 @@
   }
   &__tile {
     padding: 1.25rem 1.5rem;
-    background: var(--color-white);
-    border: 0.0625rem solid var(--color-slate-200);
+    background: var(--color-surface);
+    border: 0.0625rem solid var(--color-border);
     border-radius: 0.875rem;
 
     h2 {
       margin: 0;
-      color: var(--color-slate-500);
+      color: var(--color-text-subtle);
       font-size: 0.8125rem;
       font-weight: 600;
       letter-spacing: 0.04em;
@@ -35,11 +35,11 @@
   }
   &__tile-note {
     margin: 0;
-    color: var(--color-slate-500);
+    color: var(--color-text-subtle);
     font-size: 0.8125rem;
 
     a {
-      color: var(--color-brand-600);
+      color: var(--color-brand-text);
     }
   }
   &__actions {
@@ -54,14 +54,14 @@
     align-items: flex-start;
     gap: 0.5rem;
     padding: 1.5rem;
-    background: var(--color-white);
-    border: 0.0625rem solid var(--color-slate-200);
+    background: var(--color-surface);
+    border: 0.0625rem solid var(--color-border);
     border-radius: 0.875rem;
 
     .dashboard-page__action-icon {
       width: 1.75rem;
       height: 1.75rem;
-      color: var(--color-brand-600);
+      color: var(--color-brand-text);
     }
     h2 {
       margin: 0;
@@ -70,21 +70,21 @@
     p {
       flex: 1;
       margin: 0 0 0.75rem;
-      color: var(--color-slate-600);
+      color: var(--color-text-muted);
       font-size: 0.9rem;
     }
     &_disabled {
       opacity: 0.7;
 
       .dashboard-page__action-icon {
-        color: var(--color-slate-400);
+        color: var(--color-text-faint);
       }
     }
   }
   &__recents {
     padding: 1.5rem;
-    background: var(--color-white);
-    border: 0.0625rem solid var(--color-slate-200);
+    background: var(--color-surface);
+    border: 0.0625rem solid var(--color-border);
     border-radius: 0.875rem;
 
     header {
@@ -98,7 +98,7 @@
         font-size: 1.1rem;
       }
       a {
-        color: var(--color-brand-600);
+        color: var(--color-brand-text);
         font-size: 0.875rem;
         text-decoration: none;
       }
@@ -120,13 +120,13 @@
       border-radius: 0.625rem;
 
       &:nth-child(odd) {
-        background: var(--color-slate-50);
+        background: var(--color-surface-subtle);
       }
     }
   }
   &__recent-format {
     min-width: 3.5rem;
-    color: var(--color-brand-600);
+    color: var(--color-brand-text);
     font-size: 0.8125rem;
     font-weight: 700;
   }
@@ -134,21 +134,21 @@
     font-size: 0.9rem;
   }
   &__recent-saved {
-    color: var(--color-success-700);
+    color: var(--color-success-text);
     font-size: 0.85rem;
     font-weight: 600;
   }
   &__recent-note {
-    color: var(--color-slate-500);
+    color: var(--color-text-subtle);
     font-size: 0.8125rem;
   }
   &__recent-until {
     margin-left: auto;
-    color: var(--color-slate-500);
+    color: var(--color-text-subtle);
     font-size: 0.8125rem;
   }
   &__empty {
     margin: 0;
-    color: var(--color-slate-500);
+    color: var(--color-text-subtle);
   }
 }

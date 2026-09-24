@@ -3,13 +3,16 @@
 
   position: relative;
   min-height: 100vh;
-  background: var(--color-slate-50);
+  background: var(--color-bg);
 
-  &__language {
+  &__toolbar {
     position: absolute;
     z-index: 4;
     top: 1rem;
     right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
   &__visual,
   &__content {
@@ -38,9 +41,9 @@
     justify-content: center;
     gap: 2.5rem;
     padding: 4rem;
-    color: var(--color-white);
+    color: var(--color-inverse-text);
     text-align: center;
-    background: var(--color-slate-800);
+    background: var(--color-inverse-surface-soft);
   }
   &__logo {
     display: inline-flex;
@@ -57,7 +60,7 @@
     p {
       max-width: 30rem;
       margin-top: 1.25rem;
-      color: var(--color-slate-400);
+      color: var(--color-inverse-text-muted);
       font-size: 0.875rem;
       line-height: 1.25rem;
     }
@@ -75,7 +78,7 @@
     margin-left: auto;
     padding: 0;
     list-style: none;
-    color: var(--color-slate-200);
+    color: var(--color-inverse-text-muted);
     font-size: 0.875rem;
     text-align: left;
 
@@ -92,8 +95,8 @@
       align-items: center;
       justify-content: center;
       content: '✓';
-      color: var(--color-white);
-      background: var(--color-brand-500);
+      color: var(--color-on-brand);
+      background: var(--color-brand-accent);
       border-radius: 50%;
       font-weight: 700;
     }
@@ -103,13 +106,13 @@
     align-items: center;
     justify-content: center;
     padding: 2.5rem 4rem 3rem;
-    background: var(--color-slate-50);
+    background: var(--color-bg);
   }
   &__card {
     width: min(100%, 32.5rem);
     padding: 2.5rem;
-    background: var(--color-white);
-    border: 0.0625rem solid var(--color-slate-200);
+    background: var(--color-surface);
+    border: 0.0625rem solid var(--color-border);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-card);
   }
@@ -128,9 +131,9 @@
     &__art {
       display: none;
     }
-    &_variant_signin #{$root}__language,
-    &_variant_signup #{$root}__language {
-      color: var(--color-white);
+    &_variant_signin #{$root}__toolbar,
+    &_variant_signup #{$root}__toolbar {
+      color: var(--color-inverse-text);
     }
     &__content {
       align-items: flex-start;

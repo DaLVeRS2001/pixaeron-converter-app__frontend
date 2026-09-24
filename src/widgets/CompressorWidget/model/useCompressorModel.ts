@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client/react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ConversionEntitlementDocument } from 'entities/conversion';
 
@@ -39,6 +39,12 @@ const useCompressorModel = () => {
     batchToken: active?.batchToken ?? null,
   });
   const entitlement = entitlementQuery.data?.conversionEntitlement ?? null;
+
+  useEffect(() => {
+    if (!pollingStopped) return;
+
+    refetchEntitlement().catch(() => undefined);
+  }, [pollingStopped, refetchEntitlement]);
 
   const reset = useCallback(() => {
     attempt.current += 1;

@@ -1,4 +1,3 @@
-import type { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { defaultLanguage, isSupportedLanguage, supportedLanguages } from 'shared/config/i18n';
@@ -19,25 +18,20 @@ const createLanguageOption = (language: TSupportedLanguage): TLanguageOption => 
 const useLanguageSwitcher = () => {
   const { i18n, t } = useTranslation();
 
-  const currentLanguage = isSupportedLanguage(i18n.resolvedLanguage || '')
-    ? i18n.resolvedLanguage
+  const resolvedLanguage = i18n.resolvedLanguage ?? '';
+  const currentLanguage = isSupportedLanguage(resolvedLanguage)
+    ? resolvedLanguage
     : defaultLanguage;
 
   const languageOptions = supportedLanguages.map(createLanguageOption);
 
-  const handleLanguageChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const nextLanguage = event.target.value;
-
-    if (!isSupportedLanguage(nextLanguage)) {
-      return;
-    }
-
+  const changeLanguage = (nextLanguage: TSupportedLanguage) => {
     void i18n.changeLanguage(nextLanguage);
   };
 
   return {
     currentLanguage,
-    handleLanguageChange,
+    changeLanguage,
     languageLabel: t('language.label'),
     languageOptions,
   };

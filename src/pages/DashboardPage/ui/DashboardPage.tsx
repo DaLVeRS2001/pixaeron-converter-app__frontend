@@ -5,8 +5,7 @@ import { Link } from 'react-router-dom';
 
 import {
   ConversionEntitlementDocument,
-  MyConversionBatchesDocument,
-  flattenBatchFiles,
+  MyConversionFilesDocument,
   formatBytes,
   resultNoteKey,
   savedPercent,
@@ -22,8 +21,6 @@ import './DashboardPage.scss';
 
 const cn = block('dashboard-page');
 
-const RECENT_BATCHES = 5;
-
 const RECENT_FILES = 5;
 
 const DashboardPage = () => {
@@ -31,14 +28,14 @@ const DashboardPage = () => {
   const { t: tConversion } = useTranslation('conversion');
   const session = useCurrentUser();
   const entitlement = useQuery(ConversionEntitlementDocument).data?.conversionEntitlement;
-  const recents = useQuery(MyConversionBatchesDocument, {
-    variables: { limit: RECENT_BATCHES, offset: 0 },
+  const recents = useQuery(MyConversionFilesDocument, {
+    variables: { limit: RECENT_FILES, offset: 0 },
     fetchPolicy: 'cache-and-network',
-  }).data?.myConversionBatches;
+  }).data?.myConversionFiles;
 
   if (session.status !== 'authenticated') return null;
 
-  const recentFiles = flattenBatchFiles(recents?.items ?? []);
+  const recentFiles = recents?.items ?? [];
 
   return (
     <section className={cn()}>
@@ -104,7 +101,7 @@ const DashboardPage = () => {
           <p className={cn('empty')}>{t('app.dashboard.empty')}</p>
         ) : (
           <ul>
-            {recentFiles.slice(0, RECENT_FILES).map((file) => {
+            {recentFiles.map((file) => {
               const note = resultNoteKey(file.resultKind);
               const percent =
                 typeof file.inputBytes === 'number' && typeof file.outputBytes === 'number'

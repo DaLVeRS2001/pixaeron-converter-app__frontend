@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useCurrentUser } from 'entities/user';
 
 import { LanguageSwitcher } from 'features/changeLanguage';
+import { ThemeToggle } from 'features/toggleTheme';
 
 import { BrandLogo } from 'shared/ui/BrandLogo';
 
@@ -21,6 +22,7 @@ const Header = () => {
           <BrandLogo />
         </Link>
         <div className={cn('actions')}>
+          <ThemeToggle />
           <LanguageSwitcher />
           {session.status === 'authenticated' && (
             <span className={cn('user')}>{session.user.username}</span>

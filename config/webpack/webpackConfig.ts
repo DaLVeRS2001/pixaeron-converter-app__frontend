@@ -26,6 +26,7 @@ export function webpackConfig(options: IBuildOptions): webpack.Configuration {
       hints: isDev ? false : 'warning',
       maxAssetSize: 700 * 1024,
       maxEntrypointSize: 700 * 1024,
+      assetFilter: (asset: string) => !asset.startsWith('samples/'),
     },
     resolve: resolvers(options),
     module: {

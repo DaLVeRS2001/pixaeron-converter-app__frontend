@@ -1,6 +1,6 @@
 .header {
-  background: var(--color-white);
-  border-bottom: 0.0625rem solid var(--color-slate-200);
+  background: var(--color-surface);
+  border-bottom: 0.0625rem solid var(--color-border);
 
   &__inner {
     display: flex;
@@ -22,7 +22,7 @@
     text-decoration: none;
   }
   &__user {
-    color: var(--color-slate-700);
+    color: var(--color-text-secondary);
     font-weight: 600;
   }
 }

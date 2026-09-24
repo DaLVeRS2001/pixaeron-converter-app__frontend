@@ -10,7 +10,7 @@
 
   &__label {
     padding: 0;
-    color: var(--color-slate-600);
+    color: var(--color-text-muted);
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -26,7 +26,7 @@
     display: inline-flex;
     gap: 0.25rem;
     padding: 0.25rem;
-    background: var(--color-slate-100);
+    background: var(--color-surface-muted);
     border-radius: 999rem;
   }
   &__option {
@@ -35,7 +35,7 @@
     align-items: center;
     min-height: 2rem;
     padding: 0 0.875rem;
-    color: var(--color-slate-600);
+    color: var(--color-text-muted);
     border-radius: 999rem;
     font-size: 0.8125rem;
     font-weight: 600;
@@ -48,16 +48,16 @@
       box-shadow 160ms ease;
 
     &_active {
-      color: var(--color-brand-600);
-      background: var(--color-white);
-      box-shadow: 0 0.0625rem 0.125rem rgb(15 23 42 / 12%);
+      color: var(--color-brand-text);
+      background: var(--color-surface);
+      box-shadow: var(--shadow-raised);
     }
     &:has(#{$root}__input:focus-visible) {
-      box-shadow: 0 0 0 0.1875rem rgb(99 102 241 / 24%);
+      box-shadow: 0 0 0 0.1875rem var(--color-focus-ring);
     }
   }
   &:not(:disabled) &__option:hover {
-    color: var(--color-slate-900);
+    color: var(--color-text);
   }
   &:disabled &__option {
     cursor: not-allowed;
@@ -72,7 +72,7 @@
   &__hint {
     flex: 1 1 16rem;
     margin: 0;
-    color: var(--color-slate-600);
+    color: var(--color-text-muted);
     font-size: 0.8125rem;
     line-height: 1.25rem;
   }

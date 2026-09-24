@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { LanguageSwitcher } from 'features/changeLanguage';
+import { ThemeToggle } from 'features/toggleTheme';
 
 import CompressionArt from 'shared/assets/auth-compression.svg';
 import { BrandLogo } from 'shared/ui/BrandLogo';
@@ -30,7 +31,8 @@ const AuthShell = ({ variant, children }: AuthShellProps) => {
   if (variant === 'centered') {
     return (
       <main className={cn({ variant })}>
-        <div className={cn('language')}>
+        <div className={cn('toolbar')}>
+          <ThemeToggle />
           <LanguageSwitcher />
         </div>
         {logoLink}
@@ -41,7 +43,8 @@ const AuthShell = ({ variant, children }: AuthShellProps) => {
 
   return (
     <main className={cn({ variant })}>
-      <div className={cn('language')}>
+      <div className={cn('toolbar')}>
+        <ThemeToggle />
         <LanguageSwitcher />
       </div>
       <section className={cn('visual')}>

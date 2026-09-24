@@ -4,13 +4,14 @@
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   padding: 0.875rem clamp(1rem, 4vw, 3rem);
-  background: var(--color-white);
-  border-bottom: 0.0625rem solid var(--color-slate-200);
+  background: var(--color-surface);
+  border-bottom: 0.0625rem solid var(--color-border);
 
   &__logo {
     display: inline-flex;
+    flex-shrink: 0;
     text-decoration: none;
   }
   &__nav {
@@ -19,42 +20,106 @@
     margin-inline: auto;
 
     a {
-      color: var(--color-slate-600);
+      color: var(--color-text-muted);
       font-weight: 500;
       text-decoration: none;
+      white-space: nowrap;
 
       &:hover {
-        color: var(--color-slate-900);
+        color: var(--color-text);
       }
     }
   }
   &__actions {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 1rem;
+    white-space: nowrap;
+  }
+  &__controls {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  &__burger {
+    display: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    border: 0.0625rem solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--color-border-strong);
+    }
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 0.1875rem var(--color-focus-ring);
+    }
+  }
+  &__burger-icon {
+    width: 1.25rem;
+    height: 1.25rem;
   }
   &__sign-in {
-    color: var(--color-slate-700);
+    color: var(--color-text-secondary);
     font-weight: 500;
     text-decoration: none;
 
     &:hover {
-      color: var(--color-slate-900);
+      color: var(--color-text);
     }
   }
+  &__panel {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    padding: 1rem clamp(1rem, 4vw, 3rem) 1.25rem;
+    background: var(--color-surface);
+    border-bottom: 0.0625rem solid var(--color-border);
+    box-shadow: var(--shadow-card);
+  }
+  &__panel-nav {
+    display: flex;
+    flex-direction: column;
 
-  @media (width <= 48rem) {
+    a {
+      padding: 0.75rem 0;
+      border-bottom: 0.0625rem solid var(--color-border);
+      color: var(--color-text);
+      font-weight: 500;
+      text-decoration: none;
+    }
+  }
+  &__panel-actions {
+    display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 0.75rem 1rem;
-
-    &__nav {
-      display: none;
-    }
+    margin-top: 1rem;
   }
 
-  @media (width <= 30rem) {
-    &__sign-in {
+  @media (width <= 60rem) {
+    &__nav,
+    &__actions {
       display: none;
+    }
+    &__controls {
+      margin-left: auto;
+    }
+    &__burger {
+      display: inline-flex;
+    }
+    &__panel {
+      display: block;
     }
   }
 }
