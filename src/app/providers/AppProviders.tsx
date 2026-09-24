@@ -6,6 +6,8 @@ import { ThemeProvider } from 'app/providers/ThemeProvider';
 
 import { CurrentUserProvider } from 'entities/user';
 
+import { CurrentUploadProvider } from 'features/uploadImages';
+
 import { i18n } from 'shared/config/i18n';
 
 const AppProviders = ({ children }: PropsWithChildren) => {
@@ -13,7 +15,9 @@ const AppProviders = ({ children }: PropsWithChildren) => {
     <ThemeProvider>
       <I18nextProvider i18n={i18n}>
         <ApolloProvider>
-          <CurrentUserProvider>{children}</CurrentUserProvider>
+          <CurrentUserProvider>
+            <CurrentUploadProvider>{children}</CurrentUploadProvider>
+          </CurrentUserProvider>
         </ApolloProvider>
       </I18nextProvider>
     </ThemeProvider>

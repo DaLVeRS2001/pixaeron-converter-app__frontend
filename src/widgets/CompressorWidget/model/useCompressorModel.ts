@@ -1,16 +1,14 @@
 import { useQuery } from '@apollo/client/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { ConversionEntitlementDocument } from 'entities/conversion';
 
 import { DOWNLOAD_FAILURE, saveResult, useConversionProgress } from 'features/trackConversion';
-import { UploadFailedError, useImageUpload, validateSelection } from 'features/uploadImages';
-import type { RejectedSelection, StartedBatch } from 'features/uploadImages';
+import { useCurrentUpload, validateSelection } from 'features/uploadImages';
+import type { RejectedSelection } from 'features/uploadImages';
 
 import { getGraphQLErrorDetails } from 'shared/api';
 import type { ConversionMode, ConversionStrength } from 'shared/api';
-
-type ActiveBatch = StartedBatch & { startedAt: number };
 
 type DownloadFailure = { fileId: string; reason: string };
 
@@ -19,15 +17,12 @@ const NO_FILES: ReadonlyMap<string, File> = new Map();
 const useCompressorModel = () => {
   const entitlementQuery = useQuery(ConversionEntitlementDocument);
   const { refetch: refetchEntitlement } = entitlementQuery;
-  const { start, cancel, uploading } = useImageUpload();
+  const upload = useCurrentUpload();
 
   const [mode, setMode] = useState<ConversionMode>('LOSSY');
   const [strength, setStrength] = useState<ConversionStrength>('LOW');
-  const [active, setActive] = useState<ActiveBatch | null>(null);
   const [rejected, setRejected] = useState<RejectedSelection[]>([]);
-  const [failure, setFailure] = useState<string | null>(null);
   const [downloadFailure, setDownloadFailure] = useState<DownloadFailure | null>(null);
-  const attempt = useRef(0);
 
   const {
     batch,
@@ -35,8 +30,8 @@ const useCompressorModel = () => {
     refetch: refetchBatch,
     error: progressError,
   } = useConversionProgress({
-    batchId: active?.batchId ?? null,
-    batchToken: active?.batchToken ?? null,
+    batchId: upload.active?.batchId ?? null,
+    batchToken: upload.active?.batchToken ?? null,
   });
   const entitlement = entitlementQuery.data?.conversionEntitlement ?? null;
 
@@ -47,20 +42,15 @@ const useCompressorModel = () => {
   }, [pollingStopped, refetchEntitlement]);
 
   const reset = useCallback(() => {
-    attempt.current += 1;
-    cancel();
-    setActive(null);
+    upload.reset();
     setRejected([]);
-    setFailure(null);
     setDownloadFailure(null);
-  }, [cancel]);
+  }, [upload]);
 
   const submit = useCallback(
     async (files: readonly File[]) => {
-      if (!entitlement || uploading) return;
+      if (!entitlement || upload.uploading) return;
 
-      setFailure(null);
-      const run = (attempt.current += 1);
       const selection = validateSelection(files, {
         maxBatchFiles: entitlement.maxBatchFiles,
         maxFileBytes: entitlement.maxFileBytes,
@@ -69,25 +59,10 @@ const useCompressorModel = () => {
       setRejected(selection.rejected);
       if (selection.accepted.length === 0) return;
 
-      try {
-        const started = await start(selection.accepted, mode, strength);
-        if (run !== attempt.current) return;
-
-        setActive({ ...started, startedAt: Date.now() });
-      } catch (error) {
-        if (run !== attempt.current) return;
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-
-        setFailure(
-          error instanceof UploadFailedError
-            ? error.reason
-            : (getGraphQLErrorDetails(error).code ?? null)
-        );
-      }
-
+      await upload.submit(selection.accepted, mode, strength);
       await refetchEntitlement().catch(() => undefined);
     },
-    [entitlement, mode, refetchEntitlement, start, strength, uploading]
+    [entitlement, mode, refetchEntitlement, strength, upload]
   );
 
   const download = useCallback(
@@ -111,7 +86,7 @@ const useCompressorModel = () => {
   );
 
   const errorCode =
-    failure ??
+    upload.failure ??
     (entitlementQuery.error && getGraphQLErrorDetails(entitlementQuery.error).code) ??
     (progressError && getGraphQLErrorDetails(progressError).code) ??
     null;
@@ -124,13 +99,13 @@ const useCompressorModel = () => {
     setStrength,
     batch,
     pollingStopped,
-    startedAt: active?.startedAt ?? null,
-    missingUploads: active?.missingFiles ?? 0,
-    sourceFiles: active?.sourceFiles ?? NO_FILES,
+    startedAt: upload.active?.startedAt ?? null,
+    missingUploads: upload.active?.missingFiles ?? 0,
+    sourceFiles: upload.active?.sourceFiles ?? NO_FILES,
     downloadFailure,
     rejected,
     errorCode,
-    uploading,
+    uploading: upload.uploading,
     submit,
     reset,
     download,

@@ -7,11 +7,12 @@ import {
   FILE_STATUS_GROUP,
   MyConversionFilesDocument,
   formatBytes,
+  isFileMoving,
   resultNoteKey,
   savedPercent,
 } from 'entities/conversion';
 
-import { DOWNLOAD_FAILURE, saveResult } from 'features/trackConversion';
+import { DOWNLOAD_FAILURE, saveResult, usePollingWhile } from 'features/trackConversion';
 
 import ImageIcon from 'shared/assets/icons/image.svg';
 import { Button } from 'shared/ui/Button';
@@ -47,6 +48,10 @@ const MyFilesPage = () => {
   const pages = Math.max(1, Math.ceil((result?.total ?? 0) / FILE_PAGE_SIZE));
   const currentPage = Math.min(page, pages - 1);
   const rows = result?.items ?? [];
+  usePollingWhile(
+    query,
+    rows.some((file) => isFileMoving(file.status))
+  );
 
   const onDownload = async (fileId: string) => {
     setDownloadFailure(null);

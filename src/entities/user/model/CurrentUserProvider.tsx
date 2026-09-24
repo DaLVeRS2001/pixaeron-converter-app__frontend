@@ -23,8 +23,8 @@ const CurrentUserProvider = ({ children }: PropsWithChildren) => {
   const refresh = () => refetch();
   let value: CurrentUserContextValue;
 
-  if (loading) value = { status: 'loading', user: undefined, refresh };
-  else if (data?.me) value = { status: 'authenticated', user: data.me, refresh };
+  if (data?.me) value = { status: 'authenticated', user: data.me, refresh };
+  else if (loading) value = { status: 'loading', user: undefined, refresh };
   else if (!error || getGraphQLErrorDetails(error).code === 'UNAUTHENTICATED') {
     value = { status: 'guest', user: undefined, refresh };
   } else value = { status: 'unavailable', user: undefined, refresh };
