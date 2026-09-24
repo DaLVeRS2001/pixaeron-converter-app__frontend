@@ -1,12 +1,9 @@
-import { act, renderHook } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 
 import type { ConversionBatchStatus, ConversionFileStatus } from 'entities/conversion';
 
-import {
-  ACTIVE_POLL_MS,
-  HIDDEN_POLL_MS,
-  useConversionProgress,
-} from './useConversionProgress';
+import { useConversionProgress } from './useConversionProgress';
+import { ACTIVE_POLL_MS } from './usePollingWhile';
 
 const mockStartPolling = jest.fn();
 const mockStopPolling = jest.fn();
@@ -34,15 +31,9 @@ const batch = (status: ConversionBatchStatus, files: ConversionFileStatus[]): Mo
   files: files.map((fileStatus, index) => ({ id: `file-${index}`, status: fileStatus })),
 });
 
-const setVisibility = (state: DocumentVisibilityState) => {
-  Object.defineProperty(document, 'visibilityState', { value: state, configurable: true });
-  act(() => document.dispatchEvent(new Event('visibilitychange')));
-};
-
 describe('useConversionProgress', () => {
   beforeEach(() => {
     mockBatchPayload = null;
-    setVisibility('visible');
   });
 
   it('asks the server for progress while the batch is still running', () => {
@@ -66,16 +57,6 @@ describe('useConversionProgress', () => {
     expect(result.current.pollingStopped).toBe(true);
     expect(mockStopPolling).toHaveBeenCalled();
     expect(mockStartPolling).not.toHaveBeenCalled();
-  });
-
-  it('slows down while the tab is in the background', () => {
-    mockBatchPayload = batch('QUEUED', ['QUEUED', 'QUEUED']);
-    renderHook(() => useConversionProgress({ batchId: 'batch-1', batchToken: 'token' }));
-
-    mockStartPolling.mockClear();
-    setVisibility('hidden');
-
-    expect(mockStartPolling).toHaveBeenCalledWith(HIDDEN_POLL_MS);
   });
 
   it('ignores a payload left over from the previous batch', () => {

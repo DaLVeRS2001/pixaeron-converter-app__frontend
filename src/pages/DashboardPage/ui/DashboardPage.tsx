@@ -5,12 +5,16 @@ import { Link } from 'react-router-dom';
 
 import {
   ConversionEntitlementDocument,
+  FILE_STATUS_GROUP,
   MyConversionFilesDocument,
   formatBytes,
+  isFileMoving,
   resultNoteKey,
   savedPercent,
 } from 'entities/conversion';
 import { useCurrentUser } from 'entities/user';
+
+import { usePollingWhile } from 'features/trackConversion';
 
 import CompressIcon from 'shared/assets/icons/compress.svg';
 import SwapIcon from 'shared/assets/icons/swap.svg';
@@ -28,14 +32,18 @@ const DashboardPage = () => {
   const { t: tConversion } = useTranslation('conversion');
   const session = useCurrentUser();
   const entitlement = useQuery(ConversionEntitlementDocument).data?.conversionEntitlement;
-  const recents = useQuery(MyConversionFilesDocument, {
+  const recentsQuery = useQuery(MyConversionFilesDocument, {
     variables: { limit: RECENT_FILES, offset: 0 },
     fetchPolicy: 'cache-and-network',
-  }).data?.myConversionFiles;
+  });
+  const recents = recentsQuery.data?.myConversionFiles;
+  const recentFiles = recents?.items ?? [];
+  usePollingWhile(
+    recentsQuery,
+    recentFiles.some((file) => isFileMoving(file.status))
+  );
 
   if (session.status !== 'authenticated') return null;
-
-  const recentFiles = recents?.items ?? [];
 
   return (
     <section className={cn()}>
@@ -133,7 +141,7 @@ const DashboardPage = () => {
                       ? t('app.results.until', {
                           date: new Date(file.expiresAt).toLocaleString(i18n.resolvedLanguage),
                         })
-                      : ''}
+                      : t(`app.files.status.${FILE_STATUS_GROUP[file.status]}`)}
                   </span>
                 </li>
               );
