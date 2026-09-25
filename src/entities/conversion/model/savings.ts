@@ -4,12 +4,14 @@ const BYTE_UNITS = ['B', 'KB', 'MB', 'GB'] as const;
 
 const STEP = 1024;
 
+const PROMOTE_AT = 1000;
+
 const formatBytes = (bytes: number): string => {
   if (!Number.isFinite(bytes) || bytes < 0) return '';
 
   let value = bytes;
   let unit = 0;
-  while (value >= STEP && unit < BYTE_UNITS.length - 1) {
+  while (Math.round(value) >= PROMOTE_AT && unit < BYTE_UNITS.length - 1) {
     value /= STEP;
     unit += 1;
   }
