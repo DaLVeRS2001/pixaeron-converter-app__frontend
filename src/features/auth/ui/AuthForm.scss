@@ -68,15 +68,19 @@
       margin-top: 0.0625rem;
       accent-color: var(--color-brand-accent);
     }
+  }
+  &__legal {
+    margin-top: -0.5rem;
+    color: var(--color-text-subtle);
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+    text-align: center;
+
     a {
       color: var(--color-brand-text);
-      text-decoration: none;
+      text-decoration: underline;
+      text-underline-offset: 0.125rem;
     }
-  }
-  &__checkbox-error {
-    margin-top: -0.625rem;
-    color: var(--color-error-accent);
-    font-size: 0.6875rem;
   }
   &__link {
     padding: 0;

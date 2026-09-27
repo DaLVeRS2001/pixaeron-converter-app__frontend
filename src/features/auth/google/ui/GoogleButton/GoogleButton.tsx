@@ -1,5 +1,7 @@
 ﻿import block from 'bem-cn';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useTheme } from 'shared/config/theme';
 import { invalidateExternalScript, loadExternalScript } from 'shared/lib';
@@ -7,7 +9,7 @@ import { invalidateExternalScript, loadExternalScript } from 'shared/lib';
 import './GoogleButton.scss';
 
 type GoogleButtonProps = {
-  mode: 'signin_with' | 'signup_with';
+  caption: ReactNode;
   onCredential: (credential: string) => void;
   onUnavailable?: () => void;
 };
@@ -20,8 +22,11 @@ type GoogleIdentityClient = NonNullable<Window['google']>['accounts']['id'];
 let initializedGoogleIdentity: GoogleIdentityClient | undefined;
 let activeCredentialHandler: ((credential: string) => void) | undefined;
 
-const GoogleButton = ({ mode, onCredential, onUnavailable }: GoogleButtonProps) => {
+const GoogleButton = ({ caption, onCredential, onUnavailable }: GoogleButtonProps) => {
   const { theme } = useTheme();
+  const { i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage;
+  const [unavailable, setUnavailable] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const onCredentialRef = useRef(onCredential);
   const onUnavailableRef = useRef(onUnavailable);
@@ -71,12 +76,14 @@ const GoogleButton = ({ mode, onCredential, onUnavailable }: GoogleButtonProps) 
           theme: theme === 'dark' ? 'filled_black' : 'outline',
           size: 'large',
           width: Math.min(container.clientWidth, 400),
-          text: mode,
+          text: 'continue_with',
+          locale,
         });
       } catch {
         if (cancelled) return;
         invalidateExternalScript(scriptId);
         container.replaceChildren();
+        setUnavailable(true);
         notifyUnavailable();
       }
     };
@@ -88,11 +95,16 @@ const GoogleButton = ({ mode, onCredential, onUnavailable }: GoogleButtonProps) 
       if (activeCredentialHandler === handleCredential) activeCredentialHandler = undefined;
       container.replaceChildren();
     };
-  }, [mode, theme]);
+  }, [locale, theme]);
 
-  if (!__GOOGLE_CLIENT_ID__) return null;
+  if (!__GOOGLE_CLIENT_ID__ || unavailable) return null;
 
-  return <div ref={containerRef} className={cn()} />;
+  return (
+    <>
+      <div ref={containerRef} className={cn()} />
+      {caption}
+    </>
+  );
 };
 
 export { GoogleButton };

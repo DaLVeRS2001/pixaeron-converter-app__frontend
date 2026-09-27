@@ -4,14 +4,14 @@ import { useCallback, useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { GoogleLoginDocument, RegisterDocument } from 'shared/api';
+import { RegisterDocument } from 'shared/api';
 
 import { AUTH_ERROR_CODE, CAPTCHA_ACTION } from '../../model/errors';
 import { CURRENT_LEGAL_CONSENT } from '../../model/legalConsent';
 import { signUpSchema } from '../../model/schemas';
 import type { SignUpFormValues } from '../../model/schemas';
 import { useAuthAction } from '../../model/useAuthAction';
-import { useCompleteLogin } from '../../model/useCompleteLogin';
+import { useGoogleLogin } from '../../model/useGoogleLogin';
 
 type SignUpIntent =
   | { kind: 'register'; values: SignUpFormValues }
@@ -26,7 +26,6 @@ const useSignUpModel = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      termsAccepted: false,
     },
   });
   const password = useWatch({ control: form.control, name: 'password' });
@@ -41,8 +40,7 @@ const useSignUpModel = () => {
     [password]
   );
   const [registerUser] = useMutation(RegisterDocument);
-  const [googleLogin] = useMutation(GoogleLoginDocument);
-  const completeLogin = useCompleteLogin();
+  const loginWithGoogle = useGoogleLogin();
 
   const execute = useCallback(
     async (intent: SignUpIntent, captchaToken?: string) => {
@@ -66,18 +64,9 @@ const useSignUpModel = () => {
         return;
       }
 
-      const { data } = await googleLogin({
-        variables: {
-          input: {
-            idToken: intent.idToken,
-            captchaToken,
-            ...CURRENT_LEGAL_CONSENT,
-          },
-        },
-      });
-      if (data?.googleLogin) completeLogin(data.googleLogin);
+      await loginWithGoogle(intent.idToken, captchaToken);
     },
-    [completeLogin, googleLogin, navigate, registerUser]
+    [loginWithGoogle, navigate, registerUser]
   );
   const fallbackCaptchaAction = useCallback(
     (intent: SignUpIntent) =>
@@ -100,11 +89,6 @@ const useSignUpModel = () => {
     (idToken: string) => {
       if (action.busy || action.captcha) return;
 
-      if (!form.getValues('termsAccepted')) {
-        form.setError('termsAccepted', { message: 'validation.terms' });
-        return;
-      }
-
       const intent: SignUpIntent = { kind: 'google', idToken };
 
       if (__TURNSTILE_SITE_KEY__) {
@@ -114,7 +98,7 @@ const useSignUpModel = () => {
 
       void action.run(intent);
     },
-    [action, form]
+    [action]
   );
   const handleGoogleUnavailable = useCallback(() => {
     action.clear();

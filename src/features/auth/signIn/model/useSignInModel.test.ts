@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { GoogleLoginDocument, MeDocument } from 'shared/api';
 
-import { LEGAL_CONSENT_NOTICE } from '../../model/legalConsent';
+import { CURRENT_LEGAL_CONSENT } from '../../model/legalConsent';
 import { useSignInModel } from './useSignInModel';
 
 const mockGoogleLogin = jest.fn();
@@ -11,7 +11,6 @@ const mockLogin = jest.fn();
 const mockNavigate = jest.fn();
 const mockUseMutation = jest.fn();
 const mockWriteQuery = jest.fn();
-let mockLocationState: unknown = null;
 
 const setTurnstileSiteKey = (value: string) =>
   Object.assign(globalThis, { __TURNSTILE_SITE_KEY__: value });
@@ -25,7 +24,7 @@ jest.mock('@apollo/client/react', () => ({
 }));
 
 jest.mock('react-router-dom', () => ({
-  useLocation: () => ({ state: mockLocationState }),
+  useLocation: () => ({ state: null }),
   useNavigate: () => mockNavigate,
 }));
 
@@ -94,6 +93,7 @@ describe('useSignInModel CAPTCHA timing', () => {
           input: {
             idToken: 'google-id-token',
             captchaToken: 'google-captcha-token',
+            ...CURRENT_LEGAL_CONSENT,
           },
         },
       })
@@ -171,7 +171,6 @@ describe('useSignInModel CAPTCHA timing', () => {
 describe('useSignInModel routing', () => {
   beforeEach(() => {
     setTurnstileSiteKey('');
-    mockLocationState = null;
     sessionStorage.clear();
   });
 
@@ -218,28 +217,26 @@ describe('useSignInModel routing', () => {
     });
   });
 
-  it('does not send account-creation consent during an existing Google sign-in', async () => {
+  it('sends current consent with Google so a new visitor gets an account straight away', async () => {
     mockGoogleLogin.mockResolvedValue({ data: undefined });
     const { result } = renderModel();
 
     await act(async () => {
-      await result.current.submitGoogle('existing-google-token');
+      await result.current.submitGoogle('new-google-token');
     });
 
     expect(mockGoogleLogin).toHaveBeenCalledWith({
       variables: {
         input: {
-          idToken: 'existing-google-token',
+          idToken: 'new-google-token',
           captchaToken: undefined,
+          ...CURRENT_LEGAL_CONSENT,
         },
       },
     });
   });
 
-  it('preserves a safe return location when routing an unknown Google identity to signup', async () => {
-    mockLocationState = {
-      from: { pathname: '/app', search: '?view=queue', hash: '#latest' },
-    };
+  it('stays on the page and explains outdated terms instead of sending the visitor away', async () => {
     mockGoogleLogin.mockRejectedValue(legalConsentError());
     const { result } = renderModel();
 
@@ -248,16 +245,8 @@ describe('useSignInModel routing', () => {
     });
 
     await waitFor(() =>
-      expect(mockNavigate).toHaveBeenCalledWith('/sign-up', {
-        replace: true,
-        state: {
-          notice: LEGAL_CONSENT_NOTICE,
-          from: { pathname: '/app', search: '?view=queue', hash: '#latest' },
-        },
-      })
+      expect(result.current.error).toMatchObject({ code: 'LEGAL_CONSENT_REQUIRED' })
     );
-    expect(JSON.stringify(mockNavigate.mock.calls)).not.toContain('new-google-token');
-    expect(localStorage.getItem('google-id-token')).toBeNull();
-    expect(sessionStorage.getItem('google-id-token')).toBeNull();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 });

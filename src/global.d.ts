@@ -41,7 +41,8 @@ interface Window {
             theme: 'outline' | 'filled_black';
             size: 'large';
             width: number;
-            text: 'signin_with' | 'signup_with';
+            text: 'continue_with';
+            locale?: string;
           }
         ) => void;
       };

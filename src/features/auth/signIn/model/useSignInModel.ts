@@ -2,32 +2,31 @@ import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import { GoogleLoginDocument, LoginDocument } from 'shared/api';
+import { LoginDocument } from 'shared/api';
 import type { GraphQLErrorDetails } from 'shared/api';
 
 import { AUTH_ERROR_CODE, CAPTCHA_ACTION } from '../../model/errors';
-import { LEGAL_CONSENT_ACTION, LEGAL_CONSENT_NOTICE } from '../../model/legalConsent';
 import { signInSchema } from '../../model/schemas';
 import type { SignInFormValues } from '../../model/schemas';
 import { useAuthAction } from '../../model/useAuthAction';
-import { getSafePostLoginLocation, useCompleteLogin } from '../../model/useCompleteLogin';
+import { useCompleteLogin } from '../../model/useCompleteLogin';
+import { useGoogleLogin } from '../../model/useGoogleLogin';
 
 type SignInIntent =
   | { kind: 'password'; values: SignInFormValues }
   | { kind: 'google'; idToken: string };
 
 const useSignInModel = () => {
-  const { state: locationState } = useLocation();
   const navigate = useNavigate();
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: '', password: '', rememberMe: false },
   });
   const [login] = useMutation(LoginDocument);
-  const [googleLogin] = useMutation(GoogleLoginDocument);
   const completeLogin = useCompleteLogin();
+  const loginWithGoogle = useGoogleLogin();
 
   const execute = useCallback(
     async (intent: SignInIntent, captchaToken?: string) => {
@@ -39,12 +38,9 @@ const useSignInModel = () => {
         return;
       }
 
-      const { data } = await googleLogin({
-        variables: { input: { idToken: intent.idToken, captchaToken } },
-      });
-      if (data?.googleLogin) completeLogin(data.googleLogin);
+      await loginWithGoogle(intent.idToken, captchaToken);
     },
-    [completeLogin, googleLogin, login]
+    [completeLogin, login, loginWithGoogle]
   );
   const fallbackCaptchaAction = useCallback(
     (intent: SignInIntent) =>
@@ -53,24 +49,6 @@ const useSignInModel = () => {
   );
   const handleSignInError = useCallback(
     (details: GraphQLErrorDetails, intent: SignInIntent) => {
-      const requiresGoogleConsent =
-        intent.kind === 'google' &&
-        (details.code === AUTH_ERROR_CODE.legalConsentRequired ||
-          details.action === LEGAL_CONSENT_ACTION);
-
-      if (requiresGoogleConsent) {
-        const from = getSafePostLoginLocation(locationState);
-
-        navigate('/sign-up', {
-          replace: true,
-          state: {
-            notice: LEGAL_CONSENT_NOTICE,
-            ...(from ? { from } : {}),
-          },
-        });
-        return true;
-      }
-
       if (intent.kind === 'password' && details.code === AUTH_ERROR_CODE.emailNotVerified) {
         const email = intent.values.email.trim().toLowerCase();
         sessionStorage.setItem('pendingVerificationEmail', email);
@@ -80,7 +58,7 @@ const useSignInModel = () => {
 
       return false;
     },
-    [locationState, navigate]
+    [navigate]
   );
   const action = useAuthAction<SignInIntent>({
     execute,
