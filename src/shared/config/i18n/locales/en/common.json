@@ -38,6 +38,7 @@
       "unoptimized": "Unoptimized",
       "smaller": "{{percent}}% smaller",
       "open": "Open full file",
+      "openLabel": "Open full file: {{title}}",
       "originalAlt": "A wave breaking on a sandy beach, original photo",
       "compressedAlt": "The same wave after compression",
       "credit": "Photo: Misquamicut Beach, Wikimedia Commons, public domain"
