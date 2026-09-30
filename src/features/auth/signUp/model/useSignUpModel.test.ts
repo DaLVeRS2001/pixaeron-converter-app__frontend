@@ -54,7 +54,6 @@ describe('useSignUpModel', () => {
       result.current.form.setValue('email', 'user@example.com');
       result.current.form.setValue('password', 'Strong1!');
       result.current.form.setValue('confirmPassword', 'Strong1!');
-      result.current.form.setValue('termsAccepted', true);
     });
     await act(async () => {
       await result.current.submit();
@@ -87,7 +86,6 @@ describe('useSignUpModel', () => {
   it('starts Google CAPTCHA only after Google is selected', async () => {
     setTurnstileSiteKey('turnstile-site-key');
     const { result } = renderModel();
-    act(() => result.current.form.setValue('termsAccepted', true));
 
     act(() => result.current.submitGoogle('google-id-token'));
 
@@ -117,7 +115,6 @@ describe('useSignUpModel', () => {
       result.current.form.setValue('email', 'user@example.com');
       result.current.form.setValue('password', 'Strong1!');
       result.current.form.setValue('confirmPassword', 'Strong1!');
-      result.current.form.setValue('termsAccepted', true);
     });
     await act(async () => {
       await result.current.submit();
@@ -136,9 +133,8 @@ describe('useSignUpModel', () => {
     });
   });
 
-  it('sends current consent when explicitly creating an account with Google', async () => {
+  it('sends current consent with Google without asking for a checkbox first', async () => {
     const { result } = renderModel();
-    act(() => result.current.form.setValue('termsAccepted', true));
     act(() => result.current.submitGoogle('google-id-token'));
 
     await waitFor(() =>

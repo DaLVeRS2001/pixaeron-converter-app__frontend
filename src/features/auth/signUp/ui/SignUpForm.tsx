@@ -1,6 +1,6 @@
 import block from 'bem-cn';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import LockIcon from 'shared/assets/icons/lock.svg';
 import { Alert } from 'shared/ui/Alert';
@@ -9,8 +9,8 @@ import { Captcha } from 'shared/ui/Captcha';
 import { FormField } from 'shared/ui/FormField';
 
 import { GoogleButton } from '../../google/ui/GoogleButton';
-import { LEGAL_CONSENT_NOTICE } from '../../model/legalConsent';
 import { validationMessage } from '../../model/schemas';
+import { LegalNotice } from '../../ui/LegalNotice';
 import { useSignUpModel } from '../model/useSignUpModel';
 
 import '../../ui/AuthForm.scss';
@@ -19,10 +19,7 @@ const cn = block('auth-form');
 
 const SignUpForm = () => {
   const { t } = useTranslation('auth');
-  const location = useLocation();
   const model = useSignUpModel();
-  const requiresGoogleConsent =
-    (location.state as { notice?: string } | null)?.notice === LEGAL_CONSENT_NOTICE;
   const { errors } = model.form.formState;
 
   return (
@@ -32,12 +29,9 @@ const SignUpForm = () => {
         <p>{t('signUp.subtitle')}</p>
       </header>
       <div className={cn('stack')}>
-        {requiresGoogleConsent && (
-          <Alert variant="warning">{t('signUp.googleConsentNotice')}</Alert>
-        )}
         {model.errorMessage && <Alert variant="error">{model.errorMessage}</Alert>}
         <GoogleButton
-          mode="signup_with"
+          caption={<LegalNotice lead={t('legal.continueWithGoogle')} />}
           onCredential={model.submitGoogle}
           onUnavailable={model.onGoogleUnavailable}
         />
@@ -98,21 +92,14 @@ const SignUpForm = () => {
               onUnavailable={model.onCaptchaUnavailable}
             />
           )}
-          <label className={cn('checkbox')}>
-            <input type="checkbox" {...model.form.register('termsAccepted')} />
-            <span>
-              {t('signUp.termsPrefix')} <Link to="/terms">{t('signUp.terms')}</Link>{' '}
-              {t('signUp.and')} <Link to="/privacy">{t('signUp.privacy')}</Link>
-            </span>
-          </label>
-          {errors.termsAccepted?.message && (
-            <p className={cn('checkbox-error')}>
-              {validationMessage(t, errors.termsAccepted.message)}
-            </p>
-          )}
-          <Button type="submit" disabled={model.busy || Boolean(model.captcha)}>
+          <Button
+            type="submit"
+            aria-describedby="sign-up-legal"
+            disabled={model.busy || Boolean(model.captcha)}
+          >
             {model.busy ? t('signUp.submitting') : t('signUp.submit')}
           </Button>
+          <LegalNotice id="sign-up-legal" lead={t('legal.createAccount')} />
           <p className={cn('security-note')}>
             <LockIcon aria-hidden="true" />
             {t('signUp.security')}

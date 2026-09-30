@@ -1,4 +1,4 @@
-import { act, render, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 
 import { GoogleButton } from './GoogleButton';
 
@@ -25,13 +25,13 @@ describe('GoogleButton', () => {
     delete window.google;
   });
 
-  it('reports an unavailable SDK after loader failure', async () => {
+  it('reports a failed SDK load and drops the button with its caption', async () => {
     const onUnavailable = jest.fn();
     mockLoadExternalScript.mockRejectedValue(new Error('sdk failed'));
 
-    render(
+    const { container } = render(
       <GoogleButton
-        mode="signin_with"
+        caption="consent line"
         onCredential={jest.fn()}
         onUnavailable={onUnavailable}
       />
@@ -39,6 +39,8 @@ describe('GoogleButton', () => {
 
     await waitFor(() => expect(onUnavailable).toHaveBeenCalledTimes(1));
     expect(mockInvalidateExternalScript).toHaveBeenCalledWith('google-identity-script');
+    expect(screen.queryByText('consent line')).not.toBeInTheDocument();
+    expect(container.querySelector('.google-button')).not.toBeInTheDocument();
   });
 
   it('does not initialize or invoke callbacks after unmount', async () => {
@@ -53,7 +55,7 @@ describe('GoogleButton', () => {
     const onUnavailable = jest.fn();
     const { unmount } = render(
       <GoogleButton
-        mode="signin_with"
+        caption="consent line"
         onCredential={onCredential}
         onUnavailable={onUnavailable}
       />
@@ -80,15 +82,22 @@ describe('GoogleButton', () => {
     const renderButton = jest.fn();
     window.google = { accounts: { id: { initialize, renderButton } } };
     const firstOnCredential = jest.fn();
-    const first = render(<GoogleButton mode="signin_with" onCredential={firstOnCredential} />);
+    const first = render(
+      <GoogleButton caption="consent line" onCredential={firstOnCredential} />
+    );
 
     await waitFor(() => expect(initialize).toHaveBeenCalledTimes(1));
     first.unmount();
 
     const secondOnCredential = jest.fn();
-    render(<GoogleButton mode="signup_with" onCredential={secondOnCredential} />);
+    render(<GoogleButton caption="consent line" onCredential={secondOnCredential} />);
 
     await waitFor(() => expect(renderButton).toHaveBeenCalledTimes(2));
+    expect(renderButton).toHaveBeenLastCalledWith(
+      expect.any(HTMLElement),
+      expect.objectContaining({ text: 'continue_with', locale: 'en' })
+    );
+    expect(screen.getByText('consent line')).toBeInTheDocument();
     act(() => receiveCredential?.({ credential: 'id-token' }));
 
     expect(initialize).toHaveBeenCalledTimes(1);

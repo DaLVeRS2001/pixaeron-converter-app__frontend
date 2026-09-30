@@ -5,53 +5,25 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MeDocument } from 'shared/api';
 import type { MeQuery } from 'shared/api';
 
-const DEFAULT_POST_LOGIN_PATH = '/app';
-
-type PostLoginLocation = {
-  pathname: string;
-  search: string;
-  hash: string;
-};
-
-const getSafePostLoginLocation = (state: unknown): PostLoginLocation | undefined => {
-  if (!state || typeof state !== 'object') return undefined;
-
-  const from = (state as { from?: unknown }).from;
-  if (!from || typeof from !== 'object') return undefined;
-
-  const { pathname, search, hash } = from as {
-    pathname?: unknown;
-    search?: unknown;
-    hash?: unknown;
-  };
+const useCompleteLogin = () => {
+  const apolloClient = useApolloClient();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = (
+    location.state as {
+      from?: { pathname?: unknown; search?: unknown; hash?: unknown };
+    } | null
+  )?.from;
+  const pathname = from?.pathname;
   const hasSafePathname =
     typeof pathname === 'string' &&
     pathname.startsWith('/') &&
     !pathname.startsWith('//') &&
     !pathname.includes('\\');
-
-  if (!hasSafePathname) return undefined;
-
-  return {
-    pathname,
-    search: typeof search === 'string' && search.startsWith('?') ? search : '',
-    hash: typeof hash === 'string' && hash.startsWith('#') ? hash : '',
-  };
-};
-
-const getPostLoginPath = (state: unknown) => {
-  const location = getSafePostLoginLocation(state);
-
-  return location
-    ? location.pathname + location.search + location.hash
-    : DEFAULT_POST_LOGIN_PATH;
-};
-
-const useCompleteLogin = () => {
-  const apolloClient = useApolloClient();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const postLoginPath = getPostLoginPath(location.state);
+  const search =
+    typeof from?.search === 'string' && from.search.startsWith('?') ? from.search : '';
+  const hash = typeof from?.hash === 'string' && from.hash.startsWith('#') ? from.hash : '';
+  const postLoginPath = hasSafePathname ? pathname + search + hash : '/app';
 
   return useCallback(
     (user: MeQuery['me']) => {
@@ -66,4 +38,4 @@ const useCompleteLogin = () => {
   );
 };
 
-export { getSafePostLoginLocation, useCompleteLogin };
+export { useCompleteLogin };

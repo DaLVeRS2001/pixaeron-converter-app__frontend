@@ -11,7 +11,6 @@ describe('schemas', () => {
       email: 'not-an-email',
       password: 'short',
       confirmPassword: 'different',
-      termsAccepted: false,
     });
 
     expect(result.success).toBe(false);
@@ -21,7 +20,6 @@ describe('schemas', () => {
         'validation.usernameMin',
         'validation.email',
         'validation.passwordMin',
-        'validation.terms',
       ])
     );
     for (const message of messages) {

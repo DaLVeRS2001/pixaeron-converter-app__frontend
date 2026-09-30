@@ -109,7 +109,15 @@ const LandingPage = () => {
                     {SAMPLE.width}×{SAMPLE.height}
                   </span>
                   <span>{SAMPLE.format}</span>
-                  <a href={rendition.file} target="_blank" rel="noreferrer">
+                  <a
+                    className={cn('sample-open')}
+                    href={rendition.file}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={t('landing.comparison.openLabel', {
+                      title: t(`landing.comparison.${rendition.kind}Title`),
+                    })}
+                  >
                     {t('landing.comparison.open')}
                   </a>
                 </p>

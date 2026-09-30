@@ -9,6 +9,7 @@ import { FormField } from 'shared/ui/FormField';
 
 import { GoogleButton } from '../../google/ui/GoogleButton';
 import { validationMessage } from '../../model/schemas';
+import { LegalNotice } from '../../ui/LegalNotice';
 import { useSignInModel } from '../model/useSignInModel';
 
 import '../../ui/AuthForm.scss';
@@ -76,7 +77,7 @@ const SignInForm = () => {
         </form>
         <div className={cn('divider')}>{t('signIn.divider')}</div>
         <GoogleButton
-          mode="signin_with"
+          caption={<LegalNotice lead={t('legal.continueWithGoogle')} />}
           onCredential={model.submitGoogle}
           onUnavailable={model.onGoogleUnavailable}
         />

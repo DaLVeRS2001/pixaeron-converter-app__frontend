@@ -31,7 +31,6 @@ const signUpSchema = z
     email: z.email('validation.email').max(254),
     password: passwordSchema,
     confirmPassword: z.string(),
-    termsAccepted: z.boolean().refine(Boolean, 'validation.terms'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ['confirmPassword'],
